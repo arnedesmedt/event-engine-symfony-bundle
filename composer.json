@@ -1,0 +1,49 @@
+{
+    "name": "arnedesmedt/event-engine-symfony-bundle",
+    "type": "symfony-bundle",
+    "description": "A library that creates a bridge between Event Engine and Symfony.",
+    "homepage": "https://github.com/arnedesmedt/event-engine-symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Arne De Smedt",
+            "email": "arnedesmdt@gmail.com",
+            "homepage": "https://github.com/arnedesmedt"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "ext-pdo": "*",
+        "event-engine/php-engine": "^0.11.0",
+        "event-engine/php-json-schema": "^0.5.0",
+        "event-engine/php-postgres-document-store": "^0.7.0",
+        "event-engine/prooph-v7-event-store": "^0.6.0",
+        "prooph/pdo-event-store": "^1.11",
+        "symfony/http-kernel": "^5.0",
+        "symfony/orm-pack": "^1.0",
+        "opis/json-schema": "^1.0",
+        "arnedesmedt/value-objects": "dev-master"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.7",
+        "squizlabs/php_codesniffer": "^3.5",
+        "doctrine/coding-standard": "^7.0",
+        "phpro/grumphp": "^0.17.2"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../../php/packages/value-objects",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ADS\\Bundle\\EventEngineBundle\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

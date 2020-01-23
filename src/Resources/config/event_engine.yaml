@@ -1,0 +1,131 @@
+services:
+    # General
+    event_engine.cache:
+        class: Symfony\Component\Cache\Adapter\FilesystemAdapter
+
+    event_engine.connection:
+        class: PDO
+        factory:
+            - '@doctrine.dbal.default_connection'
+            - getWrappedConnection
+
+    # Commands
+    event_engine.command.data_reset:
+        class: ADS\Bundle\EventEngineBundle\Command\EventEngineDataResetCommand
+        arguments:
+            - '@Prooph\EventStore\EventStore'
+            - '@EventEngine\DocumentStore\DocumentStore'
+            - '%event_engine.aggregates%'
+        tags:
+            - console.command
+
+    event_engine.command.document_stores_create:
+        class: ADS\Bundle\EventEngineBundle\Command\EventEngineDocumentStoresCreateCommand
+        arguments:
+            - '@EventEngine\DocumentStore\DocumentStore'
+            - '%event_engine.aggregates%'
+        tags:
+            - console.command
+
+    event_engine.command.streams_create:
+        class: ADS\Bundle\EventEngineBundle\Command\EventEngineEventStreamsCreateCommand
+        arguments:
+            - '@event_engine.connection'
+            - '@Prooph\EventStore\EventStore'
+            - '%event_engine.aggregates%'
+        tags:
+            - console.command
+
+    # Interfaces
+    Prooph\Common\Event\ActionEventEmitter: '@Prooph\Common\Event\ProophActionEventEmitter'
+    Prooph\EventStore\EventStore: '@Prooph\EventStore\TransactionalActionEventEmitterEventStore'
+    Prooph\EventStore\Pdo\PersistenceStrategy\PostgresPersistenceStrategy: '@ADS\Bundle\EventEngineBundle\Persistency\SingleStreamStrategy'
+    Prooph\EventStore\TransactionalEventStore: '@Prooph\EventStore\Pdo\PostgresEventStore'
+
+    EventEngine\DocumentStore\DocumentStore: '@EventEngine\DocumentStore\Postgres\PostgresDocumentStore'
+    EventEngine\EventStore\EventStore: '@EventEngine\Prooph\V7\EventStore\ProophEventStore'
+    EventEngine\Logger\LogEngine: '@EventEngine\Logger\SimpleMessageEngine'
+    EventEngine\Persistence\MultiModelStore: '@EventEngine\Persistence\ComposedMultiModelStore'
+    EventEngine\Persistence\TransactionalConnection: '@ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection'
+    EventEngine\Runtime\Flavour: '@EventEngine\Runtime\OopFlavour'
+    EventEngine\Runtime\Functional\Port: '@ADS\Bundle\EventEngineBundle\Port\MessagePort'
+    EventEngine\Runtime\Oop\Port: '@ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort'
+    EventEngine\Schema\Schema: '@EventEngine\JsonSchema\OpisJsonSchema'
+
+
+    # Implementations
+    Prooph\EventStore\TransactionalActionEventEmitterEventStore:
+        arguments:
+            - '@Prooph\EventStore\TransactionalEventStore'
+            - '@Prooph\Common\Event\ActionEventEmitter'
+    Prooph\EventStore\Pdo\PostgresEventStore:
+        arguments:
+            - '@EventEngine\Prooph\V7\EventStore\ProophEventStoreMessageFactory'
+            - '@event_engine.connection'
+            - '@Prooph\EventStore\Pdo\PersistenceStrategy\PostgresPersistenceStrategy'
+    Prooph\Common\Event\ProophActionEventEmitter:
+        arguments:
+            - !php/const Prooph\EventStore\TransactionalActionEventEmitterEventStore::ALL_EVENTS
+
+    EventEngine\DocumentStore\Postgres\PostgresDocumentStore:
+        arguments:
+            - '@event_engine.connection'
+            - '%event_engine.document_store.prefix%'
+            - '%event_engine.document_store.id.schema%'
+            - '%event_engine.document_store.transactional%'
+    EventEngine\EventEngine:
+        arguments:
+            - '@EventEngine\Schema\Schema'
+        configurator: '@ADS\Bundle\EventEngineBundle\Configurator'
+    EventEngine\JsonSchema\OpisJsonSchema: ~
+    EventEngine\Logger\SimpleMessageEngine:
+        arguments:
+            - '@logger'
+    EventEngine\Persistence\ComposedMultiModelStore:
+        arguments:
+            - '@EventEngine\Persistence\TransactionalConnection'
+            - '@EventEngine\EventStore\EventStore'
+            - '@EventEngine\DocumentStore\DocumentStore'
+    EventEngine\Prooph\V7\EventStore\ProophEventStore:
+        arguments:
+            - '@Prooph\EventStore\EventStore'
+    EventEngine\Prooph\V7\EventStore\ProophEventStoreMessageFactory: ~
+    EventEngine\Runtime\FunctionalFlavour:
+        arguments:
+            - '@EventEngine\Runtime\Functional\Port'
+    EventEngine\Runtime\OopFlavour:
+        arguments:
+            - '@EventEngine\Runtime\Oop\Port'
+            - '@EventEngine\Runtime\FunctionalFlavour'
+
+    ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot: ~
+    ADS\Bundle\EventEngineBundle\Aggregate\AggregateApplyMethodIsEventName: ~
+    ADS\Bundle\EventEngineBundle\Aggregate\EventSourced: ~
+    ADS\Bundle\EventEngineBundle\Config:
+        arguments:
+            - '@EventEngine\EventEngine'
+            - '@event_engine.cache'
+        tags:
+            - { name: kernel.cache_clearer }
+    ADS\Bundle\EventEngineBundle\Configurator:
+        arguments:
+            - '@EventEngine\Runtime\Flavour'
+            - '@EventEngine\Persistence\MultiModelStore'
+            - '@EventEngine\Logger\LogEngine'
+            - '@service_container'
+            - '%kernel.environment%'
+            - '%kernel.debug%'
+            - '%event_engine.descriptions%'
+            - '%event_engine.commands%'
+            - '%event_engine.queries%'
+            - '%event_engine.events%'
+    ADS\Bundle\EventEngineBundle\Persistency\SingleStreamStrategy: ~
+    ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection:
+        arguments:
+            - '@event_engine.connection'
+    ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort: ~
+    ADS\Bundle\EventEngineBundle\Port\MessagePort: ~
+    ADS\Bundle\EventEngineBundle\Repository\Repository: ~
+    ADS\Bundle\EventEngineBundle\Util: ~
+
+

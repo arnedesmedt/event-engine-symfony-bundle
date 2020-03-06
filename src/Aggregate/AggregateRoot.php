@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Message\Event;
+use EventEngine\Data\ImmutableRecord;
 
 interface AggregateRoot
 {
@@ -27,5 +28,8 @@ interface AggregateRoot
      */
     public function toArray() : array;
 
-    public function state() : void;
+    /**
+     * @return ImmutableRecord
+     */
+    public function state(); // phpcs:ignore SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
 }

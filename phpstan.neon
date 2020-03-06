@@ -4,3 +4,4 @@ parameters:
         - %currentWorkingDirectory%/vendor/autoload.php
     excludes_analyse:
         - src/DependencyInjection/Configuration.php
+

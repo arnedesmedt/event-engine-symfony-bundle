@@ -12,7 +12,6 @@ use ADS\Bundle\EventEngineBundle\Repository\Repository;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\EventEngineDescription;
 use ReflectionClass;
-use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -34,14 +33,14 @@ final class EventEnginePass implements CompilerPassInterface
 
         $resources = array_filter(
             $resources,
-            static function (ReflectionClassResource $resource) use ($filter) {
+            static function ($resource) use ($filter) {
                 return strpos($resource . '', $filter) === 0;
             }
         );
 
         [$commandClasses, $queryClasses, $eventClasses, $descriptionClasses, $aggregateShortNames] = array_reduce(
             $resources,
-            static function (array $classes, ReflectionClassResource $reflectionClass) {
+            static function (array $classes, $reflectionClass) {
                 /** @var class-string $class */
                 $class = substr($reflectionClass . '', 11);
                 $reflectionClass = new ReflectionClass($class);

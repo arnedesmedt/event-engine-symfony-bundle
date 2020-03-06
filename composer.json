@@ -30,15 +30,6 @@
         "doctrine/coding-standard": "^7.0",
         "phpro/grumphp": "^0.17.2"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../../../php/packages/value-objects",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
     "autoload": {
         "psr-4": {
             "ADS\\Bundle\\EventEngineBundle\\": "src/"

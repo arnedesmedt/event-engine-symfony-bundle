@@ -4,15 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bc50c12e853ed14c68327aa07eb98fed",
+    "content-hash": "7d7f7b4825d8b6b8353326f9b723ec0c",
     "packages": [
         {
             "name": "arnedesmedt/value-objects",
             "version": "dev-master",
-            "dist": {
-                "type": "path",
-                "url": "../../../php/packages/value-objects",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/arnedesmedt/value-objects.git",
                 "reference": "0980718af737d3b9c2439c2f1a19dad6da935f43"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/arnedesmedt/value-objects/zipball/0980718af737d3b9c2439c2f1a19dad6da935f43",
+                "reference": "0980718af737d3b9c2439c2f1a19dad6da935f43",
+                "shasum": ""
             },
             "require": {
                 "opis/json-schema": "^1.0",
@@ -30,6 +36,7 @@
                     "ADS\\ValueObjects\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -42,9 +49,7 @@
             ],
             "description": "Value objects",
             "homepage": "https://github.com/arnedesmedt/value-objects",
-            "transport-options": {
-                "symlink": true
-            }
+            "time": "2020-03-02T10:54:24+00:00"
         },
         {
             "name": "beberlei/assert",
@@ -2285,35 +2290,35 @@
         },
         {
             "name": "ocramius/package-versions",
-            "version": "1.5.1",
+            "version": "1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Ocramius/PackageVersions.git",
-                "reference": "1d32342b8c1eb27353c8887c366147b4c2da673c"
+                "reference": "651c372efc914aea8223e049f85afaf65e09ba23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Ocramius/PackageVersions/zipball/1d32342b8c1eb27353c8887c366147b4c2da673c",
-                "reference": "1d32342b8c1eb27353c8887c366147b4c2da673c",
+                "url": "https://api.github.com/repos/Ocramius/PackageVersions/zipball/651c372efc914aea8223e049f85afaf65e09ba23",
+                "reference": "651c372efc914aea8223e049f85afaf65e09ba23",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.0.0",
-                "php": "^7.3.0"
+                "composer-plugin-api": "^1.1.0",
+                "php": "^7.4.0"
             },
             "require-dev": {
-                "composer/composer": "^1.8.6",
-                "doctrine/coding-standard": "^6.0.0",
-                "ext-zip": "*",
-                "infection/infection": "^0.13.4",
-                "phpunit/phpunit": "^8.2.5",
-                "vimeo/psalm": "^3.4.9"
+                "composer/composer": "^1.9.3",
+                "doctrine/coding-standard": "^7.0.2",
+                "ext-zip": "^1.15.0",
+                "infection/infection": "^0.15.3",
+                "phpunit/phpunit": "^9.0.1",
+                "vimeo/psalm": "^3.9.3"
             },
             "type": "composer-plugin",
             "extra": {
                 "class": "PackageVersions\\Installer",
                 "branch-alias": {
-                    "dev-master": "1.6.x-dev"
+                    "dev-master": "1.99.x-dev"
                 }
             },
             "autoload": {
@@ -2332,7 +2337,7 @@
                 }
             ],
             "description": "Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
-            "time": "2019-07-17T15:49:50+00:00"
+            "time": "2020-03-06T11:34:16+00:00"
         },
         {
             "name": "ocramius/proxy-manager",

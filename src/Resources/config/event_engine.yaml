@@ -100,6 +100,7 @@ services:
 
     ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot: ~
     ADS\Bundle\EventEngineBundle\Aggregate\AggregateApplyMethodIsEventName: ~
+    ADS\Bundle\EventEngineBundle\Aggregate\DeletableAggregate: ~
     ADS\Bundle\EventEngineBundle\Aggregate\EventSourced: ~
     ADS\Bundle\EventEngineBundle\Config:
         arguments:

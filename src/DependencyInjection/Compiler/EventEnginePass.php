@@ -15,6 +15,7 @@ use ReflectionClass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use function array_filter;
 use function array_reduce;
 use function sprintf;
@@ -117,14 +118,15 @@ final class EventEnginePass implements CompilerPassInterface
         $definitions = array_reduce(
             $aggregates,
             static function (array $result, string $aggregate) use ($entityNamespace, $repository) {
-                $result[sprintf('event_engine.repository.%s', $aggregate)] = new Definition(
+                $result[sprintf('event_engine.repository.%s', $aggregate)] = (new Definition(
                     $repository->getClass(),
                     [
-                        sprintf('@%s', DocumentStore::class),
+                        new Reference(DocumentStore::class),
                         $aggregate,
                         $entityNamespace,
                     ]
-                );
+                ))
+                    ->setPublic(true);
 
                 return $result;
             },

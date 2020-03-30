@@ -13,6 +13,6 @@ trait AggregateRootByNamespace
      */
     public static function aggregateRoot()
     {
-        Util::fromStateToAggregateClass(static::class);
+        return Util::fromStateToAggregateClass(static::class);
     }
 }

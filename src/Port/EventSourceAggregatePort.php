@@ -36,7 +36,7 @@ final class EventSourceAggregatePort implements Port
      */
     public function callAggregateWithCommand($aggregate, $customCommand, ...$contextServices) : void // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
     {
-        $call = $customCommand->aggregateMethod();
+        $call = $customCommand->__aggregateMethod();
 
         if (empty($call)) {
             throw new RuntimeException(

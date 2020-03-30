@@ -102,7 +102,7 @@ trait EventSourced
 
     private function deriveMethodNameFromEvent(Event $event) : string
     {
-        return $event->applyMethod();
+        return $event->__applyMethod();
     }
 
     /**

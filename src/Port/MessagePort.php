@@ -84,7 +84,7 @@ final class MessagePort implements Port
     public function getAggregateIdFromCommand(string $aggregateIdPayloadKey, $command) : string
     {
         if ($command instanceof AggregateCommand) {
-            return $command->aggregateId();
+            return $command->__aggregateId();
         }
 
         throw new RuntimeException(

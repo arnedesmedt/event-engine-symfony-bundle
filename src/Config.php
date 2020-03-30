@@ -37,11 +37,13 @@ final class Config implements CacheClearerInterface
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, string>|string
      */
-    public function aggregateIdentifiers() : array
-    {
-        return $this->cache->get(
+    public function aggregateIdentifiers(
+        ?string $aggregateRootClass = null,
+        ?string $defaultAggregateIdentifier = null
+    ) {
+        $aggregateIdentifiers = $this->cache->get(
             self::AGGREGATE_IDENTIFIERS,
             function () {
                 $config = $this->config();
@@ -54,6 +56,12 @@ final class Config implements CacheClearerInterface
                 );
             }
         );
+
+        if ($aggregateRootClass === null) {
+            return $aggregateIdentifiers;
+        }
+
+        return $aggregateIdentifiers[$aggregateRootClass] ?? $defaultAggregateIdentifier;
     }
 
     public function clear(string $cacheDir) : void

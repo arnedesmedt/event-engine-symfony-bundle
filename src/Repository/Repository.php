@@ -9,6 +9,7 @@ use ADS\ValueObjects\ValueObject;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\DocumentStore\Filter\Filter;
+use EventEngine\DocumentStore\PartialSelect;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Traversable;
@@ -64,8 +65,26 @@ class Repository
      */
     public function findDocuments(Filter $filter, ?int $skip = null, ?int $limit = null) : Traversable
     {
-        return $this->documentStore->filterDocs(
+        return $this->documentStore->findDocs(
             $this->documentStoreName,
+            $filter,
+            $skip,
+            $limit
+        );
+    }
+
+    /**
+     * @return Traversable<array<mixed>>
+     */
+    public function findPartialDocuments(
+        PartialSelect $partialSelect,
+        Filter $filter,
+        ?int $skip,
+        ?int $limit = null
+    ) : Traversable {
+        return $this->documentStore->findPartialDocs(
+            $this->documentStoreName,
+            $partialSelect,
             $filter,
             $skip,
             $limit

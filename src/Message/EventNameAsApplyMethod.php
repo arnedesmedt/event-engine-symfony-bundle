@@ -10,7 +10,7 @@ use function sprintf;
 
 trait EventNameAsApplyMethod
 {
-    public function applyMethod() : string
+    public function __applyMethod() : string
     {
         $parts = explode('\\', static::class);
 

@@ -8,7 +8,7 @@ use ReflectionClass;
 
 trait CommandNameAsAggregateMethod
 {
-    public function aggregateMethod() : string
+    public function __aggregateMethod() : string
     {
         return (new ReflectionClass($this))->getShortName();
     }

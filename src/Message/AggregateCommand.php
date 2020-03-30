@@ -6,7 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\Message;
 
 interface AggregateCommand extends Command
 {
-    public function aggregateId() : string;
+    public function __aggregateId() : string;
 
-    public function aggregateMethod() : string;
+    public function __aggregateMethod() : string;
 }

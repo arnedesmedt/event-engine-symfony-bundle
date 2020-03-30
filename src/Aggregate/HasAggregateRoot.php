@@ -9,5 +9,5 @@ interface HasAggregateRoot
     /**
      * @return class-string|string
      */
-    public static function aggregateRoot();
+    public static function __aggregateRoot();
 }

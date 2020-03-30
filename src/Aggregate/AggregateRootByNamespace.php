@@ -11,7 +11,7 @@ trait AggregateRootByNamespace
     /**
      * @inheritDoc
      */
-    public static function aggregateRoot()
+    public static function __aggregateRoot()
     {
         return Util::fromStateToAggregateClass(static::class);
     }

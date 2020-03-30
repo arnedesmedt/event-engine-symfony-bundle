@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Util;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\DocumentStore\DocumentStore;
+use EventEngine\DocumentStore\Filter\AnyFilter;
 use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\PartialSelect;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -63,8 +64,12 @@ class Repository
     /**
      * @return Traversable<array<mixed>>
      */
-    public function findDocuments(Filter $filter, ?int $skip = null, ?int $limit = null) : Traversable
+    public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null) : Traversable
     {
+        if ($filter === null) {
+            $filter = new AnyFilter();
+        }
+
         return $this->documentStore->findDocs(
             $this->documentStoreName,
             $filter,
@@ -78,10 +83,14 @@ class Repository
      */
     public function findPartialDocuments(
         PartialSelect $partialSelect,
-        Filter $filter,
-        ?int $skip,
+        ?Filter $filter = null,
+        ?int $skip = null,
         ?int $limit = null
     ) : Traversable {
+        if ($filter === null) {
+            $filter = new AnyFilter();
+        }
+
         return $this->documentStore->findPartialDocs(
             $this->documentStoreName,
             $partialSelect,
@@ -94,7 +103,7 @@ class Repository
     /**
      * @return array<ImmutableRecord>
      */
-    public function findDocumentStates(Filter $filter, ?int $skip = null, ?int $limit = null) : array
+    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null) : array
     {
         return $this->statesFromDocuments(
             $this->findDocuments($filter, $skip, $limit)

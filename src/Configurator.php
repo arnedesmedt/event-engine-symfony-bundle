@@ -95,7 +95,9 @@ final class Configurator
         foreach ($this->queryClasses as $query) {
             /** @var PayloadSchema $schema */
             $schema = self::schemaFromMessage($query);
-            $eventEngine->registerQuery($query, $schema);
+            $eventEngine->registerQuery($query, $schema)
+                ->resolveWith($query::__resolver())
+                ->setReturnType($query::__defaultResponseSchema());
         }
 
         foreach ($this->eventClasses as $event) {

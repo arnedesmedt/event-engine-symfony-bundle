@@ -27,7 +27,7 @@ final class Configuration implements ConfigurationInterface
                         ->arrayNode('id')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->scalarNode('schema')->defaultValue('CHAR(36) NOT NULL')->end()
+                                ->scalarNode('schema')->defaultValue('VARCHAR(36) NOT NULL')->end()
                             ->end()
                         ->end()
                         ->booleanNode('transactional')->defaultValue(false)->end()

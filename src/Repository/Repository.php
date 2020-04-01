@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Traversable;
 use function array_filter;
 use function array_map;
+use function array_values;
 use function iterator_to_array;
 use function sprintf;
 
@@ -44,7 +45,7 @@ class Repository
         return array_filter(
             array_map(
                 [$this, 'stateFromDocument'],
-                iterator_to_array($documents)
+                array_values(iterator_to_array($documents))
             )
         );
     }

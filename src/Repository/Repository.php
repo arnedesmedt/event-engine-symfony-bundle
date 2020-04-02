@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Repository;
 
-use ADS\Bundle\EventEngineBundle\Util;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\DocumentStore\Filter\AnyFilter;
 use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\PartialSelect;
+use PDO;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Traversable;
@@ -24,15 +24,21 @@ class Repository
 {
     public const DOCUMENT_STORE_NOT_FOUND = 'Could not found document store \'%s\' for repository \'%s\'.';
 
-    private DocumentStore $documentStore;
-    private string $documentStoreName;
-    private string $stateClass;
+    protected DocumentStore $documentStore;
+    protected string $documentStoreName;
+    protected string $stateClass;
+    protected PDO $connection;
 
-    public function __construct(DocumentStore $documentStore, string $name, string $entityNamespace)
-    {
+    public function __construct(
+        DocumentStore $documentStore,
+        string $documentStoreName,
+        string $stateClass,
+        PDO $connection
+    ) {
         $this->documentStore = $documentStore;
-        $this->documentStoreName = Util::fromAggregateNameToDocumentStoreName($name);
-        $this->stateClass = Util::fromAggregateNameToStateClass($name, $entityNamespace);
+        $this->documentStoreName = $documentStoreName;
+        $this->stateClass = $stateClass;
+        $this->connection = $connection;
     }
 
     /**

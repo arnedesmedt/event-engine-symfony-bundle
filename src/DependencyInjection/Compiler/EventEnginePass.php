@@ -9,6 +9,7 @@ use ADS\Bundle\EventEngineBundle\Message\Command;
 use ADS\Bundle\EventEngineBundle\Message\Event;
 use ADS\Bundle\EventEngineBundle\Message\Query;
 use ADS\Bundle\EventEngineBundle\Repository\Repository;
+use ADS\Bundle\EventEngineBundle\Util;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\EventEngineDescription;
 use ReflectionClass;
@@ -139,8 +140,9 @@ final class EventEnginePass implements CompilerPassInterface
                     $repository->getClass(),
                     [
                         new Reference(DocumentStore::class),
-                        $aggregate,
-                        $entityNamespace,
+                        Util::fromAggregateNameToDocumentStoreName($aggregate),
+                        Util::fromAggregateNameToStateClass($aggregate, $entityNamespace),
+                        new Reference('event_engine.connection'),
                     ]
                 ))
                     ->setPublic(true);

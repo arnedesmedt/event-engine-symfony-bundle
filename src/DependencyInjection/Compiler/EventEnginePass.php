@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\DependencyInjection\Compiler;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
+use ADS\Bundle\EventEngineBundle\Command\PreProcessor;
 use ADS\Bundle\EventEngineBundle\Event\Listener;
 use ADS\Bundle\EventEngineBundle\Message\Command;
 use ADS\Bundle\EventEngineBundle\Message\Event;
@@ -49,6 +50,7 @@ final class EventEnginePass implements CompilerPassInterface
             $resolverClasses,
             $eventClasses,
             $listenerClasses,
+            $preProcessorClasses,
             $descriptionClasses,
             $aggregateShortNames,
             $repositories,
@@ -80,22 +82,27 @@ final class EventEnginePass implements CompilerPassInterface
                     $classes[4][] = $class;
                 }
 
-                if ($reflectionClass->implementsInterface(EventEngineDescription::class)) {
+                if ($reflectionClass->implementsInterface(PreProcessor::class)) {
                     $classes[5][] = $class;
                 }
 
+                if ($reflectionClass->implementsInterface(EventEngineDescription::class)) {
+                    $classes[6][] = $class;
+                }
+
                 if ($reflectionClass->implementsInterface(AggregateRoot::class)) {
-                    $classes[6][] = strtolower($reflectionClass->getShortName());
+                    $classes[7][] = strtolower($reflectionClass->getShortName());
                 }
 
                 $parentReflection = $reflectionClass->getParentClass();
                 if ($parentReflection && $parentReflection->getName() === Repository::class) {
-                    $classes[7][] = $class;
+                    $classes[8][] = $class;
                 }
 
                 return $classes;
             },
             [
+                [],
                 [],
                 [],
                 [],
@@ -124,7 +131,12 @@ final class EventEnginePass implements CompilerPassInterface
 
         $container->setParameter(
             'event_engine.listeners',
-            $eventClasses
+            $listenerClasses
+        );
+
+        $container->setParameter(
+            'event_engine.pre_processors',
+            $preProcessorClasses
         );
 
         $container->setParameter(
@@ -146,7 +158,8 @@ final class EventEnginePass implements CompilerPassInterface
         $this->makePublic(
             $container,
             ...$resolverClasses,
-            ...$listenerClasses
+            ...$listenerClasses,
+            ...$preProcessorClasses
         );
     }
 

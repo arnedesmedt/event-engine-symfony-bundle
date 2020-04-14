@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\DependencyInjection\Compiler;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
+use ADS\Bundle\EventEngineBundle\Event\Listener;
 use ADS\Bundle\EventEngineBundle\Message\Command;
 use ADS\Bundle\EventEngineBundle\Message\Event;
 use ADS\Bundle\EventEngineBundle\Message\Query;
@@ -20,6 +21,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use function array_filter;
 use function array_reduce;
+use function preg_match_all;
 use function sprintf;
 use function strpos;
 use function strtolower;
@@ -41,7 +43,16 @@ final class EventEnginePass implements CompilerPassInterface
             }
         );
 
-        [$commandClasses, $queryClasses, $resolverClasses, $eventClasses, $descriptionClasses, $aggregateShortNames] = array_reduce(
+        [
+            $commandClasses,
+            $queryClasses,
+            $resolverClasses,
+            $eventClasses,
+            $listenerClasses,
+            $descriptionClasses,
+            $aggregateShortNames,
+            $repositories,
+        ] = array_reduce(
             $resources,
             static function (array $classes, $reflectionClass) {
                 /** @var class-string $class */
@@ -65,17 +76,28 @@ final class EventEnginePass implements CompilerPassInterface
                     $classes[3][] = $class;
                 }
 
-                if ($reflectionClass->implementsInterface(EventEngineDescription::class)) {
+                if ($reflectionClass->implementsInterface(Listener::class)) {
                     $classes[4][] = $class;
                 }
 
+                if ($reflectionClass->implementsInterface(EventEngineDescription::class)) {
+                    $classes[5][] = $class;
+                }
+
                 if ($reflectionClass->implementsInterface(AggregateRoot::class)) {
-                    $classes[5][] = strtolower($reflectionClass->getShortName());
+                    $classes[6][] = strtolower($reflectionClass->getShortName());
+                }
+
+                $parentReflection = $reflectionClass->getParentClass();
+                if ($parentReflection && $parentReflection->getName() === Repository::class) {
+                    $classes[7][] = $class;
                 }
 
                 return $classes;
             },
             [
+                [],
+                [],
                 [],
                 [],
                 [],
@@ -101,6 +123,11 @@ final class EventEnginePass implements CompilerPassInterface
         );
 
         $container->setParameter(
+            'event_engine.listeners',
+            $eventClasses
+        );
+
+        $container->setParameter(
             'event_engine.descriptions',
             $descriptionClasses
         );
@@ -110,26 +137,23 @@ final class EventEnginePass implements CompilerPassInterface
             $aggregateShortNames
         );
 
+        $container->setParameter(
+            'event_engine.child_repositories',
+            $repositories
+        );
+
         $this->buildRepositories($container);
-
-        foreach ($resolverClasses as $resolverClass) {
-            if (! $container->hasDefinition($resolverClass)) {
-                throw new RuntimeException(
-                    sprintf(
-                        'Resolver class \'%s\' not found.',
-                        $resolverClass
-                    )
-                );
-            }
-
-            $container->getDefinition($resolverClass)
-                ->setPublic(true);
-        }
+        $this->makePublic(
+            $container,
+            ...$resolverClasses,
+            ...$listenerClasses
+        );
     }
 
     private function buildRepositories(ContainerBuilder $container) : void
     {
         $repository = $container->getDefinition(Repository::class);
+        $childRepositories = $container->getParameter('event_engine.child_repositories');
         $aggregates = $container->getParameter('event_engine.aggregates');
         $entityNamespace = $container->getParameter('event_engine.entity_namespace');
 
@@ -154,5 +178,39 @@ final class EventEnginePass implements CompilerPassInterface
 
         $container->addDefinitions($definitions);
         $container->removeDefinition(Repository::class);
+
+        foreach ($childRepositories as $childRepository) {
+            preg_match_all('/\\\([^\\\]+)Repository$/', $childRepository, $matches);
+
+            $container->getDefinition($childRepository)
+                ->setArguments(
+                    $container
+                        ->getDefinition(
+                            sprintf(
+                                'event_engine.repository.%s',
+                                strtolower($matches[1][0])
+                            )
+                        )
+                        ->getArguments()
+                )
+                ->setPublic(true);
+        }
+    }
+
+    private function makePublic(ContainerBuilder $container, string ...$classes) : void
+    {
+        foreach ($classes as $class) {
+            if (! $container->hasDefinition($class)) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Class \'%s\' can\'t be made public because it\'s not found.',
+                        $class
+                    )
+                );
+            }
+
+            $container->getDefinition($class)
+                ->setPublic(true);
+        }
     }
 }

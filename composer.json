@@ -14,15 +14,16 @@
     "require": {
         "php": "^7.4",
         "ext-pdo": "*",
-        "event-engine/php-engine": "^0.13",
+        "event-engine/php-engine": "^0.14",
         "event-engine/php-json-schema": "2.0-beta.1",
-        "event-engine/php-postgres-document-store": "^0.8.0",
-        "event-engine/prooph-v7-event-store": "^0.7.0",
+        "event-engine/php-postgres-document-store": "^0.9.0",
+        "event-engine/prooph-v7-event-store": "^0.8.0",
         "prooph/pdo-event-store": "^1.11",
         "symfony/http-kernel": "^5.0",
         "symfony/orm-pack": "^1.0",
         "opis/json-schema": "^1.0",
-        "arnedesmedt/value-objects": "dev-master"
+        "arnedesmedt/value-objects": "dev-master",
+        "event-engine/cockpit-php-backend": "dev-master"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12.7",

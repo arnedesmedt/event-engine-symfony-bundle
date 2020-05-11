@@ -13,8 +13,6 @@ trait DefaultCommand
      */
     public static function __aggregateMethod() : string
     {
-        $reflectionClass = new ReflectionClass(static::class);
-
-        return $reflectionClass->getShortName();
+        return (new ReflectionClass(static::class))->getShortName();
     }
 }

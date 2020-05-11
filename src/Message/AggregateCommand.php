@@ -8,5 +8,5 @@ interface AggregateCommand extends Command
 {
     public function __aggregateId() : string;
 
-    public function __aggregateMethod() : string;
+    public static function __aggregateMethod() : string;
 }

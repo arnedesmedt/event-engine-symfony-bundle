@@ -54,6 +54,7 @@ services:
 
 
     # Implementations
+    Opis\JsonSchema\Validator: ~
     Prooph\EventStore\TransactionalActionEventEmitterEventStore:
         arguments:
             - '@Prooph\EventStore\TransactionalEventStore'
@@ -124,7 +125,10 @@ services:
         arguments:
             - '@event_engine.connection'
     ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort: ~
-    ADS\Bundle\EventEngineBundle\Port\MessagePort: ~
+    ADS\Bundle\EventEngineBundle\Port\MessagePort:
+        arguments:
+            - '@Opis\JsonSchema\Validator'
     ADS\Bundle\EventEngineBundle\Repository\Repository: ~
+    ADS\Bundle\EventEngineBundle\Util: ~
 
 

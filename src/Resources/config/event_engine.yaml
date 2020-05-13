@@ -98,10 +98,6 @@ services:
             - '@EventEngine\Runtime\Oop\Port'
             - '@EventEngine\Runtime\FunctionalFlavour'
 
-    ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot: ~
-    ADS\Bundle\EventEngineBundle\Aggregate\AggregateApplyMethodIsEventName: ~
-    ADS\Bundle\EventEngineBundle\Aggregate\DeletableAggregate: ~
-    ADS\Bundle\EventEngineBundle\Aggregate\EventSourced: ~
     ADS\Bundle\EventEngineBundle\Config:
         arguments:
             - '@EventEngine\EventEngine'
@@ -120,13 +116,8 @@ services:
             - '%event_engine.commands%'
             - '%event_engine.queries%'
             - '%event_engine.events%'
-    ADS\Bundle\EventEngineBundle\Persistency\SingleStreamStrategy: ~
     ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection:
         arguments:
             - '@event_engine.connection'
-    ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort: ~
-    ADS\Bundle\EventEngineBundle\Port\MessagePort: ~
-    ADS\Bundle\EventEngineBundle\Repository\Repository: ~
-    ADS\Bundle\EventEngineBundle\Util: ~
 
 

@@ -4,30 +4,65 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Port;
 
+use ADS\Bundle\EventEngineBundle\Exception\JsonException;
 use ADS\Bundle\EventEngineBundle\Message\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Message\Query;
 use EventEngine\Data\ImmutableRecord;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Functional\Port;
+use Opis\JsonSchema\Schema;
+use Opis\JsonSchema\Validator;
+use ReflectionClass;
 use RuntimeException;
 use function get_class;
 use function gettype;
 use function is_array;
 use function is_object;
+use function json_decode;
+use function json_encode;
 use function sprintf;
 
 final class MessagePort implements Port
 {
+    private Validator $validator;
+
+    public function __construct(Validator $validator)
+    {
+        $this->validator = $validator;
+    }
+
     /**
      * @inheritDoc
      */
     public function deserialize(Message $message)
     {
-        /** @var ImmutableRecord $messageType */
+        /** @var class-string $messageType */
         $messageType = $message->messageName();
+        $data = $message->payload();
 
-        return $messageType::fromArray($message->payload());
+        $reflectionClass = new ReflectionClass($messageType);
+
+        if ($reflectionClass->implementsInterface(JsonSchemaAwareRecord::class)) {
+            $encodedData = json_encode($data);
+
+            if ($encodedData === false) {
+                throw JsonException::couldNotEncode($data);
+            }
+
+            $schemaArray = $messageType::__schema()->toArray();
+            $schema = json_encode($schemaArray);
+
+            if ($schema === false) {
+                throw JsonException::couldNotEncode($schemaArray);
+            }
+
+            $data = json_decode($encodedData);
+            $this->validator->schemaValidation($data, Schema::fromJsonString($schema));
+        }
+
+        return $messageType::fromArray((array) $data);
     }
 
     /**

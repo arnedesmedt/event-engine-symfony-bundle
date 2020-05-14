@@ -6,8 +6,10 @@ namespace ADS\Bundle\EventEngineBundle\Message;
 
 use ReflectionClass;
 
-trait DefaultCommand
+trait DefaultAggregateCommand
 {
+    use DefaultResponses;
+
     /**
      * The default aggregate method is the shortname of the class.
      */

@@ -120,6 +120,7 @@ services:
             - '%event_engine.commands%'
             - '%event_engine.queries%'
             - '%event_engine.events%'
+            - '%event_engine.aggregates%'
     ADS\Bundle\EventEngineBundle\Persistency\SingleStreamStrategy: ~
     ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection:
         arguments:

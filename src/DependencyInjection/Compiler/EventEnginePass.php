@@ -52,7 +52,7 @@ final class EventEnginePass implements CompilerPassInterface
             $listenerClasses,
             $preProcessorClasses,
             $descriptionClasses,
-            $aggregateShortNames,
+            $aggregateClasses,
             $repositories,
         ] = array_reduce(
             $resources,
@@ -91,7 +91,7 @@ final class EventEnginePass implements CompilerPassInterface
                 }
 
                 if ($reflectionClass->implementsInterface(AggregateRoot::class)) {
-                    $classes[7][] = strtolower($reflectionClass->getShortName());
+                    $classes[7][] = $class;
                 }
 
                 $parentReflection = $reflectionClass->getParentClass();
@@ -146,7 +146,7 @@ final class EventEnginePass implements CompilerPassInterface
 
         $container->setParameter(
             'event_engine.aggregates',
-            $aggregateShortNames
+            $aggregateClasses
         );
 
         $container->setParameter(
@@ -172,7 +172,10 @@ final class EventEnginePass implements CompilerPassInterface
 
         $definitions = array_reduce(
             $aggregates,
-            static function (array $result, string $aggregate) use ($entityNamespace, $repository) {
+            static function (array $result, $aggregate) use ($entityNamespace, $repository) {
+                $reflectionClass = new ReflectionClass($aggregate);
+                $aggregate = strtolower($reflectionClass->getShortName());
+
                 $result[sprintf('event_engine.repository.%s', $aggregate)] = (new Definition(
                     $repository->getClass(),
                     [

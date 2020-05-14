@@ -16,4 +16,6 @@ interface HasResponses
     public static function __responseSchemaForStatusCode(int $statusCode) : ResponseTypeSchema;
 
     public static function __defaultStatusCode() : ?int;
+
+    public static function __defaultResponseSchema() : ResponseTypeSchema;
 }

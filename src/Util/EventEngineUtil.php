@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ADS\Bundle\EventEngineBundle;
+namespace ADS\Bundle\EventEngineBundle\Util;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ReflectionClass;
@@ -16,7 +16,7 @@ use function strtolower;
 use function substr;
 use function ucfirst;
 
-final class Util
+final class EventEngineUtil
 {
     /**
      * @param class-string $stateClass
@@ -93,17 +93,17 @@ final class Util
 
     public static function fromAggregateNameToAggregateClass(string $aggregateName, string $entityNamespace) : string
     {
-        return sprintf('%s\\%2$s\\%2$s', $entityNamespace, ucfirst($aggregateName));
+        return sprintf('%s\\%2$s\\%2$s', $entityNamespace, ucfirst(StringUtil::camelize($aggregateName)));
     }
 
     public static function fromAggregateNameToStreamName(string $aggregateName) : string
     {
-        return sprintf('%s_stream', $aggregateName);
+        return sprintf('%s_stream', StringUtil::decamilize($aggregateName));
     }
 
     public static function fromAggregateNameToDocumentStoreName(string $aggregateName) : string
     {
-        return sprintf('%s_state', $aggregateName);
+        return sprintf('%s_state', StringUtil::decamilize($aggregateName));
     }
 
     public static function fromAggregateNameToStateClass(string $aggregateName, string $entityNamespace) : string

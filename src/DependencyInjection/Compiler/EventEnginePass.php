@@ -11,7 +11,8 @@ use ADS\Bundle\EventEngineBundle\Message\Command;
 use ADS\Bundle\EventEngineBundle\Message\Event;
 use ADS\Bundle\EventEngineBundle\Message\Query;
 use ADS\Bundle\EventEngineBundle\Repository\Repository;
-use ADS\Bundle\EventEngineBundle\Util;
+use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
+use ADS\Bundle\EventEngineBundle\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\EventEngineDescription;
 use ReflectionClass;
@@ -174,14 +175,16 @@ final class EventEnginePass implements CompilerPassInterface
             $aggregates,
             static function (array $result, $aggregate) use ($entityNamespace, $repository) {
                 $reflectionClass = new ReflectionClass($aggregate);
-                $aggregate = strtolower($reflectionClass->getShortName());
+                $aggregate = $reflectionClass->getShortName();
 
-                $result[sprintf('event_engine.repository.%s', $aggregate)] = (new Definition(
+                $key = sprintf('event_engine.repository.%s', StringUtil::decamilize($aggregate));
+
+                $result[$key] = (new Definition(
                     $repository->getClass(),
                     [
                         new Reference(DocumentStore::class),
-                        Util::fromAggregateNameToDocumentStoreName($aggregate),
-                        Util::fromAggregateNameToStateClass($aggregate, $entityNamespace),
+                        EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregate),
+                        EventEngineUtil::fromAggregateNameToStateClass($aggregate, $entityNamespace),
                         new Reference('event_engine.connection'),
                     ]
                 ))
@@ -204,7 +207,7 @@ final class EventEnginePass implements CompilerPassInterface
                         ->getDefinition(
                             sprintf(
                                 'event_engine.repository.%s',
-                                strtolower($matches[1][0])
+                                strtolower(StringUtil::decamilize($matches[1][0]))
                             )
                         )
                         ->getArguments()

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Command;
 
-use ADS\Bundle\EventEngineBundle\Util;
+use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
@@ -42,7 +42,7 @@ class EventEngineDocumentStoresCreateCommand extends Command
     {
         foreach ($this->aggregates as $aggregate) {
             $reflectionClass = new ReflectionClass($aggregate);
-            $documentStore = Util::fromAggregateNameToDocumentStoreName(strtolower($reflectionClass->getShortName()));
+            $documentStore = EventEngineUtil::fromAggregateNameToDocumentStoreName(strtolower($reflectionClass->getShortName()));
 
             if ($this->documentStore->hasCollection($documentStore)) {
                 continue;

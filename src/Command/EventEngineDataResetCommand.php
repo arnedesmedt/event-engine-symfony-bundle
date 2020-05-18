@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Command;
 
-use ADS\Bundle\EventEngineBundle\Util;
+use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use Prooph\EventStore\EventStore;
 use Prooph\EventStore\StreamName;
@@ -46,8 +46,8 @@ class EventEngineDataResetCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         foreach ($this->aggregates as $aggregate) {
-            $documentStore = Util::fromAggregateNameToDocumentStoreName($aggregate);
-            $streamName = Util::fromAggregateNameToStreamName($aggregate);
+            $documentStore = EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregate);
+            $streamName = EventEngineUtil::fromAggregateNameToStreamName($aggregate);
             $streamNameObject = new StreamName($streamName);
 
             if ($this->eventStore->hasStream($streamNameObject)) {

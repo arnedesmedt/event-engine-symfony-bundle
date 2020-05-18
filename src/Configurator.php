@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle;
 
+use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Logger\SimpleMessageEngine;
@@ -112,7 +113,7 @@ final class Configurator
         }
 
         foreach ($this->aggregateClasses as $aggregateClass) {
-            $eventEngine->registerResponseType(Util::fromAggregateClassToStateClass($aggregateClass));
+            $eventEngine->registerResponseType(EventEngineUtil::fromAggregateClassToStateClass($aggregateClass));
         }
 
         foreach ($this->descriptionServices as $descriptionService) {

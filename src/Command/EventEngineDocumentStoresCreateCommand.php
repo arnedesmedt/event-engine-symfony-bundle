@@ -6,9 +6,11 @@ namespace ADS\Bundle\EventEngineBundle\Command;
 
 use ADS\Bundle\EventEngineBundle\Util;
 use EventEngine\DocumentStore\DocumentStore;
+use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function strtolower;
 
 class EventEngineDocumentStoresCreateCommand extends Command
 {
@@ -16,11 +18,11 @@ class EventEngineDocumentStoresCreateCommand extends Command
     protected static $defaultName = 'event-engine:document-stores:create'; // phpcs:ignore SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
 
     private DocumentStore $documentStore;
-    /** @var array<string> */
+    /** @var array<class-string> */
     private array $aggregates;
 
     /**
-     * @param array<string> $aggregates
+     * @param array<class-string> $aggregates
      */
     public function __construct(
         DocumentStore $documentStore,
@@ -39,7 +41,8 @@ class EventEngineDocumentStoresCreateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         foreach ($this->aggregates as $aggregate) {
-            $documentStore = Util::fromAggregateNameToDocumentStoreName($aggregate);
+            $reflectionClass = new ReflectionClass($aggregate);
+            $documentStore = Util::fromAggregateNameToDocumentStoreName(strtolower($reflectionClass->getShortName()));
 
             if ($this->documentStore->hasCollection($documentStore)) {
                 continue;

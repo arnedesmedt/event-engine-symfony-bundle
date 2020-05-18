@@ -9,10 +9,12 @@ use PDO;
 use Prooph\EventStore\EventStore;
 use Prooph\EventStore\Stream as ProophStream;
 use Prooph\EventStore\StreamName;
+use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;
+use function strtolower;
 
 class EventEngineEventStreamsCreateCommand extends Command
 {
@@ -21,11 +23,11 @@ class EventEngineEventStreamsCreateCommand extends Command
 
     private PDO $connection;
     private EventStore $eventStore;
-    /** @var array<string> */
+    /** @var array<class-string> */
     private array $aggregates;
 
     /**
-     * @param array<string> $aggregates
+     * @param array<class-string> $aggregates
      */
     public function __construct(
         PDO $connection,
@@ -63,7 +65,8 @@ class EventEngineEventStreamsCreateCommand extends Command
         );
 
         foreach ($this->aggregates as $aggregate) {
-            $streamName = sprintf('%s_stream', $aggregate);
+            $reflectionClass = new ReflectionClass($aggregate);
+            $streamName = sprintf('%s_stream', strtolower($reflectionClass->getShortName()));
             $streamNameObject = new StreamName($streamName);
 
             if ($this->eventStore->hasStream($streamNameObject)) {

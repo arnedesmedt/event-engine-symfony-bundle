@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use function array_filter;
+use function array_map;
 use function array_reduce;
 use function preg_match_all;
 use function sprintf;
@@ -40,128 +41,83 @@ final class EventEnginePass implements CompilerPassInterface
 
         $resources = array_filter(
             $resources,
-            static function ($resource) use ($filter) {
+            static function (string $resource) use ($filter) {
                 return strpos($resource . '', $filter) === 0;
             }
         );
 
-        [
-            $commandClasses,
-            $queryClasses,
-            $resolverClasses,
-            $eventClasses,
-            $listenerClasses,
-            $preProcessorClasses,
-            $descriptionClasses,
-            $aggregateClasses,
-            $repositories,
-        ] = array_reduce(
-            $resources,
-            static function (array $classes, $reflectionClass) {
+        $resources = array_map(
+            static function (string $resource) {
                 /** @var class-string $class */
-                $class = substr($reflectionClass . '', 11);
-                $reflectionClass = new ReflectionClass($class);
+                $class = substr($resource . '', 11);
 
-                if ($reflectionClass->implementsInterface(Command::class)) {
-                    $classes[0][] = $class;
-
-                    return $classes;
-                }
-
-                if ($reflectionClass->implementsInterface(Query::class)) {
-                    $classes[1][] = $class;
-                    $classes[2][] = $class::__resolver();
-
-                    return $classes;
-                }
-
-                if ($reflectionClass->implementsInterface(Event::class)) {
-                    $classes[3][] = $class;
-                }
-
-                if ($reflectionClass->implementsInterface(Listener::class)) {
-                    $classes[4][] = $class;
-                }
-
-                if ($reflectionClass->implementsInterface(PreProcessor::class)) {
-                    $classes[5][] = $class;
-                }
-
-                if ($reflectionClass->implementsInterface(EventEngineDescription::class)) {
-                    $classes[6][] = $class;
-                }
-
-                if ($reflectionClass->implementsInterface(AggregateRoot::class)) {
-                    $classes[7][] = $class;
-                }
-
-                $parentReflection = $reflectionClass->getParentClass();
-                if ($parentReflection && $parentReflection->getName() === Repository::class) {
-                    $classes[8][] = $class;
-                }
-
-                return $classes;
+                return new ReflectionClass($class);
             },
-            [
-                [],
-                [],
-                [],
-                [],
-                [],
-                [],
-                [],
-                [],
-                [],
-            ]
+            $resources
         );
 
-        $container->setParameter(
-            'event_engine.commands',
-            $commandClasses
-        );
+        $mappers = [
+            'commands' => static function (ReflectionClass $reflectionClass) {
+                return $reflectionClass->implementsInterface(Command::class)
+                    ? $reflectionClass->name
+                    : null;
+            },
+            'queries' => static function (ReflectionClass $reflectionClass) {
+                return $reflectionClass->implementsInterface(Query::class)
+                    ? $reflectionClass->name
+                    : null;
+            },
+            'resolvers' => static function (ReflectionClass $reflectionClass) {
+                /** @var class-string $className */
+                $className = $reflectionClass->name;
 
-        $container->setParameter(
-            'event_engine.queries',
-            $queryClasses
-        );
+                return $reflectionClass->implementsInterface(Query::class)
+                    ? $className::__resolver()
+                    : null;
+            },
+            'events' => static function (ReflectionClass $reflectionClass) {
+                return $reflectionClass->implementsInterface(Event::class)
+                    ? $reflectionClass->name
+                    : null;
+            },
+            'aggregates' => static function (ReflectionClass $reflectionClass) {
+                return $reflectionClass->implementsInterface(AggregateRoot::class)
+                    ? $reflectionClass->name
+                    : null;
+            },
+            'pre_processors' => static function (ReflectionClass $reflectionClass) {
+                return $reflectionClass->implementsInterface(PreProcessor::class)
+                    ? $reflectionClass->name
+                    : null;
+            },
+            'listeners' => static function (ReflectionClass $reflectionClass) {
+                return $reflectionClass->implementsInterface(Listener::class)
+                    ? $reflectionClass->name
+                    : null;
+            },
+            'descriptions' => static function (ReflectionClass $reflectionClass) {
+                return $reflectionClass->implementsInterface(EventEngineDescription::class)
+                    ? $reflectionClass->name
+                    : null;
+            },
+            'child_repositories' => static function (ReflectionClass $reflectionClass) {
+                $parentReflection = $reflectionClass->getParentClass();
 
-        $container->setParameter(
-            'event_engine.events',
-            $eventClasses
-        );
+                return $parentReflection && $parentReflection->name === Repository::class
+                    ? $reflectionClass->name
+                    : null;
+            },
+        ];
 
-        $container->setParameter(
-            'event_engine.listeners',
-            $listenerClasses
-        );
-
-        $container->setParameter(
-            'event_engine.pre_processors',
-            $preProcessorClasses
-        );
-
-        $container->setParameter(
-            'event_engine.descriptions',
-            $descriptionClasses
-        );
-
-        $container->setParameter(
-            'event_engine.aggregates',
-            $aggregateClasses
-        );
-
-        $container->setParameter(
-            'event_engine.child_repositories',
-            $repositories
-        );
+        foreach ($mappers as $name => $mapper) {
+            $container->setParameter(
+                sprintf('event_engine.%s', $name),
+                array_filter(array_map($mapper, $resources))
+            );
+        }
 
         $this->buildRepositories($container);
-        $this->makePublic(
-            $container,
-            ...$resolverClasses,
-            ...$listenerClasses,
-            ...$preProcessorClasses
-        );
+        $this->makePublic($container);
     }
 
     private function buildRepositories(ContainerBuilder $container) : void
@@ -218,6 +174,12 @@ final class EventEnginePass implements CompilerPassInterface
 
     private function makePublic(ContainerBuilder $container, string ...$classes) : void
     {
+        $classes = [
+            ...$container->getParameter('event_engine.resolvers'),
+            ...$container->getParameter('event_engine.listeners'),
+            ...$container->getParameter('event_engine.pre_processors'),
+        ];
+
         foreach ($classes as $class) {
             if (! $container->hasDefinition($class)) {
                 throw new RuntimeException(
@@ -228,8 +190,7 @@ final class EventEnginePass implements CompilerPassInterface
                 );
             }
 
-            $container->getDefinition($class)
-                ->setPublic(true);
+            $container->getDefinition($class)->setPublic(true);
         }
     }
 }

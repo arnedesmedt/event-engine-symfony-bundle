@@ -9,5 +9,5 @@ interface ControllerCommand extends Command
     /**
      * @return class-string
      */
-    public function __controller() : string;
+    public static function __controller() : string;
 }

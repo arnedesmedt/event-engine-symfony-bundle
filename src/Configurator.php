@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle;
 
+use ADS\Bundle\EventEngineBundle\Message\ControllerCommand;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
@@ -96,6 +97,12 @@ final class Configurator
             /** @var PayloadSchema $schema */
             $schema = self::schemaFromMessage($command);
             $eventEngine->registerCommand($command, $schema);
+
+            if (! (new ReflectionClass($command))->implementsInterface(ControllerCommand::class)) {
+                continue;
+            }
+
+            $eventEngine->passToController($command, $command::__controller());
         }
 
         foreach ($this->queryClasses as $query) {

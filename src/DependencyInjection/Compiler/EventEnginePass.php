@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Command\PreProcessor;
 use ADS\Bundle\EventEngineBundle\Event\Listener;
 use ADS\Bundle\EventEngineBundle\Message\Command;
+use ADS\Bundle\EventEngineBundle\Message\ControllerCommand;
 use ADS\Bundle\EventEngineBundle\Message\Event;
 use ADS\Bundle\EventEngineBundle\Message\Query;
 use ADS\Bundle\EventEngineBundle\Repository\Repository;
@@ -24,6 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use function array_filter;
 use function array_map;
 use function array_reduce;
+use function array_unique;
 use function preg_match_all;
 use function sprintf;
 use function strpos;
@@ -95,6 +97,14 @@ final class EventEnginePass implements CompilerPassInterface
                     ? $reflectionClass->name
                     : null;
             },
+            'controllers' => static function (ReflectionClass $reflectionClass) {
+                /** @var class-string $className */
+                $className = $reflectionClass->name;
+
+                return $reflectionClass->implementsInterface(ControllerCommand::class)
+                    ? $className::__controller()
+                    : null;
+            },
             'descriptions' => static function (ReflectionClass $reflectionClass) {
                 return $reflectionClass->implementsInterface(EventEngineDescription::class)
                     ? $reflectionClass->name
@@ -112,7 +122,7 @@ final class EventEnginePass implements CompilerPassInterface
         foreach ($mappers as $name => $mapper) {
             $container->setParameter(
                 sprintf('event_engine.%s', $name),
-                array_filter(array_map($mapper, $resources))
+                array_unique(array_filter(array_map($mapper, $resources)))
             );
         }
 
@@ -178,6 +188,7 @@ final class EventEnginePass implements CompilerPassInterface
             ...$container->getParameter('event_engine.resolvers'),
             ...$container->getParameter('event_engine.listeners'),
             ...$container->getParameter('event_engine.pre_processors'),
+            ...$container->getParameter('event_engine.controllers'),
         ];
 
         foreach ($classes as $class) {

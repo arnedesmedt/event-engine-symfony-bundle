@@ -10,7 +10,6 @@ use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use function strtolower;
 
 class EventEngineDocumentStoresCreateCommand extends Command
 {
@@ -42,7 +41,7 @@ class EventEngineDocumentStoresCreateCommand extends Command
     {
         foreach ($this->aggregates as $aggregate) {
             $reflectionClass = new ReflectionClass($aggregate);
-            $documentStore = EventEngineUtil::fromAggregateNameToDocumentStoreName(strtolower($reflectionClass->getShortName()));
+            $documentStore = EventEngineUtil::fromAggregateNameToDocumentStoreName($reflectionClass->getShortName());
 
             if ($this->documentStore->hasCollection($documentStore)) {
                 continue;

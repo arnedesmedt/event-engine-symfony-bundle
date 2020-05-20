@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Command;
 
+use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ArrayIterator;
 use PDO;
 use Prooph\EventStore\EventStore;
@@ -13,8 +14,6 @@ use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use function sprintf;
-use function strtolower;
 
 class EventEngineEventStreamsCreateCommand extends Command
 {
@@ -66,7 +65,7 @@ class EventEngineEventStreamsCreateCommand extends Command
 
         foreach ($this->aggregates as $aggregate) {
             $reflectionClass = new ReflectionClass($aggregate);
-            $streamName = sprintf('%s_stream', strtolower($reflectionClass->getShortName()));
+            $streamName= EventEngineUtil::fromAggregateNameToStreamName($reflectionClass->getShortName());
             $streamNameObject = new StreamName($streamName);
 
             if ($this->eventStore->hasStream($streamNameObject)) {

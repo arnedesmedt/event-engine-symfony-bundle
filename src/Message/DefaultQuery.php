@@ -10,8 +10,6 @@ use function implode;
 
 trait DefaultQuery
 {
-    use DefaultResponses;
-
     /**
      * @inheritDoc
      */

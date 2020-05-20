@@ -8,8 +8,6 @@ use ReflectionClass;
 
 trait DefaultAggregateCommand
 {
-    use DefaultResponses;
-
     /**
      * The default aggregate method is the shortname of the class.
      */

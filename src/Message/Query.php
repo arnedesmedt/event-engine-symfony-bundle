@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Message;
 
-interface Query extends HasResponses
+interface Query
 {
     /**
      * @return class-string|string

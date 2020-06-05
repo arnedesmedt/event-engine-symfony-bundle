@@ -45,6 +45,15 @@ class EventEngineDataResetCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
+        /** @var Application $application */
+        $application = $this->getApplication();
+
+        $createEventStreams = $application->find('event-engine:event-streams:create');
+        $createDocumentStores = $application->find('event-engine:document-stores:create');
+
+        $createEventStreams->run($input, $output);
+        $createDocumentStores->run($input, $output);
+
         foreach ($this->aggregates as $aggregate) {
             $documentStore = EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregate);
             $streamName = EventEngineUtil::fromAggregateNameToStreamName($aggregate);
@@ -60,15 +69,6 @@ class EventEngineDataResetCommand extends Command
 
             $this->documentStore->dropCollection($documentStore);
         }
-
-        /** @var Application $application */
-        $application = $this->getApplication();
-
-        $createEventStreams = $application->find('event-engine:event-streams:create');
-        $createDocumentStores = $application->find('event-engine:document-stores:create');
-
-        $createEventStreams->run($input, $output);
-        $createDocumentStores->run($input, $output);
 
         return 0;
     }

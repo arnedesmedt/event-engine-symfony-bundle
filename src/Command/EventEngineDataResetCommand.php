@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use Prooph\EventStore\EventStore;
 use Prooph\EventStore\StreamName;
+use ReflectionClass;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,11 +21,11 @@ class EventEngineDataResetCommand extends Command
 
     private EventStore $eventStore;
     private DocumentStore $documentStore;
-    /** @var array<string> */
+    /** @var array<class-string> */
     private array $aggregates;
 
     /**
-     * @param array<string> $aggregates
+     * @param array<class-string> $aggregates
      */
     public function __construct(
         EventStore $eventStore,
@@ -55,8 +56,10 @@ class EventEngineDataResetCommand extends Command
         $createDocumentStores->run($input, $output);
 
         foreach ($this->aggregates as $aggregate) {
-            $documentStore = EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregate);
-            $streamName = EventEngineUtil::fromAggregateNameToStreamName($aggregate);
+            $reflectionClass = new ReflectionClass($aggregate);
+            $shortAggregateName = $reflectionClass->getShortName();
+            $documentStore = EventEngineUtil::fromAggregateNameToDocumentStoreName($shortAggregateName);
+            $streamName = EventEngineUtil::fromAggregateNameToStreamName($shortAggregateName);
             $streamNameObject = new StreamName($streamName);
 
             if ($this->eventStore->hasStream($streamNameObject)) {

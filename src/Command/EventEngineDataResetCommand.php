@@ -73,6 +73,9 @@ class EventEngineDataResetCommand extends Command
             $this->documentStore->dropCollection($documentStore);
         }
 
+        $createEventStreams->run($input, $output);
+        $createDocumentStores->run($input, $output);
+
         return 0;
     }
 }

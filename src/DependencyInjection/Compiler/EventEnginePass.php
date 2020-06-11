@@ -183,7 +183,7 @@ final class EventEnginePass implements CompilerPassInterface
         }
     }
 
-    private function makePublic(ContainerBuilder $container, string ...$classes) : void
+    private function makePublic(ContainerBuilder $container) : void
     {
         $classes = [
             ...$container->getParameter('event_engine.resolvers'),

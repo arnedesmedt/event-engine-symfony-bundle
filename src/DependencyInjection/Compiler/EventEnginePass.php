@@ -18,6 +18,8 @@ use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\EventEngineDescription;
 use ReflectionClass;
 use RuntimeException;
+use Symfony\Component\Config\Resource\ReflectionClassResource;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -36,20 +38,19 @@ final class EventEnginePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container) : void
     {
-        $resources = $container->getResources();
-
         $domainNamespace = $container->getParameter('event_engine.domain_namespace');
         $filter = sprintf('reflection.%s', $domainNamespace);
 
         $resources = array_filter(
-            $resources,
-            static function (string $resource) use ($filter) {
-                return strpos($resource . '', $filter) === 0;
+            $container->getResources(),
+            static function (ResourceInterface $resource) use ($filter) {
+                return $resource instanceof ReflectionClassResource
+                    && strpos($resource . '', $filter) === 0;
             }
         );
 
         $resources = array_map(
-            static function (string $resource) {
+            static function (ReflectionClassResource $resource) {
                 /** @var class-string $class */
                 $class = substr($resource . '', 11);
 

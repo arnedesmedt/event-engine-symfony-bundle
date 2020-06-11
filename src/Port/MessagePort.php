@@ -162,6 +162,6 @@ final class MessagePort implements Port
      */
     public function callResolver($customQuery, $resolver)
     {
-        return $resolver->resolve($customQuery);
+        return $resolver($customQuery);
     }
 }

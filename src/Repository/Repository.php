@@ -107,6 +107,18 @@ class Repository
         );
     }
 
+    public function countDocuments(?Filter $filter = null) : int
+    {
+        if ($filter === null) {
+            $filter = new AnyFilter();
+        }
+
+        return $this->documentStore->countDocs(
+            $this->documentStoreName,
+            $filter
+        );
+    }
+
     /**
      * @return array<ImmutableRecord>
      */

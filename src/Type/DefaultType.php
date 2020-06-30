@@ -11,22 +11,22 @@ use EventEngine\JsonSchema\Type\TypeRef;
 
 abstract class DefaultType
 {
-    public static function getAll() : ArrayType
+    public static function getAll(): ArrayType
     {
         return JsonSchema::array(
             static::byId()
         );
     }
 
-    public static function byId() : TypeRef
+    public static function byId(): TypeRef
     {
         return JsonSchema::typeRef(static::typeRefName());
     }
 
-    public static function emptyResponse() : ObjectType
+    public static function emptyResponse(): ObjectType
     {
         return JsonSchema::object([]);
     }
 
-    abstract public static function typeRefName() : string;
+    abstract public static function typeRefName(): string;
 }

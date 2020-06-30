@@ -16,6 +16,7 @@ use Opis\JsonSchema\Schema;
 use Opis\JsonSchema\Validator;
 use ReflectionClass;
 use RuntimeException;
+
 use function get_class;
 use function gettype;
 use function is_array;
@@ -70,7 +71,7 @@ final class MessagePort implements Port
      *
      * @return array<mixed>
      */
-    public function serializePayload($customMessage) : array
+    public function serializePayload($customMessage): array
     {
         if (is_array($customMessage)) {
             return $customMessage;
@@ -92,7 +93,7 @@ final class MessagePort implements Port
     /**
      * @inheritDoc
      */
-    public function decorateCommand($customCommand) : MessageBag
+    public function decorateCommand($customCommand): MessageBag
     {
         return new MessageBag(
             get_class($customCommand),
@@ -104,7 +105,7 @@ final class MessagePort implements Port
     /**
      * @inheritDoc
      */
-    public function decorateEvent($customEvent) : MessageBag
+    public function decorateEvent($customEvent): MessageBag
     {
         return new MessageBag(
             get_class($customEvent),
@@ -116,7 +117,7 @@ final class MessagePort implements Port
     /**
      * @inheritDoc
      */
-    public function getAggregateIdFromCommand(string $aggregateIdPayloadKey, $command) : string
+    public function getAggregateIdFromCommand(string $aggregateIdPayloadKey, $command): string
     {
         if ($command instanceof AggregateCommand) {
             return $command->__aggregateId();

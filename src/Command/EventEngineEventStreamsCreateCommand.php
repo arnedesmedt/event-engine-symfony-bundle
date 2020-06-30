@@ -40,12 +40,12 @@ class EventEngineEventStreamsCreateCommand extends Command
         $this->aggregates = $aggregates;
     }
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this->setDescription('Create the event_streams table and all the current available streams.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->connection->exec(
             'CREATE TABLE IF NOT EXISTS event_streams (
@@ -65,7 +65,7 @@ class EventEngineEventStreamsCreateCommand extends Command
 
         foreach ($this->aggregates as $aggregate) {
             $reflectionClass = new ReflectionClass($aggregate);
-            $streamName= EventEngineUtil::fromAggregateNameToStreamName($reflectionClass->getShortName());
+            $streamName = EventEngineUtil::fromAggregateNameToStreamName($reflectionClass->getShortName());
             $streamNameObject = new StreamName($streamName);
 
             if ($this->eventStore->hasStream($streamNameObject)) {

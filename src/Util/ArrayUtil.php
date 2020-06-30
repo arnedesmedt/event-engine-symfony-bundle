@@ -6,6 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\Util;
 
 use Closure;
 use stdClass;
+
 use function is_array;
 use function is_int;
 
@@ -21,7 +22,7 @@ final class ArrayUtil
         ?Closure $keyClosure = null,
         ?Closure $valueClosure = null,
         bool $recursive = false
-    ) : array {
+    ): array {
         $processedArray = [];
 
         foreach ($array as $key => $value) {
@@ -50,11 +51,11 @@ final class ArrayUtil
      *
      * @return array<int|string, mixed>
      */
-    public static function toCamelCasedKeys(array $array, bool $recursive = false) : array
+    public static function toCamelCasedKeys(array $array, bool $recursive = false): array
     {
         return self::process(
             $array,
-            static fn($key) => is_int($key) ? $key : StringUtil::camelize($key),
+            static fn ($key) => is_int($key) ? $key : StringUtil::camelize($key),
             null,
             $recursive
         );
@@ -65,11 +66,11 @@ final class ArrayUtil
      *
      * @return array<int|string, mixed>
      */
-    public static function toSnakeCasedKeys(array $array, bool $recursive = false) : array
+    public static function toSnakeCasedKeys(array $array, bool $recursive = false): array
     {
         return self::process(
             $array,
-            static fn($key) => is_int($key) ? $key : StringUtil::decamilize($key),
+            static fn ($key) => is_int($key) ? $key : StringUtil::decamilize($key),
             null,
             $recursive
         );
@@ -80,12 +81,12 @@ final class ArrayUtil
      *
      * @return array<int|string, mixed>
      */
-    public static function toSnakeCasedValues(array $array, bool $recursive = false) : array
+    public static function toSnakeCasedValues(array $array, bool $recursive = false): array
     {
         return self::process(
             $array,
             null,
-            static fn($value) => is_int($value) ? $value : StringUtil::decamilize($value),
+            static fn ($value) => is_int($value) ? $value : StringUtil::decamilize($value),
             $recursive
         );
     }

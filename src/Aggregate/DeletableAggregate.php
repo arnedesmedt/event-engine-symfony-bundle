@@ -8,7 +8,7 @@ trait DeletableAggregate
 {
     private bool $deleted = false;
 
-    public function deleted() : bool
+    public function deleted(): bool
     {
         return $this->deleted === true;
     }

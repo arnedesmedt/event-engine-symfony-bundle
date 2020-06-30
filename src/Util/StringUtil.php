@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Util;
 
 use ADS\Bundle\EventEngineBundle\Exception\StringUtilException;
+
 use function lcfirst;
 use function preg_replace;
 use function sprintf;
@@ -14,14 +15,14 @@ use function ucwords;
 
 final class StringUtil
 {
-    public static function camelize(string $string, string $delimiter = '_', bool $pascal = false) : string
+    public static function camelize(string $string, string $delimiter = '_', bool $pascal = false): string
     {
         $result = str_replace($delimiter, '', ucwords($string, $delimiter));
 
         return $pascal ? $result : lcfirst($result);
     }
 
-    public static function decamilize(string $string, string $delimiter = '_') : string
+    public static function decamilize(string $string, string $delimiter = '_'): string
     {
         $regex = [
             '/([a-z\d])([A-Z])/',

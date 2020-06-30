@@ -9,24 +9,24 @@ use EventEngine\Data\ImmutableRecord;
 
 interface AggregateRoot
 {
-    public static function reconstituteFromHistory(Event ...$domainEvents) : AggregateRoot;
+    public static function reconstituteFromHistory(Event ...$domainEvents): AggregateRoot;
 
     /**
      * @param array<mixed> $state
      */
-    public static function reconstituteFromStateArray(array $state) : AggregateRoot;
+    public static function reconstituteFromStateArray(array $state): AggregateRoot;
 
     /**
      * @return array<Event>
      */
-    public function popRecordedEvents() : array;
+    public function popRecordedEvents(): array;
 
-    public function apply(Event $event) : void;
+    public function apply(Event $event): void;
 
     /**
      * @return array<mixed>
      */
-    public function toArray() : array;
+    public function toArray(): array;
 
     /**
      * @return ImmutableRecord

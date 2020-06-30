@@ -16,6 +16,7 @@ use EventEngine\Schema\TypeSchema;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use RuntimeException;
+
 use function sprintf;
 
 final class Configurator
@@ -91,7 +92,7 @@ final class Configurator
         );
     }
 
-    public function __invoke(EventEngine $eventEngine) : void
+    public function __invoke(EventEngine $eventEngine): void
     {
         foreach ($this->commandClasses as $command) {
             /** @var PayloadSchema $schema */

@@ -9,6 +9,7 @@ use ADS\Bundle\EventEngineBundle\Message\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Message\Event;
 use EventEngine\Runtime\Oop\Port;
 use RuntimeException;
+
 use function get_class;
 use function gettype;
 use function is_object;
@@ -34,7 +35,7 @@ final class EventSourceAggregatePort implements Port
      * @param AggregateCommand $customCommand
      * @param array<int, class-string> $contextServices
      */
-    public function callAggregateWithCommand($aggregate, $customCommand, ...$contextServices) : void // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+    public function callAggregateWithCommand($aggregate, $customCommand, ...$contextServices): void // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
     {
         $method = lcfirst($customCommand->__aggregateMethod());
 
@@ -56,7 +57,7 @@ final class EventSourceAggregatePort implements Port
      *
      * @return array<Event>
      */
-    public function popRecordedEvents($aggregate) : array // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+    public function popRecordedEvents($aggregate): array // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
     {
         if (! $aggregate instanceof AggregateRoot) {
             throw new RuntimeException(
@@ -74,7 +75,7 @@ final class EventSourceAggregatePort implements Port
     /**
      * @inheritDoc
      */
-    public function applyEvent($aggregate, $customEvent) : void
+    public function applyEvent($aggregate, $customEvent): void
     {
         if (! $aggregate instanceof AggregateRoot) {
             throw new RuntimeException(
@@ -94,7 +95,7 @@ final class EventSourceAggregatePort implements Port
      *
      * @return array<mixed>
      */
-    public function serializeAggregate($aggregate) : array
+    public function serializeAggregate($aggregate): array
     {
         if (! $aggregate instanceof AggregateRoot) {
             throw new RuntimeException(
@@ -135,7 +136,7 @@ final class EventSourceAggregatePort implements Port
         return $aggregateClass::reconstituteFromStateArray($state);
     }
 
-    protected function aggregateClassByType(string $aggregateType) : string
+    protected function aggregateClassByType(string $aggregateType): string
     {
         return $aggregateType;
     }

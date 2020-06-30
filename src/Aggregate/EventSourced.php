@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Message\Event;
 use ReflectionClass;
 use ReflectionNamedType;
 use RuntimeException;
+
 use function get_class;
 use function method_exists;
 use function sprintf;
@@ -20,7 +21,7 @@ trait EventSourced
     /** @var mixed */
     private $state;
 
-    public static function reconstituteFromHistory(Event ...$domainEvents) : AggregateRoot
+    public static function reconstituteFromHistory(Event ...$domainEvents): AggregateRoot
     {
         $self = new self();
 
@@ -34,7 +35,7 @@ trait EventSourced
     /**
      * @return class-string
      */
-    private static function stateClass() : string
+    private static function stateClass(): string
     {
         $refObj = new ReflectionClass(self::class);
 
@@ -56,7 +57,7 @@ trait EventSourced
     /**
      * @param array<string, mixed> $state
      */
-    public static function reconstituteFromStateArray(array $state) : AggregateRoot
+    public static function reconstituteFromStateArray(array $state): AggregateRoot
     {
         $stateClass = self::stateClass();
 
@@ -66,7 +67,7 @@ trait EventSourced
         return $self;
     }
 
-    public function recordThat(Event $event) : void
+    public function recordThat(Event $event): void
     {
         $this->recordedEvents[] = $event;
     }
@@ -74,7 +75,7 @@ trait EventSourced
     /**
      * @return Event[]
      */
-    public function popRecordedEvents() : array
+    public function popRecordedEvents(): array
     {
         $events = $this->recordedEvents;
         $this->recordedEvents = [];
@@ -82,7 +83,7 @@ trait EventSourced
         return $events;
     }
 
-    public function apply(Event $event) : void
+    public function apply(Event $event): void
     {
         $whenMethod = $this->deriveMethodNameFromEvent($event);
 
@@ -100,7 +101,7 @@ trait EventSourced
         $this->{$whenMethod}($event);
     }
 
-    private function deriveMethodNameFromEvent(Event $event) : string
+    private function deriveMethodNameFromEvent(Event $event): string
     {
         return $event->__applyMethod();
     }
@@ -108,7 +109,7 @@ trait EventSourced
     /**
      * @return array<mixed>
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return $this->state->toArray();
     }

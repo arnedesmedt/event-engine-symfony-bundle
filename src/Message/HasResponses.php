@@ -11,11 +11,11 @@ interface HasResponses
     /**
      * @return array<int, ResponseTypeSchema>
      */
-    public static function __responseSchemasPerStatusCode() : array;
+    public static function __responseSchemasPerStatusCode(): array;
 
-    public static function __responseSchemaForStatusCode(int $statusCode) : ResponseTypeSchema;
+    public static function __responseSchemaForStatusCode(int $statusCode): ResponseTypeSchema;
 
-    public static function __defaultStatusCode() : ?int;
+    public static function __defaultStatusCode(): ?int;
 
-    public static function __defaultResponseSchema() : ResponseTypeSchema;
+    public static function __defaultResponseSchema(): ResponseTypeSchema;
 }

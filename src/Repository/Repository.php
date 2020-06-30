@@ -14,6 +14,7 @@ use PDO;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Traversable;
+
 use function array_filter;
 use function array_map;
 use function array_values;
@@ -46,7 +47,7 @@ class Repository
      *
      * @return array<ImmutableRecord>
      */
-    public function statesFromDocuments(Traversable $documents) : array
+    public function statesFromDocuments(Traversable $documents): array
     {
         return array_filter(
             array_map(
@@ -59,7 +60,7 @@ class Repository
     /**
      * @param array<mixed>|null $document
      */
-    public function stateFromDocument(?array $document) : ?ImmutableRecord
+    public function stateFromDocument(?array $document): ?ImmutableRecord
     {
         if ($document === null) {
             return null;
@@ -71,7 +72,7 @@ class Repository
     /**
      * @return Traversable<array<mixed>>
      */
-    public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null) : Traversable
+    public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): Traversable
     {
         if ($filter === null) {
             $filter = new AnyFilter();
@@ -93,7 +94,7 @@ class Repository
         ?Filter $filter = null,
         ?int $skip = null,
         ?int $limit = null
-    ) : Traversable {
+    ): Traversable {
         if ($filter === null) {
             $filter = new AnyFilter();
         }
@@ -107,7 +108,7 @@ class Repository
         );
     }
 
-    public function countDocuments(?Filter $filter = null) : int
+    public function countDocuments(?Filter $filter = null): int
     {
         if ($filter === null) {
             $filter = new AnyFilter();
@@ -122,7 +123,7 @@ class Repository
     /**
      * @return array<ImmutableRecord>
      */
-    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null) : array
+    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null): array
     {
         return $this->statesFromDocuments(
             $this->findDocuments($filter, $skip, $limit)
@@ -134,7 +135,7 @@ class Repository
      *
      * @return array<mixed>
      */
-    public function findDocument($identifier) : ?array
+    public function findDocument($identifier): ?array
     {
         return $this->documentStore->getDoc(
             $this->documentStoreName,
@@ -145,7 +146,7 @@ class Repository
     /**
      * @param string|ValueObject $identifier
      */
-    public function findDocumentState($identifier) : ?ImmutableRecord
+    public function findDocumentState($identifier): ?ImmutableRecord
     {
         return $this->stateFromDocument(
             $this->findDocument($identifier)
@@ -155,7 +156,7 @@ class Repository
     /**
      * @param string|ValueObject $identifier
      */
-    public function hasDocument($identifier) : bool
+    public function hasDocument($identifier): bool
     {
         $document = $this->findDocument($identifier);
 
@@ -165,7 +166,7 @@ class Repository
     /**
      * @param string|ValueObject $identifier
      */
-    public function hasNoDocument($identifier) : bool
+    public function hasNoDocument($identifier): bool
     {
         return ! $this->hasDocument($identifier);
     }
@@ -179,10 +180,10 @@ class Repository
         $identifier,
         ?string $message = null,
         string $exceptionClass = NotFoundHttpException::class
-    ) : array {
+    ): array {
         $document = $this->findDocument($identifier);
 
-        $message = $message ?? sprintf(
+        $message ??= sprintf(
             'Resource with id \'%s\' not found in document store \'%s\'',
             (string) $identifier,
             $this->documentStoreName
@@ -204,7 +205,7 @@ class Repository
         $identifier,
         ?string $message = null,
         string $exceptionClass = NotFoundHttpException::class
-    ) : ?ImmutableRecord {
+    ): ?ImmutableRecord {
         $document = $this->needDocument($identifier, $message, $exceptionClass);
 
         return $this->stateFromDocument($document);
@@ -217,10 +218,10 @@ class Repository
         $identifier,
         ?string $message = null,
         string $exceptionClass = ConflictHttpException::class
-    ) : void {
+    ): void {
         $document = $this->findDocument($identifier);
 
-        $message = $message ?? sprintf(
+        $message ??= sprintf(
             'Resource with id \'%s\' already exists in document store \'%s\'',
             (string) $identifier,
             $this->documentStoreName
@@ -241,7 +242,7 @@ class Repository
         ?array $document,
         $message,
         string $exceptionClass = NotFoundHttpException::class
-    ) : void {
+    ): void {
         if ($document === null) {
             throw new $exceptionClass($message);
         }
@@ -255,7 +256,7 @@ class Repository
         ?array $document,
         $message,
         string $exceptionClass = ConflictHttpException::class
-    ) : void {
+    ): void {
         if ($document !== null) {
             throw new $exceptionClass($message);
         }

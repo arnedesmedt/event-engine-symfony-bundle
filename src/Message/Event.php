@@ -6,5 +6,5 @@ namespace ADS\Bundle\EventEngineBundle\Message;
 
 interface Event
 {
-    public function __applyMethod() : string;
+    public function __applyMethod(): string;
 }

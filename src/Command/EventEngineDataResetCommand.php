@@ -39,12 +39,12 @@ class EventEngineDataResetCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this->setDescription('Reset all the streams and document stores');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var Application $application */
         $application = $this->getApplication();

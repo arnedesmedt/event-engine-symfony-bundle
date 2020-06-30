@@ -32,12 +32,12 @@ class EventEngineDocumentStoresCreateCommand extends Command
         $this->aggregates = $aggregates;
     }
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this->setDescription('Create all the document stores.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         foreach ($this->aggregates as $aggregate) {
             $reflectionClass = new ReflectionClass($aggregate);

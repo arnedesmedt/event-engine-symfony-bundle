@@ -11,7 +11,7 @@ trait DefaultAggregateCommand
     /**
      * The default aggregate method is the shortname of the class.
      */
-    public static function __aggregateMethod() : string
+    public static function __aggregateMethod(): string
     {
         return (new ReflectionClass(static::class))->getShortName();
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Exception;
 
 use Exception;
+
 use function sprintf;
 
 final class StringUtilException extends Exception

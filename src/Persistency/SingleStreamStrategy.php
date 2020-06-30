@@ -12,6 +12,7 @@ use Prooph\EventStore\Pdo\PersistenceStrategy\PostgresPersistenceStrategy;
 use Prooph\EventStore\Pdo\Util\Json;
 use Prooph\EventStore\Pdo\Util\PostgresHelper;
 use Prooph\EventStore\StreamName;
+
 use function array_merge;
 use function sprintf;
 
@@ -29,7 +30,7 @@ final class SingleStreamStrategy implements PostgresPersistenceStrategy
     /**
      * @inheritDoc
      */
-    public function createSchema(string $tableName) : array
+    public function createSchema(string $tableName): array
     {
         $tableName = $this->quoteIdent($tableName);
 
@@ -72,7 +73,7 @@ EOT;
     /**
      * @return array<string>
      */
-    public function columnNames() : array
+    public function columnNames(): array
     {
         return [
             'event_id',
@@ -88,7 +89,7 @@ EOT;
      *
      * @return array<mixed>
      */
-    public function prepareData(Iterator $streamEvents) : array
+    public function prepareData(Iterator $streamEvents): array
     {
         $data = [];
 
@@ -105,7 +106,7 @@ EOT;
         return $data;
     }
 
-    public function generateTableName(StreamName $streamName) : string
+    public function generateTableName(StreamName $streamName): string
     {
         $table = $streamName->toString();
         $schema = $this->extractSchema($table);
@@ -120,7 +121,7 @@ EOT;
     /**
      * @return array<string>
      */
-    private function getSchemaCreationSchema(string $tableName) : array
+    private function getSchemaCreationSchema(string $tableName): array
     {
         $schemaName = $this->extractSchema($tableName);
 
@@ -128,10 +129,11 @@ EOT;
             return [];
         }
 
-        return [sprintf(
-            'CREATE SCHEMA IF NOT EXISTS %s',
-            $schemaName
-        ),
+        return [
+            sprintf(
+                'CREATE SCHEMA IF NOT EXISTS %s',
+                $schemaName
+            ),
         ];
     }
 }

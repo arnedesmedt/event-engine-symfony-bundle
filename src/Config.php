@@ -7,6 +7,7 @@ namespace ADS\Bundle\EventEngineBundle;
 use EventEngine\EventEngine;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
+
 use function array_map;
 
 final class Config implements CacheClearerInterface
@@ -26,7 +27,7 @@ final class Config implements CacheClearerInterface
     /**
      * @return array<mixed>
      */
-    public function config() : array
+    public function config(): array
     {
         return $this->cache->get(
             self::CONFIG,
@@ -64,7 +65,7 @@ final class Config implements CacheClearerInterface
         return $aggregateIdentifiers[$aggregateRootClass] ?? $defaultAggregateIdentifier;
     }
 
-    public function clear(string $cacheDir) : void
+    public function clear(string $cacheDir): void
     {
         $this->cache->clear();
     }

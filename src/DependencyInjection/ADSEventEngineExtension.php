@@ -14,7 +14,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension
     /**
      * @param array<mixed> $mergedConfig
      */
-    protected function loadInternal(array $mergedConfig, ContainerBuilder $container) : void
+    protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader(
             $container,

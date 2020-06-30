@@ -15,17 +15,17 @@ final class TransactionalConnection implements \EventEngine\Persistence\Transact
         $this->connection = $connection;
     }
 
-    public function beginTransaction() : void
+    public function beginTransaction(): void
     {
         $this->connection->beginTransaction();
     }
 
-    public function commit() : void
+    public function commit(): void
     {
         $this->connection->commit();
     }
 
-    public function rollBack() : void
+    public function rollBack(): void
     {
         $this->connection->rollBack();
     }

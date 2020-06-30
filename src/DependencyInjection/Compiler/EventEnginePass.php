@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+
 use function array_filter;
 use function array_map;
 use function array_reduce;
@@ -36,7 +37,7 @@ use function substr;
 
 final class EventEnginePass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container) : void
+    public function process(ContainerBuilder $container): void
     {
         $domainNamespace = $container->getParameter('event_engine.domain_namespace');
         $filter = sprintf('reflection.%s', $domainNamespace);
@@ -131,7 +132,7 @@ final class EventEnginePass implements CompilerPassInterface
         $this->makePublic($container);
     }
 
-    private function buildRepositories(ContainerBuilder $container) : void
+    private function buildRepositories(ContainerBuilder $container): void
     {
         $repository = $container->getDefinition(Repository::class);
         $childRepositories = $container->getParameter('event_engine.child_repositories');
@@ -183,7 +184,7 @@ final class EventEnginePass implements CompilerPassInterface
         }
     }
 
-    private function makePublic(ContainerBuilder $container) : void
+    private function makePublic(ContainerBuilder $container): void
     {
         $classes = [
             ...$container->getParameter('event_engine.resolvers'),

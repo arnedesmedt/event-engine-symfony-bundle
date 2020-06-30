@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ReflectionClass;
 use ReflectionNamedType;
 use RuntimeException;
+
 use function sprintf;
 use function str_replace;
 use function strlen;
@@ -23,7 +24,7 @@ final class EventEngineUtil
      *
      * @return class-string
      */
-    public static function fromStateToAggregateClass(string $stateClass) : string
+    public static function fromStateToAggregateClass(string $stateClass): string
     {
         $aggregateRootName = self::fromStateToAggregateRootName($stateClass);
         /** @var class-string $aggregateRootClass */
@@ -49,7 +50,7 @@ final class EventEngineUtil
     /**
      * @param class-string $stateClass
      */
-    public static function fromStateToAggregateRootName(string $stateClass) : string
+    public static function fromStateToAggregateRootName(string $stateClass): string
     {
         $namespace = substr($stateClass, 0, -(strlen('State') + 1));
         $pos = strrpos($namespace, '\\');
@@ -60,7 +61,7 @@ final class EventEngineUtil
     /**
      * @param class-string $stateClass
      */
-    public static function fromStateToRepositoryId(string $stateClass) : string
+    public static function fromStateToRepositoryId(string $stateClass): string
     {
         $aggregateRootName = self::fromStateToAggregateRootName($stateClass);
 
@@ -70,7 +71,7 @@ final class EventEngineUtil
     /**
      * @param class-string $aggregateClass
      */
-    public static function fromAggregateClassToStateClass(string $aggregateClass) : string
+    public static function fromAggregateClassToStateClass(string $aggregateClass): string
     {
         $reflectionAggregateRoot = new ReflectionClass($aggregateClass);
         if (! $reflectionAggregateRoot->implementsInterface(AggregateRoot::class)) {
@@ -91,22 +92,22 @@ final class EventEngineUtil
         return $returnType->getName();
     }
 
-    public static function fromAggregateNameToAggregateClass(string $aggregateName, string $entityNamespace) : string
+    public static function fromAggregateNameToAggregateClass(string $aggregateName, string $entityNamespace): string
     {
         return sprintf('%s\\%2$s\\%2$s', $entityNamespace, ucfirst(StringUtil::camelize($aggregateName)));
     }
 
-    public static function fromAggregateNameToStreamName(string $aggregateName) : string
+    public static function fromAggregateNameToStreamName(string $aggregateName): string
     {
         return sprintf('%s_stream', StringUtil::decamilize($aggregateName));
     }
 
-    public static function fromAggregateNameToDocumentStoreName(string $aggregateName) : string
+    public static function fromAggregateNameToDocumentStoreName(string $aggregateName): string
     {
         return sprintf('%s_state', StringUtil::decamilize($aggregateName));
     }
 
-    public static function fromAggregateNameToStateClass(string $aggregateName, string $entityNamespace) : string
+    public static function fromAggregateNameToStateClass(string $aggregateName, string $entityNamespace): string
     {
         /** @var class-string $aggregateClass */
         $aggregateClass = self::fromAggregateNameToAggregateClass($aggregateName, $entityNamespace);

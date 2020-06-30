@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Exception;
 
 use Exception;
+
 use function sprintf;
 
 final class ResponseException extends Exception
@@ -12,7 +13,7 @@ final class ResponseException extends Exception
     /**
      * @param class-string $class
      */
-    public static function statusCodeNotFound(int $statusCode, string $class) : self
+    public static function statusCodeNotFound(int $statusCode, string $class): self
     {
         return new static(
             sprintf(

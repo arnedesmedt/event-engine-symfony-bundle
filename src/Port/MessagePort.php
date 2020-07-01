@@ -63,6 +63,14 @@ final class MessagePort implements Port
             $this->validator->schemaValidation($data, Schema::fromJsonString($schema));
         }
 
+        $encodedData = json_encode($data);
+
+        if ($encodedData === false) {
+            throw JsonException::couldNotEncode($data);
+        }
+
+        $data = json_decode($encodedData, true);
+
         return $messageType::fromArray((array) $data);
     }
 

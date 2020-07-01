@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1e0a9a76c95aacf018905a4fd842a67a",
+    "content-hash": "10a2531daafd9b6336408143922a63fd",
     "packages": [
         {
             "name": "arnedesmedt/value-objects",
@@ -1690,16 +1690,16 @@
         },
         {
             "name": "event-engine/php-json-schema",
-            "version": "v2.0-beta.1",
+            "version": "v2.0-beta.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/event-engine/php-json-schema.git",
-                "reference": "a0868e05fbb272f6ec3e04c22ef3bc9d028a3a92"
+                "reference": "c9edcf7c5d936d359d45bd6c7fbf120e8cc6f688"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/event-engine/php-json-schema/zipball/a0868e05fbb272f6ec3e04c22ef3bc9d028a3a92",
-                "reference": "a0868e05fbb272f6ec3e04c22ef3bc9d028a3a92",
+                "url": "https://api.github.com/repos/event-engine/php-json-schema/zipball/c9edcf7c5d936d359d45bd6c7fbf120e8cc6f688",
+                "reference": "c9edcf7c5d936d359d45bd6c7fbf120e8cc6f688",
                 "shasum": ""
             },
             "require": {
@@ -1707,7 +1707,7 @@
                 "event-engine/php-engine-utils": "^0.1",
                 "event-engine/php-schema": "^0.1",
                 "php": "^7.4",
-                "ramsey/uuid": "^3.6"
+                "ramsey/uuid": "^3.6|^4.0"
             },
             "require-dev": {
                 "ext-json": "*",
@@ -1743,7 +1743,7 @@
             ],
             "description": "Event Engine JSON Schema PHP Package",
             "homepage": "https://event-engine.io/",
-            "time": "2020-02-18T22:15:02+00:00"
+            "time": "2020-06-30T18:16:17+00:00"
         },
         {
             "name": "event-engine/php-logger",

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Message;
 
 use ADS\Bundle\EventEngineBundle\Exception\ResponseException;
-use EventEngine\Schema\ResponseTypeSchema;
+use EventEngine\Schema\TypeSchema;
 
 use function reset;
 
@@ -14,7 +14,7 @@ use function reset;
  */
 trait DefaultResponses
 {
-    public static function __responseSchemaForStatusCode(int $statusCode): ResponseTypeSchema
+    public static function __responseSchemaForStatusCode(int $statusCode): TypeSchema
     {
         $responses = self::__responseSchemasPerStatusCode();
 
@@ -30,7 +30,7 @@ trait DefaultResponses
         return null;
     }
 
-    public static function __defaultResponseSchema(): ResponseTypeSchema
+    public static function __defaultResponseSchema(): TypeSchema
     {
         $statusCode = self::__defaultStatusCode();
         $responses = self::__responseSchemasPerStatusCode();

@@ -130,6 +130,11 @@ services:
         arguments:
             - '@Opis\JsonSchema\Validator'
     ADS\Bundle\EventEngineBundle\Repository\Repository: ~
-    ADS\Bundle\EventEngineBundle\Util: ~
+    ADS\Bundle\EventEngineBundle\Util\ArrayUtil: ~
+    ADS\Bundle\EventEngineBundle\Util\StringUtil: ~
+    ADS\Bundle\EventEngineBundle\Util\EventEngineUtil: ~
+    ADS\Bundle\EventEngineBundle\Exception\Handler:
+        tags:
+            - 'kernel.event_subscriber'
 
 

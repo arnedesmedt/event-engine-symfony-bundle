@@ -71,27 +71,6 @@ final class Configurator
         $this->aggregateClasses = $aggregateClasses;
     }
 
-    /**
-     * @param class-string $message
-     *
-     * @return PayloadSchema|TypeSchema
-     */
-    private static function schemaFromMessage(string $message)
-    {
-        $reflectionClass = new ReflectionClass($message);
-
-        if ($reflectionClass->implementsInterface(JsonSchemaAwareRecord::class)) {
-            return $message::__schema();
-        }
-
-        throw new RuntimeException(
-            sprintf(
-                'No schema found for message \'%s\'. Implement the JsonSchemaAwareRecord interface.',
-                $message
-            )
-        );
-    }
-
     public function __invoke(EventEngine $eventEngine): void
     {
         foreach ($this->commandClasses as $command) {
@@ -140,5 +119,26 @@ final class Configurator
                 $this->environment,
                 $this->debug
             );
+    }
+
+    /**
+     * @param class-string $message
+     *
+     * @return PayloadSchema|TypeSchema
+     */
+    private static function schemaFromMessage(string $message)
+    {
+        $reflectionClass = new ReflectionClass($message);
+
+        if ($reflectionClass->implementsInterface(JsonSchemaAwareRecord::class)) {
+            return $message::__schema();
+        }
+
+        throw new RuntimeException(
+            sprintf(
+                'No schema found for message \'%s\'. Implement the JsonSchemaAwareRecord interface.',
+                $message
+            )
+        );
     }
 }

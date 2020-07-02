@@ -14,6 +14,7 @@
     "require": {
         "php": "^7.4",
         "ext-pdo": "*",
+        "ext-json": "*",
         "event-engine/php-engine": "^0.14",
         "event-engine/php-json-schema": "2.0-beta.3",
         "event-engine/php-postgres-document-store": "^0.9.0",

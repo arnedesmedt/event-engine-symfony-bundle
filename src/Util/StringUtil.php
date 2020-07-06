@@ -11,6 +11,7 @@ use function preg_replace;
 use function sprintf;
 use function str_replace;
 use function strtolower;
+use function trim;
 use function ucwords;
 
 final class StringUtil
@@ -36,5 +37,13 @@ final class StringUtil
         }
 
         return strtolower($replaced);
+    }
+
+    public static function slug(string $slug): string
+    {
+        /** @var string $trim */
+        $trim = preg_replace('/[^A-Za-z0-9-]+/', '-', $slug);
+
+        return strtolower(trim($trim, '-'));
     }
 }

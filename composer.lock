@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "10a2531daafd9b6336408143922a63fd",
+    "content-hash": "484dd2161531a867e58e075b09a86673",
     "packages": [
         {
             "name": "arnedesmedt/value-objects",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/arnedesmedt/value-objects.git",
-                "reference": "f716e2cdc6ad4127a55013eaad772b1d4d6f1a6a"
+                "reference": "286c6ec346aac850e43e4773b3bf152871b1e187"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/arnedesmedt/value-objects/zipball/f716e2cdc6ad4127a55013eaad772b1d4d6f1a6a",
-                "reference": "f716e2cdc6ad4127a55013eaad772b1d4d6f1a6a",
+                "url": "https://api.github.com/repos/arnedesmedt/value-objects/zipball/286c6ec346aac850e43e4773b3bf152871b1e187",
+                "reference": "286c6ec346aac850e43e4773b3bf152871b1e187",
                 "shasum": ""
             },
             "require": {
@@ -29,9 +29,9 @@
                 "ramsey/uuid": "^3.9"
             },
             "require-dev": {
-                "doctrine/coding-standard": "^7.0",
-                "phpro/grumphp": "^0.17.2",
-                "phpstan/phpstan": "^0.12.7",
+                "doctrine/coding-standard": "^8.0",
+                "phpro/grumphp": "^0.19",
+                "phpstan/phpstan": "^0.12",
                 "squizlabs/php_codesniffer": "^3.5"
             },
             "type": "library",
@@ -53,7 +53,7 @@
             ],
             "description": "Value objects",
             "homepage": "https://github.com/arnedesmedt/value-objects",
-            "time": "2020-06-24T15:53:36+00:00"
+            "time": "2020-07-07T14:23:56+00:00"
         },
         {
             "name": "beberlei/assert",
@@ -6949,7 +6949,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": "^7.4",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-json": "*"
     },
     "platform-dev": []
 }

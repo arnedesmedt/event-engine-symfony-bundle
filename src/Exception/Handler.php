@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Exception;
 
 use ADS\Bundle\EventEngineBundle\Util\StringUtil;
+use ADS\ValueObjects\Exception\PatternException;
 use EventEngine\Aggregate\Exception\AggregateNotFound;
 use EventEngine\JsonSchema\Exception\JsonValidationError;
 use Prooph\EventStore\Exception\ConcurrencyException;
@@ -65,6 +66,16 @@ final class Handler implements EventSubscriberInterface
                         str_replace('"', '\'', $encodedJson)
                     );
                 }
+
+                $event->setThrowable(
+                    new BadRequestHttpException(
+                        $message,
+                        $exception
+                    )
+                );
+                break;
+            case $exception instanceof PatternException:
+                $message = $exception->getMessage();
 
                 $event->setThrowable(
                     new BadRequestHttpException(

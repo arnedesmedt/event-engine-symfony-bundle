@@ -28,5 +28,17 @@ abstract class DefaultType
         return JsonSchema::object([]);
     }
 
+    public static function created(): ObjectType
+    {
+        return JsonSchema::object([])
+            ->describedAs('Created');
+    }
+
+    public static function ok(): ObjectType
+    {
+        return JsonSchema::object([])
+            ->describedAs('OK');
+    }
+
     abstract public static function typeRefName(): string;
 }

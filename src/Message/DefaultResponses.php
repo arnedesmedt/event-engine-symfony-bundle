@@ -6,12 +6,13 @@ namespace ADS\Bundle\EventEngineBundle\Message;
 
 use ADS\Bundle\EventEngineBundle\Exception\ResponseException;
 use EventEngine\Schema\TypeSchema;
+use ReflectionClass;
+use ReflectionMethod;
 
+use function array_filter;
+use function preg_match;
 use function reset;
 
-/**
- * @method static array __responseSchemasPerStatusCode()
- */
 trait DefaultResponses
 {
     public static function __responseSchemaForStatusCode(int $statusCode): TypeSchema
@@ -44,5 +45,33 @@ trait DefaultResponses
         }
 
         return $responses[$statusCode];
+    }
+
+    /**
+     * @return array<string, TypeSchema>
+     */
+    public static function __responseSchemasPerStatusCode(): array
+    {
+        $reflectionClass = new ReflectionClass(static::class);
+        $staticMethods = $reflectionClass->getMethods(ReflectionMethod::IS_STATIC);
+
+        $responseMethods = array_filter(
+            $staticMethods,
+            static function (ReflectionMethod $reflectionMethod) {
+                $methodName = $reflectionMethod->getShortName();
+
+                return preg_match('/^__extraResponse/', $methodName);
+            }
+        );
+
+        $responses = [];
+
+        foreach ($responseMethods as $responseMethod) {
+            $closure = $responseMethod->getClosureThis();
+
+            $responses += ($closure)();
+        }
+
+        return $responses;
     }
 }

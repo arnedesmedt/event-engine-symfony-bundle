@@ -48,7 +48,7 @@ trait DefaultResponses
     }
 
     /**
-     * @return array<string, TypeSchema>
+     * @inheritDoc
      */
     public static function __responseSchemasPerStatusCode(): array
     {

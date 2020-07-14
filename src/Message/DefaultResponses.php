@@ -67,9 +67,7 @@ trait DefaultResponses
         $responses = [];
 
         foreach ($responseMethods as $responseMethod) {
-            $closure = $responseMethod->getClosureThis();
-
-            $responses += ($closure)();
+            $responses += $responseMethod->invoke(null);
         }
 
         return $responses;

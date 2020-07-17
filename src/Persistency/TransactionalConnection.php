@@ -17,16 +17,28 @@ final class TransactionalConnection implements \EventEngine\Persistence\Transact
 
     public function beginTransaction(): void
     {
+        if ($_ENV['APP_ENV'] === 'test') {
+            return;
+        }
+
         $this->connection->beginTransaction();
     }
 
     public function commit(): void
     {
+        if ($_ENV['APP_ENV'] === 'test') {
+            return;
+        }
+
         $this->connection->commit();
     }
 
     public function rollBack(): void
     {
+        if ($_ENV['APP_ENV'] === 'test') {
+            return;
+        }
+
         $this->connection->rollBack();
     }
 }

@@ -7,8 +7,11 @@ namespace ADS\Bundle\EventEngineBundle\Util;
 use Closure;
 use stdClass;
 
+use function array_keys;
+use function count;
 use function is_array;
 use function is_int;
+use function range;
 
 final class ArrayUtil
 {
@@ -89,5 +92,17 @@ final class ArrayUtil
             static fn ($value) => is_int($value) ? $value : StringUtil::decamilize($value),
             $recursive
         );
+    }
+
+    /**
+     * @param array<mixed> $array
+     */
+    public static function isAssociative(array $array): bool
+    {
+        if (empty($array)) {
+            return false;
+        }
+
+        return array_keys($array) !== range(0, count($array) - 1);
     }
 }

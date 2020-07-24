@@ -15,7 +15,6 @@ use function strlen;
 use function strrpos;
 use function strtolower;
 use function substr;
-use function ucfirst;
 
 final class EventEngineUtil
 {
@@ -94,7 +93,15 @@ final class EventEngineUtil
 
     public static function fromAggregateNameToAggregateClass(string $aggregateName, string $entityNamespace): string
     {
-        return sprintf('%s\\%2$s\\%2$s', $entityNamespace, ucfirst(StringUtil::camelize($aggregateName)));
+        return sprintf('%s\\%2$s\\%2$s', $entityNamespace, StringUtil::camelize($aggregateName, '_', true));
+    }
+
+    /**
+     * @param class-string $aggregateClass
+     */
+    public static function fromAggregateClassToAggregateName(string $aggregateClass): string
+    {
+        return (new ReflectionClass($aggregateClass))->getShortName();
     }
 
     public static function fromAggregateNameToStreamName(string $aggregateName): string

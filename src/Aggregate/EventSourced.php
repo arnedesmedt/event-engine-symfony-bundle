@@ -113,4 +113,11 @@ trait EventSourced
     {
         return $this->state->toArray();
     }
+
+    /**
+     * Unused method for preprocessors. But it needs to be callable.
+     */
+    public function preProcessorAggregateMethod(): void
+    {
+    }
 }

@@ -35,6 +35,14 @@ abstract class AggregateDescription implements EventEngineDescription
                 ->identifiedBy(static::aggregateIdentifierMapping()[$aggregateRootClass])
                 ->handle([$aggregateRootClass, $commandClass::__aggregateMethod()]);
 
+            $preprocessor = static::commandPreprocessors()[$commandClass] ?? false;
+
+            if ($preprocessor) {
+                $commandProcessor->preProcess($preprocessor);
+
+                continue;
+            }
+
             $events = static::commandEventMapping()[$commandClass] ?? [];
 
             if (! is_array($events)) {
@@ -88,4 +96,9 @@ abstract class AggregateDescription implements EventEngineDescription
      * @return array<class-string<AggregateCommand>, array<class-string>>|array<class-string<AggregateCommand>, class-string>
      */
     abstract protected static function commandServiceMapping(): array;
+
+    /**
+     * @return array<class-string<AggregateCommand>, array<class-string>>
+     */
+    abstract protected static function commandPreProcessors(): array;
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
-use ADS\Bundle\EventEngineBundle\Message\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Message\Event;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
@@ -78,27 +77,27 @@ abstract class AggregateDescription implements EventEngineDescription
     }
 
     /**
-     * @return array<class-string<AggregateRoot>, string>
+     * @return array<string, string>
      */
     abstract protected static function aggregateIdentifierMapping(): array;
 
     /**
-     * @return array<class-string<AggregateCommand>, class-string<AggregateRoot>>
+     * @return array<string, class-string<AggregateRoot>>
      */
     abstract protected static function commandAggregateMapping(): array;
 
     /**
-     * @return array<class-string<AggregateCommand>, array<class-string<Event>>>|array<class-string<AggregateCommand>, class-string<Event>>
+     * @return array<string, array<class-string<Event>>>|array<string, class-string<Event>>
      */
     abstract protected static function commandEventMapping(): array;
 
     /**
-     * @return array<class-string<AggregateCommand>, array<class-string>>|array<class-string<AggregateCommand>, class-string>
+     * @return array<string, array<class-string>>|array<string, class-string>
      */
     abstract protected static function commandServiceMapping(): array;
 
     /**
-     * @return array<class-string<AggregateCommand>, array<class-string>>
+     * @return array<string, class-string>
      */
     abstract protected static function commandPreProcessors(): array;
 }

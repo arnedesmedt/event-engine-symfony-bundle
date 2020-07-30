@@ -13,6 +13,7 @@ use EventEngine\DocumentStore\PartialSelect;
 use PDO;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 use Traversable;
 
 use function array_filter;
@@ -178,21 +179,21 @@ class Repository
      */
     public function needDocument(
         $identifier,
-        ?string $message = null,
-        string $exceptionClass = NotFoundHttpException::class
+        ?Throwable $exception = null
     ): array {
         $document = $this->findDocument($identifier);
 
-        $message ??= sprintf(
-            'Resource with id \'%s\' not found in document store \'%s\'',
-            (string) $identifier,
-            $this->documentStoreName
+        $exception ??= new NotFoundHttpException(
+            sprintf(
+                'Resource with id \'%s\' not found in document store \'%s\'',
+                (string) $identifier,
+                $this->documentStoreName
+            )
         );
 
         $this->checkDocumentExists(
             $document,
-            $message,
-            $exceptionClass
+            $exception
         );
 
         return (array) $document;
@@ -203,10 +204,9 @@ class Repository
      */
     public function needDocumentState(
         $identifier,
-        ?string $message = null,
-        string $exceptionClass = NotFoundHttpException::class
+        ?Throwable $exception = null
     ): ?ImmutableRecord {
-        $document = $this->needDocument($identifier, $message, $exceptionClass);
+        $document = $this->needDocument($identifier, $exception);
 
         return $this->stateFromDocument($document);
     }
@@ -216,49 +216,45 @@ class Repository
      */
     public function dontNeedDocument(
         $identifier,
-        ?string $message = null,
-        string $exceptionClass = ConflictHttpException::class
+        ?Throwable $exception = null
     ): void {
         $document = $this->findDocument($identifier);
 
-        $message ??= sprintf(
-            'Resource with id \'%s\' already exists in document store \'%s\'',
-            (string) $identifier,
-            $this->documentStoreName
+        $exception ??= new ConflictHttpException(
+            sprintf(
+                'Resource with id \'%s\' already exists in document store \'%s\'',
+                (string) $identifier,
+                $this->documentStoreName
+            )
         );
 
         $this->checkDocumentDoesntExists(
             $document,
-            $message,
-            $exceptionClass
+            $exception
         );
     }
 
     /**
      * @param array<mixed> $document
-     * @param mixed $message
      */
     private function checkDocumentExists(
         ?array $document,
-        $message,
-        string $exceptionClass = NotFoundHttpException::class
+        Throwable $exception
     ): void {
         if ($document === null) {
-            throw new $exceptionClass($message);
+            throw $exception;
         }
     }
 
     /**
      * @param array<mixed> $document
-     * @param mixed $message
      */
     private function checkDocumentDoesntExists(
         ?array $document,
-        $message,
-        string $exceptionClass = ConflictHttpException::class
+        Throwable $exception
     ): void {
         if ($document !== null) {
-            throw new $exceptionClass($message);
+            throw $exception;
         }
     }
 }

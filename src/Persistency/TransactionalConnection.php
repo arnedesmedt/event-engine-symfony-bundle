@@ -17,7 +17,7 @@ final class TransactionalConnection implements \EventEngine\Persistence\Transact
 
     public function beginTransaction(): void
     {
-        if ($_ENV['APP_ENV'] === 'test') {
+        if ($_SERVER['APP_ENV'] === 'test') {
             return;
         }
 
@@ -26,7 +26,7 @@ final class TransactionalConnection implements \EventEngine\Persistence\Transact
 
     public function commit(): void
     {
-        if ($_ENV['APP_ENV'] === 'test') {
+        if ($_SERVER['APP_ENV'] === 'test') {
             return;
         }
 
@@ -35,7 +35,7 @@ final class TransactionalConnection implements \EventEngine\Persistence\Transact
 
     public function rollBack(): void
     {
-        if ($_ENV['APP_ENV'] === 'test') {
+        if ($_SERVER['APP_ENV'] === 'test') {
             return;
         }
 

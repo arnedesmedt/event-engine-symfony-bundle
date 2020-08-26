@@ -32,7 +32,9 @@ abstract class AggregateDescription implements EventEngineDescription
             $commandProcessor
                 ->$aggregateRootMethod($aggregateRootClass)
                 ->identifiedBy(static::aggregateIdentifierMapping()[$aggregateRootClass])
-                ->handle([$aggregateRootClass, $commandClass::__aggregateMethod()]);
+                ->handle($usedAggregateRoot
+                    ? [FlavourHint::class, 'useAggregate']
+                    : [$aggregateRootClass, $commandClass::__aggregateMethod()]);
 
             $preprocessor = static::commandPreprocessors()[$commandClass] ?? false;
 

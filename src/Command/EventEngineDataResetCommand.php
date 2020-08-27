@@ -13,6 +13,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class EventEngineDataResetCommand extends Command
 {
@@ -46,6 +47,20 @@ class EventEngineDataResetCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
+
+        if (
+            $_SERVER['APP_ENV'] === 'prod'
+            && (
+                ! $io->confirm('Resetting the data in production is not a good idea. Are you sure?', false)
+                || ! $io->confirm('Are you really sure?', false)
+            )
+        ) {
+            $io->comment('Reset is not executed.');
+
+            return 0;
+        }
+
         /** @var Application $application */
         $application = $this->getApplication();
 
@@ -75,6 +90,8 @@ class EventEngineDataResetCommand extends Command
 
         $createEventStreams->run($input, $output);
         $createDocumentStores->run($input, $output);
+
+        $io->comment('Reset executed.');
 
         return 0;
     }

@@ -11,6 +11,7 @@ use function array_keys;
 use function count;
 use function is_array;
 use function is_int;
+use function ksort;
 use function range;
 
 final class ArrayUtil
@@ -104,5 +105,21 @@ final class ArrayUtil
         }
 
         return array_keys($array) !== range(0, count($array) - 1);
+    }
+
+    /**
+     * @param array<mixed> $array
+     */
+    public static function ksortRecursive(array &$array): bool
+    {
+        foreach ($array as &$value) {
+            if (! is_array($value)) {
+                continue;
+            }
+
+            self::ksortRecursive($value);
+        }
+
+        return ksort($array);
     }
 }

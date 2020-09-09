@@ -121,6 +121,16 @@ class Repository
         );
     }
 
+    public function hasDocuments(?Filter $filter = null): bool
+    {
+        return $this->countDocuments($filter) > 0;
+    }
+
+    public function hasNoDocuments(?Filter $filter = null): bool
+    {
+        return $this->countDocuments($filter) === 0;
+    }
+
     /**
      * @return array<ImmutableRecord>
      */

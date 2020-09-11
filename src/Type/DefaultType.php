@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Type;
 
 use EventEngine\JsonSchema\JsonSchema;
+use EventEngine\JsonSchema\Type;
 use EventEngine\JsonSchema\Type\ArrayType;
 use EventEngine\JsonSchema\Type\ObjectType;
-use EventEngine\JsonSchema\Type\TypeRef;
+use EventEngine\Schema\TypeSchema;
 
 abstract class DefaultType
 {
     public static function getAll(): ArrayType
     {
-        return JsonSchema::array(
-            static::byId()
-        );
+        /** @var Type $byId */
+        $byId = static::byId();
+
+        return JsonSchema::array($byId);
     }
 
-    public static function byId(): TypeRef
+    public static function byId(): TypeSchema
     {
         return JsonSchema::typeRef(static::typeRefName());
     }

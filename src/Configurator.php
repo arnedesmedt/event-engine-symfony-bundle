@@ -37,6 +37,8 @@ final class Configurator
     private array $eventClasses;
     /** @var array<class-string> */
     private array $aggregateClasses;
+    /** @var array<class-string> */
+    private array $typeClasses;
 
     /**
      * @param array<class-string> $descriptionServices
@@ -44,6 +46,7 @@ final class Configurator
      * @param array<class-string> $queryClasses
      * @param array<class-string> $eventClasses
      * @param array<class-string> $aggregateClasses
+     * @param array<class-string> $typeClasses
      */
     public function __construct(
         Flavour $flavour,
@@ -56,7 +59,8 @@ final class Configurator
         array $commandClasses,
         array $queryClasses,
         array $eventClasses,
-        array $aggregateClasses
+        array $aggregateClasses,
+        array $typeClasses
     ) {
         $this->flavour = $flavour;
         $this->multiModelStore = $multiModelStore;
@@ -69,6 +73,7 @@ final class Configurator
         $this->queryClasses = $queryClasses;
         $this->eventClasses = $eventClasses;
         $this->aggregateClasses = $aggregateClasses;
+        $this->typeClasses = $typeClasses;
     }
 
     public function __invoke(EventEngine $eventEngine): void
@@ -101,6 +106,10 @@ final class Configurator
 
         foreach ($this->aggregateClasses as $aggregateClass) {
             $eventEngine->registerResponseType(EventEngineUtil::fromAggregateClassToStateClass($aggregateClass));
+        }
+
+        foreach ($this->typeClasses as $typeClass) {
+            $eventEngine->registerType($typeClass::__typeName(), $typeClass::__schema());
         }
 
         foreach ($this->descriptionServices as $descriptionService) {

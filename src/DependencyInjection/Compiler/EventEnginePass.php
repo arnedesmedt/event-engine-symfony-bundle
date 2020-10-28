@@ -12,6 +12,7 @@ use ADS\Bundle\EventEngineBundle\Message\ControllerCommand;
 use ADS\Bundle\EventEngineBundle\Message\Event;
 use ADS\Bundle\EventEngineBundle\Message\Query;
 use ADS\Bundle\EventEngineBundle\Repository\Repository;
+use ADS\Bundle\EventEngineBundle\Type\Type;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ADS\Bundle\EventEngineBundle\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
@@ -116,6 +117,11 @@ final class EventEnginePass implements CompilerPassInterface
                 $parentReflection = $reflectionClass->getParentClass();
 
                 return $parentReflection && $parentReflection->name === Repository::class
+                    ? $reflectionClass->name
+                    : null;
+            },
+            'types' => static function (ReflectionClass $reflectionClass) {
+                return $reflectionClass->implementsInterface(Type::class)
                     ? $reflectionClass->name
                     : null;
             },

@@ -6,7 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\Type;
 
 use ReflectionClass;
 
-trait TypeNameIsEntityAndClassName
+trait TypeNameIsClassName
 {
     public static function __typeName(): string
     {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ADS\Bundle\EventEngineBundle\Message;
+namespace ADS\Bundle\EventEngineBundle\Response;
 
 use ADS\Bundle\EventEngineBundle\Exception\ResponseException;
 use EventEngine\Schema\TypeSchema;

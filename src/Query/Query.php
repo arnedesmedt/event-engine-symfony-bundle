@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ADS\Bundle\EventEngineBundle\Message;
+namespace ADS\Bundle\EventEngineBundle\Query;
 
 interface Query
 {
     /**
      * @return class-string|string
      */
-    public static function __resolver();
+    public static function __resolver(): string;
 }

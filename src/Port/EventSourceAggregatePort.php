@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Port;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
-use ADS\Bundle\EventEngineBundle\Message\AggregateCommand;
-use ADS\Bundle\EventEngineBundle\Message\Event;
+use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
+use ADS\Bundle\EventEngineBundle\Event\Event;
 use EventEngine\Runtime\Oop\Port;
 use RuntimeException;
 

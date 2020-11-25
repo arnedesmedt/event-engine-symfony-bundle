@@ -11,7 +11,7 @@ services:
 
     # Commands
     event_engine.command.data_reset:
-        class: ADS\Bundle\EventEngineBundle\Command\EventEngineDataResetCommand
+        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineDataResetCommand
         arguments:
             - '@Prooph\EventStore\EventStore'
             - '@EventEngine\DocumentStore\DocumentStore'
@@ -20,7 +20,7 @@ services:
             - console.command
 
     event_engine.command.document_stores_create:
-        class: ADS\Bundle\EventEngineBundle\Command\EventEngineDocumentStoresCreateCommand
+        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineDocumentStoresCreateCommand
         arguments:
             - '@EventEngine\DocumentStore\DocumentStore'
             - '%event_engine.aggregates%'
@@ -28,7 +28,7 @@ services:
             - console.command
 
     event_engine.command.streams_create:
-        class: ADS\Bundle\EventEngineBundle\Command\EventEngineEventStreamsCreateCommand
+        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineEventStreamsCreateCommand
         arguments:
             - '@event_engine.connection'
             - '@Prooph\EventStore\EventStore'

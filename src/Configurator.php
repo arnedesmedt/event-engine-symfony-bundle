@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle;
 
-use ADS\Bundle\EventEngineBundle\Message\ControllerCommand;
+use ADS\Bundle\EventEngineBundle\Command\ControllerCommand;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\DependencyInjection\Compiler;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
-use ADS\Bundle\EventEngineBundle\Command\PreProcessor;
+use ADS\Bundle\EventEngineBundle\Command\Command;
+use ADS\Bundle\EventEngineBundle\Command\ControllerCommand;
+use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Event\Listener;
-use ADS\Bundle\EventEngineBundle\Message\Command;
-use ADS\Bundle\EventEngineBundle\Message\ControllerCommand;
-use ADS\Bundle\EventEngineBundle\Message\Event;
-use ADS\Bundle\EventEngineBundle\Message\Query;
+use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
+use ADS\Bundle\EventEngineBundle\Query\Query;
 use ADS\Bundle\EventEngineBundle\Repository\Repository;
 use ADS\Bundle\EventEngineBundle\Type\Type;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;

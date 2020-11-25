@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ADS\Bundle\EventEngineBundle\Message;
+namespace ADS\Bundle\EventEngineBundle\Command;
 
 interface AggregateCommand extends Command
 {

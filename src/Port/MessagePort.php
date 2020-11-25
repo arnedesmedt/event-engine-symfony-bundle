@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Port;
 
+use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Exception\JsonException;
-use ADS\Bundle\EventEngineBundle\Message\AggregateCommand;
-use ADS\Bundle\EventEngineBundle\Message\Query;
+use ADS\Bundle\EventEngineBundle\Query\Query;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Messaging\Message;

@@ -17,6 +17,7 @@ use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use RuntimeException;
 
+use function is_string;
 use function sprintf;
 
 final class Configurator
@@ -39,6 +40,8 @@ final class Configurator
     private array $aggregateClasses;
     /** @var array<class-string> */
     private array $typeClasses;
+    /** @var array<class-string> */
+    private array $listenerClasses;
 
     /**
      * @param array<class-string> $descriptionServices
@@ -47,6 +50,7 @@ final class Configurator
      * @param array<class-string> $eventClasses
      * @param array<class-string> $aggregateClasses
      * @param array<class-string> $typeClasses
+     * @param array<class-string> $listenerClasses
      */
     public function __construct(
         Flavour $flavour,
@@ -60,7 +64,8 @@ final class Configurator
         array $queryClasses,
         array $eventClasses,
         array $aggregateClasses,
-        array $typeClasses
+        array $typeClasses,
+        array $listenerClasses
     ) {
         $this->flavour = $flavour;
         $this->multiModelStore = $multiModelStore;
@@ -74,6 +79,7 @@ final class Configurator
         $this->eventClasses = $eventClasses;
         $this->aggregateClasses = $aggregateClasses;
         $this->typeClasses = $typeClasses;
+        $this->listenerClasses = $listenerClasses;
     }
 
     public function __invoke(EventEngine $eventEngine): void
@@ -110,6 +116,18 @@ final class Configurator
 
         foreach ($this->typeClasses as $typeClass) {
             $eventEngine->registerType($typeClass::__typeName(), $typeClass::__schema());
+        }
+
+        foreach ($this->listenerClasses as $listenerClass) {
+            $eventClasses = $listenerClass::__handleEvents();
+
+            if (is_string($eventClasses)) {
+                $eventClasses = [$eventClasses];
+            }
+
+            foreach ($eventClasses as $eventClass) {
+                $eventEngine->on($eventClass, $listenerClass);
+            }
         }
 
         foreach ($this->descriptionServices as $descriptionService) {

@@ -20,11 +20,10 @@
         "event-engine/php-postgres-document-store": "^0.11",
         "event-engine/prooph-v7-event-store": "^0.9",
         "prooph/pdo-event-store": "^1.11",
-        "symfony/http-kernel": "^5.0",
-        "symfony/orm-pack": "^1.0",
         "opis/json-schema": "^1.0",
         "arnedesmedt/value-objects": "dev-master",
-        "event-engine/cockpit-php-backend": "dev-master"
+        "symfony/cache": "^5.1",
+        "symfony/http-kernel": "^5.1"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12",

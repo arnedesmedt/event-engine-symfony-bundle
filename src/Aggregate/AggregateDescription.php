@@ -22,6 +22,19 @@ abstract class AggregateDescription implements EventEngineDescription
     {
         $usedAggregateRoots = [];
         foreach (static::commandAggregateMapping() as $commandClass => $aggregateRootClass) {
+            $commandProcessor = $eventEngine->process($commandClass);
+
+            $preprocessor = static::commandPreprocessors()[$commandClass] ?? false;
+            if ($preprocessor) {
+                $commandProcessor
+                    ->preProcess($preprocessor)
+                    ->withExisting($aggregateRootClass)
+                    ->identifiedBy(static::aggregateIdentifierMapping()[$aggregateRootClass])
+                    ->handle([FlavourHint::class, 'useAggregate']);
+
+                continue;
+            }
+
             $usedAggregateRoot = in_array($aggregateRootClass, $usedAggregateRoots);
 
             if (! $usedAggregateRoot) {
@@ -30,20 +43,10 @@ abstract class AggregateDescription implements EventEngineDescription
 
             $aggregateRootMethod = $usedAggregateRoot ? 'withExisting' : 'withNew';
 
-            $commandProcessor = $eventEngine->process($commandClass);
-
             $commandProcessor
                 ->$aggregateRootMethod($aggregateRootClass)
                 ->identifiedBy(static::aggregateIdentifierMapping()[$aggregateRootClass])
                 ->handle(self::handle($usedAggregateRoot, $aggregateRootClass, $commandClass));
-
-            $preprocessor = static::commandPreprocessors()[$commandClass] ?? false;
-
-            if ($preprocessor) {
-                $commandProcessor->preProcess($preprocessor);
-
-                continue;
-            }
 
             $events = static::commandEventMapping()[$commandClass] ?? [];
 

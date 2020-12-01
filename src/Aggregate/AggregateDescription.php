@@ -9,9 +9,12 @@ use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;
 use EventEngine\Runtime\Oop\FlavourHint;
+use RuntimeException;
 
 use function in_array;
 use function is_array;
+use function is_callable;
+use function sprintf;
 
 abstract class AggregateDescription implements EventEngineDescription
 {
@@ -32,9 +35,7 @@ abstract class AggregateDescription implements EventEngineDescription
             $commandProcessor
                 ->$aggregateRootMethod($aggregateRootClass)
                 ->identifiedBy(static::aggregateIdentifierMapping()[$aggregateRootClass])
-                ->handle($usedAggregateRoot
-                    ? [FlavourHint::class, 'useAggregate']
-                    : [$aggregateRootClass, $commandClass::__aggregateMethod()]);
+                ->handle(self::handle($usedAggregateRoot, $aggregateRootClass, $commandClass));
 
             $preprocessor = static::commandPreprocessors()[$commandClass] ?? false;
 
@@ -102,4 +103,28 @@ abstract class AggregateDescription implements EventEngineDescription
      * @return array<string, class-string>
      */
     abstract protected static function commandPreProcessors(): array;
+
+    /**
+     * @return array<string>
+     */
+    private static function handle(bool $usedAggregateRoot, string $aggregateRootClass, string $commandClass): array
+    {
+        if ($usedAggregateRoot) {
+            return [FlavourHint::class, 'useAggregate'];
+        }
+
+        $handle = [$aggregateRootClass, $commandClass::__aggregateMethod()];
+
+        if (is_callable($handle)) {
+            return $handle;
+        }
+
+        throw new RuntimeException(
+            sprintf(
+                'Aggregate method \'%s\' for aggregate root \'%s\' is not callable.',
+                $commandClass::__aggregateMethod(),
+                $aggregateRootClass
+            )
+        );
+    }
 }

@@ -1,4 +1,4 @@
-oservices:
+services:
     # General
     event_engine.cache:
         class: Symfony\Component\Cache\Adapter\FilesystemAdapter

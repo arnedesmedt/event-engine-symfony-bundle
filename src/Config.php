@@ -9,6 +9,8 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
 use function array_map;
+use function is_array;
+use function preg_match;
 
 final class Config implements CacheClearerInterface
 {
@@ -17,11 +19,16 @@ final class Config implements CacheClearerInterface
 
     private EventEngine $eventEngine;
     private AbstractAdapter $cache;
+    private string $environment;
 
-    public function __construct(EventEngine $eventEngine, AbstractAdapter $cache)
+    /** @var array<mixed>|null */
+    private ?array $config = null;
+
+    public function __construct(EventEngine $eventEngine, AbstractAdapter $cache, string $environment)
     {
         $this->eventEngine = $eventEngine;
         $this->cache = $cache;
+        $this->environment = $environment;
     }
 
     /**
@@ -29,10 +36,14 @@ final class Config implements CacheClearerInterface
      */
     public function config(): array
     {
+        if ($this->isDevEnv()) {
+            return $this->getConfig();
+        }
+
         return $this->cache->get(
             self::CONFIG,
             function () {
-                return $this->eventEngine->compileCacheableConfig();
+                return $this->getconfig();
             }
         );
     }
@@ -68,5 +79,24 @@ final class Config implements CacheClearerInterface
     public function clear(string $cacheDir): void
     {
         $this->cache->clear();
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getConfig(): array
+    {
+        if (is_array($this->config)) {
+            return $this->config;
+        }
+
+        $this->config = $this->eventEngine->compileCacheableConfig();
+
+        return $this->config;
+    }
+
+    private function isDevEnv(): bool
+    {
+        return preg_match('/(dev(.*)|local)/i', $this->environment) === 1;
     }
 }

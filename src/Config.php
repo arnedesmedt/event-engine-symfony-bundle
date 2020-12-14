@@ -43,7 +43,7 @@ final class Config implements CacheClearerInterface
         return $this->cache->get(
             self::CONFIG,
             function () {
-                return $this->getconfig();
+                return $this->getConfig();
             }
         );
     }

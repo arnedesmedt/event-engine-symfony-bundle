@@ -9,6 +9,7 @@ use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Logger\SimpleMessageEngine;
+use EventEngine\Messaging\MessageProducer;
 use EventEngine\Persistence\MultiModelStore;
 use EventEngine\Runtime\Flavour;
 use EventEngine\Schema\PayloadSchema;
@@ -42,6 +43,7 @@ final class Configurator
     private array $typeClasses;
     /** @var array<class-string> */
     private array $listenerClasses;
+    private ?MessageProducer $eventQueue;
 
     /**
      * @param array<class-string> $descriptionServices
@@ -65,7 +67,8 @@ final class Configurator
         array $eventClasses,
         array $aggregateClasses,
         array $typeClasses,
-        array $listenerClasses
+        array $listenerClasses,
+        ?MessageProducer $eventQueue
     ) {
         $this->flavour = $flavour;
         $this->multiModelStore = $multiModelStore;
@@ -80,6 +83,7 @@ final class Configurator
         $this->aggregateClasses = $aggregateClasses;
         $this->typeClasses = $typeClasses;
         $this->listenerClasses = $listenerClasses;
+        $this->eventQueue = $eventQueue;
     }
 
     public function __invoke(EventEngine $eventEngine): void
@@ -140,7 +144,9 @@ final class Configurator
             $this->flavour,
             $this->multiModelStore,
             $this->simpleMessageEngine,
-            $this->container
+            $this->container,
+            null,
+            $this->eventQueue,
         )
             ->bootstrap(
                 $this->environment,

@@ -17,6 +17,8 @@ use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ADS\Bundle\EventEngineBundle\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\EventEngineDescription;
+use EventEngine\Messaging\MessageProducer;
+use Exception;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
@@ -126,6 +128,28 @@ final class EventEnginePass implements CompilerPassInterface
                     : null;
             },
         ];
+
+        /** @var ?Definition $eventQueueDefinition */
+        $eventQueueDefinition = null;
+        foreach ($resources as $resourceReflectionClass) {
+            if (! $resourceReflectionClass->implementsInterface(MessageProducer::class)) {
+                continue;
+            }
+
+            if ($eventQueueDefinition instanceof Definition) {
+                throw new Exception('You can only have 1 event queue.');
+            }
+
+            if ($container->hasDefinition($resourceReflectionClass->name)) {
+                $eventQueueDefinition = $container->getDefinition($resourceReflectionClass->name);
+            } else {
+                $eventQueueDefinition = new Definition($resourceReflectionClass->name);
+            }
+        }
+
+        if ($eventQueueDefinition instanceof Definition) {
+            $container->setDefinition('event_engine.event_queue', $eventQueueDefinition);
+        }
 
         foreach ($mappers as $name => $mapper) {
             $container->setParameter(

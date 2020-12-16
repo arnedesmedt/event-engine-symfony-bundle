@@ -106,6 +106,7 @@ services:
         arguments:
             - '@EventEngine\EventEngine'
             - '@event_engine.cache'
+            - '%kernel.environment%'
         tags:
             - { name: kernel.cache_clearer }
     ADS\Bundle\EventEngineBundle\Configurator:

@@ -7,6 +7,8 @@ namespace ADS\Bundle\EventEngineBundle;
 use ADS\Bundle\EventEngineBundle\Command\ControllerCommand;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
+use EventEngine\JsonSchema\JsonSchema;
+use EventEngine\JsonSchema\JsonSchemaAwareCollection;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Logger\SimpleMessageEngine;
 use EventEngine\Messaging\MessageProducer;
@@ -165,6 +167,10 @@ final class Configurator
 
         if ($reflectionClass->implementsInterface(JsonSchemaAwareRecord::class)) {
             return $message::__schema();
+        }
+
+        if ($reflectionClass->implementsInterface(JsonSchemaAwareCollection::class)) {
+            return JsonSchema::array($message::__itemSchema());
         }
 
         throw new RuntimeException(

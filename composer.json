@@ -21,7 +21,7 @@
         "event-engine/prooph-v7-event-store": "^0.9",
         "prooph/pdo-event-store": "^1.11",
         "opis/json-schema": "^1.0",
-        "arnedesmedt/value-objects": "dev-master",
+        "arnedesmedt/value-objects": "^0.1",
         "symfony/cache": "^5.1",
         "symfony/http-kernel": "^5.1"
     },

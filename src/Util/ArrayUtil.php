@@ -74,7 +74,7 @@ final class ArrayUtil
     {
         return self::process(
             $array,
-            static fn ($key) => is_int($key) ? $key : StringUtil::decamilize($key),
+            static fn ($key) => is_int($key) ? $key : StringUtil::decamelize($key),
             null,
             $recursive
         );
@@ -90,7 +90,7 @@ final class ArrayUtil
         return self::process(
             $array,
             null,
-            static fn ($value) => is_int($value) ? $value : StringUtil::decamilize($value),
+            static fn ($value) => is_int($value) ? $value : StringUtil::decamelize($value),
             $recursive
         );
     }

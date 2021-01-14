@@ -29,7 +29,7 @@
         "phpstan/phpstan": "^0.12",
         "squizlabs/php_codesniffer": "^3.5",
         "doctrine/coding-standard": "^8.0",
-        "phpro/grumphp": "^0.19"
+        "phpro/grumphp": "1.*"
     },
     "autoload": {
         "psr-4": {

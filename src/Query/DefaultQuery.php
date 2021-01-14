@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Query;
 
+use ADS\Bundle\EventEngineBundle\Request\DefaultRequest;
+
 use function count;
 use function explode;
 use function implode;
 
 trait DefaultQuery
 {
+    use DefaultRequest;
+
     public static function __resolver(): string
     {
         $parts = explode('\\', static::class);

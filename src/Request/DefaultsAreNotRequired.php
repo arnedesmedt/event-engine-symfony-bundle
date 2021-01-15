@@ -11,7 +11,7 @@ use function array_filter;
 use function array_keys;
 use function in_array;
 
-trait DefaultRequest
+trait DefaultsAreNotRequired
 {
     use JsonSchemaAwareRecordLogic;
 

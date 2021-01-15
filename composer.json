@@ -22,6 +22,7 @@
         "prooph/pdo-event-store": "^1.11",
         "opis/json-schema": "^1.0",
         "arnedesmedt/value-objects": "^0.1",
+        "arnedesmedt/json-immutable-objects": "^0.1",
         "symfony/cache": "^5.1",
         "symfony/http-kernel": "^5.1"
     },

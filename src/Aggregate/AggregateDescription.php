@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
+use ADS\Bundle\EventEngineBundle\Projector\Projector;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;
 use EventEngine\Persistence\Stream;
 use EventEngine\Runtime\Oop\FlavourHint;
+use LogicException;
+use ReflectionClass;
 use RuntimeException;
 
 use function array_key_exists;
@@ -84,19 +87,26 @@ abstract class AggregateDescription implements EventEngineDescription
                 ->storeStateIn(EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregateName));
         }
 
-        foreach (static::projectorsAggregateMapping() as $projectorClass) {
+        foreach (static::projectorsList() as $projectorClass) {
+            $reflectionClassProjector = new ReflectionClass($projectorClass);
+
+            if (! $reflectionClassProjector->implementsInterface(Projector::class)) {
+                throw new LogicException(
+                    sprintf(
+                        'The projector class %s doesn\'t implement the interface %s',
+                        $projectorClass,
+                        Projector::class
+                    )
+                );
+            }
+
             $eventsForProjector = $projectorClass::getEvents();
 
             /** @var array<class-string> $aggregateRootClasses */
             $aggregateRootClasses = [];
 
             foreach ($eventsForProjector as $eventForProjector) {
-                $aggregateFromEvent = self::getAggregateFromEvent($eventForProjector);
-                if (! is_string($aggregateFromEvent)) {
-                    continue;
-                }
-
-                $aggregateRootClasses[] = $aggregateFromEvent;
+                $aggregateRootClasses[] = self::getAggregateFromEvent($eventForProjector);
             }
 
             $streams = [];
@@ -116,9 +126,9 @@ abstract class AggregateDescription implements EventEngineDescription
     /**
      * @param class-string $eventClass
      *
-     * @return class-string|null
+     * @return class-string
      */
-    private static function getAggregateFromEvent(string $eventClass): ?string
+    private static function getAggregateFromEvent(string $eventClass): string
     {
         $commandEventMappings = static::commandEventMapping();
         $commandAggregateMappings = static::commandAggregateMapping();
@@ -133,7 +143,7 @@ abstract class AggregateDescription implements EventEngineDescription
             }
         }
 
-        return null;
+        throw new LogicException(sprintf('Unable to find aggregate for event %s', $eventClass));
     }
 
     /**
@@ -164,7 +174,7 @@ abstract class AggregateDescription implements EventEngineDescription
     /**
      * @return array<int, class-string>
      */
-    abstract protected static function projectorsAggregateMapping(): array;
+    abstract protected static function projectorsList(): array;
 
     /**
      * @return array<string>

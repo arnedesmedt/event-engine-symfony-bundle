@@ -12,7 +12,7 @@ use Prooph\EventStore\Projection\ReadModelProjector;
 use function array_keys;
 use function count;
 
-final class WriteModelStreamProjection
+class WriteModelStreamProjection
 {
     public const NAME = 'ee_write_model_projection';
 
@@ -60,11 +60,7 @@ final class WriteModelStreamProjection
             $projectionOptions
         );
 
-        if ($totalSourceStreams === 1) {
-            $this->projection->fromStream($sourceStreams[0]);
-        } else {
-            $this->projection->fromStreams(...$sourceStreams);
-        }
+        $this->projection->fromStreams(...$sourceStreams);
 
         $this->projection->whenAny(function ($state, Message $event): void {
             /** @phpstan-ignore-next-line */

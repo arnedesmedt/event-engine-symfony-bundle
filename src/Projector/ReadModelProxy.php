@@ -12,7 +12,7 @@ use InvalidArgumentException;
 use Prooph\Common\Messaging\Message;
 use Prooph\EventStore\Projection\AbstractReadModel;
 
-final class ReadModelProxy extends AbstractReadModel
+class ReadModelProxy extends AbstractReadModel
 {
     private EventEngine $eventEngine;
 

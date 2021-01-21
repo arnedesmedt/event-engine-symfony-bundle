@@ -28,7 +28,7 @@ services:
             - console.command
 
     event_engine.command.projections_create:
-        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineProjectionsCreateCommand
+        class: ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand\EventEngineProjectionsCreateCommand
         arguments:
             - '@event_engine.connection'
         tags:
@@ -44,14 +44,14 @@ services:
             - console.command
 
     event_engine.command.projectors_reset:
-        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\Projectors\ResetProjectors
+        class: ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand\ResetProjections
         arguments:
             - '@Prooph\EventStore\Projection\ProjectionManager'
         tags:
             - console.command
 
     event_engine.command.projectors_run:
-        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\Projectors\RunProjectors
+        class: ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand\RunProjections
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Projector\WriteModelStreamProjection'
         tags:

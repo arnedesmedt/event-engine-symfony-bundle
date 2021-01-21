@@ -8,10 +8,13 @@ use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\DocumentStore\DocumentStore;
+use LogicException;
 use PDO;
+use ReflectionClass;
 use Throwable;
 
 use function assert;
+use function sprintf;
 
 abstract class Repository extends DefaultStateRepository implements AggregateRepository
 {
@@ -30,8 +33,17 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
     ) {
         parent::__construct($documentStore, $documentStoreName, $stateClass, $connection);
 
-        // TODO: Validate aggregate class
-        $this->aggregateClass = EventEngineUtil::fromStateToAggregateClass($this->stateClass);
+        $aggregateClass = EventEngineUtil::fromStateToAggregateClass($this->stateClass);
+        $reflectionClassAggregate = new ReflectionClass($aggregateClass);
+        if (! $reflectionClassAggregate->implementsInterface(AggregateRoot::class)) {
+            throw new LogicException(sprintf(
+                'The aggregate class "%s" doesn\'t implement the "%s" interface',
+                $aggregateClass,
+                AggregateRoot::class
+            ));
+        }
+
+        $this->aggregateClass = $aggregateClass;
     }
 
     /**

@@ -10,7 +10,9 @@ use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\DocumentStore\Filter\AnyFilter;
 use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\PartialSelect;
+use LogicException;
 use PDO;
+use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -46,7 +48,15 @@ abstract class DefaultStateRepository implements StateRepository
         PDO $connection
     ) {
         $this->documentStore = $documentStore;
-        // TODO validate state class
+        $reflectionClassState = new ReflectionClass($stateClass);
+        if (! $reflectionClassState->implementsInterface(ImmutableRecord::class)) {
+            throw new LogicException(sprintf(
+                'The state class "%s" doesn\'t implement the "%s" interface',
+                $stateClass,
+                ImmutableRecord::class
+            ));
+        }
+
         $this->stateClass = $stateClass;
         $this->documentStoreName = $documentStoreName;
         $this->connection = $connection;

@@ -77,11 +77,6 @@ final class WriteModelStreamProjection
         $this->projection->run(! $this->testMode && $keepRunning);
     }
 
-    public function stop(): void
-    {
-        $this->projection->stop();
-    }
-
     public function reset(): void
     {
         $this->projection->reset();

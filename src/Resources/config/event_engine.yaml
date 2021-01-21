@@ -45,19 +45,15 @@ services:
 
     event_engine.command.projectors_reset:
         class: ADS\Bundle\EventEngineBundle\SymfonyCommand\Projectors\ResetProjectors
-        autowire: true
+        arguments:
+            - '@Prooph\EventStore\Projection\ProjectionManager'
         tags:
             - console.command
 
     event_engine.command.projectors_run:
         class: ADS\Bundle\EventEngineBundle\SymfonyCommand\Projectors\RunProjectors
-        autowire: true
-        tags:
-            - console.command
-
-    event_engine.command.projectors_stop:
-        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\Projectors\StopProjectors
-        autowire: true
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\Projector\WriteModelStreamProjection'
         tags:
             - console.command
 
@@ -173,5 +169,9 @@ services:
             - '@event_engine.connection'
 
     ADS\Bundle\EventEngineBundle\Projector\WriteModelStreamProjection:
+        arguments:
+            - '@Prooph\EventStore\Projection\ProjectionManager'
+            - '@EventEngine\EventEngine'
     ADS\Bundle\EventEngineBundle\Projector\ReadModelProxy:
-        autowire: true
+        arguments:
+            - '@EventEngine\EventEngine'

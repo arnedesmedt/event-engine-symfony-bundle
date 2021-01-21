@@ -171,3 +171,7 @@ services:
         arguments:
             - '@Prooph\EventStore\EventStore'
             - '@event_engine.connection'
+
+    ADS\Bundle\EventEngineBundle\Projector\WriteModelStreamProjection:
+    ADS\Bundle\EventEngineBundle\Projector\ReadModelProxy:
+        autowire: true

@@ -43,6 +43,24 @@ services:
         tags:
             - console.command
 
+    event_engine.command.projectors_reset:
+        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\Projectors\ResetProjectors
+        autowire: true
+        tags:
+            - console.command
+
+    event_engine.command.projectors_run:
+        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\Projectors\RunProjectors
+        autowire: true
+        tags:
+            - console.command
+
+    event_engine.command.projectors_stop:
+        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\Projectors\StopProjectors
+        autowire: true
+        tags:
+            - console.command
+
     # Interfaces
     Prooph\Common\Event\ActionEventEmitter: '@Prooph\Common\Event\ProophActionEventEmitter'
     Prooph\EventStore\EventStore: '@Prooph\EventStore\TransactionalActionEventEmitterEventStore'

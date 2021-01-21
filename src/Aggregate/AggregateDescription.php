@@ -8,12 +8,15 @@ use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;
+use EventEngine\Persistence\Stream;
 use EventEngine\Runtime\Oop\FlavourHint;
 use RuntimeException;
 
+use function array_key_exists;
 use function in_array;
 use function is_array;
 use function is_callable;
+use function is_string;
 use function sprintf;
 
 abstract class AggregateDescription implements EventEngineDescription
@@ -80,6 +83,57 @@ abstract class AggregateDescription implements EventEngineDescription
                 ->storeEventsIn(EventEngineUtil::fromAggregateNameToStreamName($aggregateName))
                 ->storeStateIn(EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregateName));
         }
+
+        foreach (static::projectorsAggregateMapping() as $projectorClass) {
+            $eventsForProjector = $projectorClass::getEvents();
+
+            /** @var array<class-string> $aggregateRootClasses */
+            $aggregateRootClasses = [];
+
+            foreach ($eventsForProjector as $eventForProjector) {
+                $aggregateFromEvent = self::getAggregateFromEvent($eventForProjector);
+                if (! is_string($aggregateFromEvent)) {
+                    continue;
+                }
+
+                $aggregateRootClasses[] = $aggregateFromEvent;
+            }
+
+            $streams = [];
+            foreach ($aggregateRootClasses as $aggregateRootClass) {
+                $aggregateName = EventEngineUtil::fromAggregateClassToAggregateName($aggregateRootClass);
+                $aggregateStreamName = EventEngineUtil::fromAggregateNameToStreamName($aggregateName);
+
+                $streams[] = Stream::ofLocalProjection($aggregateStreamName);
+            }
+
+            $eventEngine->watch(...$streams)
+                ->with($projectorClass::getProjectionName(), $projectorClass)
+                ->filterEvents($eventsForProjector);
+        }
+    }
+
+    /**
+     * @param class-string $eventClass
+     *
+     * @return class-string|null
+     */
+    private static function getAggregateFromEvent(string $eventClass): ?string
+    {
+        $commandEventMappings = static::commandEventMapping();
+        $commandAggregateMappings = static::commandAggregateMapping();
+
+        foreach ($commandEventMappings as $command => $eventClasses) {
+            if (is_string($eventClasses)) {
+                $eventClasses = [$eventClasses];
+            }
+
+            if (array_key_exists($command, $commandAggregateMappings) && in_array($eventClass, $eventClasses, true)) {
+                return $commandAggregateMappings[$command];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -106,6 +160,11 @@ abstract class AggregateDescription implements EventEngineDescription
      * @return array<string, class-string>
      */
     abstract protected static function commandPreProcessors(): array;
+
+    /**
+     * @return array<int, class-string>
+     */
+    abstract protected static function projectorsAggregateMapping(): array;
 
     /**
      * @return array<string>

@@ -141,4 +141,8 @@ services:
         tags:
             - 'kernel.event_subscriber'
 
-
+    Prooph\EventStore\Projection\ProjectionManager:
+        class: Prooph\EventStore\Pdo\Projection\PostgresProjectionManager
+        arguments:
+            - '@Prooph\EventStore\EventStore'
+            - '@event_engine.connection'

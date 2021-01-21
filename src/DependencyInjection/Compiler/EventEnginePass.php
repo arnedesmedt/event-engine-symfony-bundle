@@ -10,6 +10,7 @@ use ADS\Bundle\EventEngineBundle\Command\ControllerCommand;
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Event\Listener;
 use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
+use ADS\Bundle\EventEngineBundle\Projector\Projector;
 use ADS\Bundle\EventEngineBundle\Query\Query;
 use ADS\Bundle\EventEngineBundle\Repository\Repository;
 use ADS\Bundle\EventEngineBundle\Type\Type;
@@ -127,6 +128,11 @@ final class EventEnginePass implements CompilerPassInterface
                     ? $reflectionClass->name
                     : null;
             },
+            'projectors' => static function (ReflectionClass $reflectionClass) {
+                return $reflectionClass->implementsInterface(Projector::class)
+                    ? $reflectionClass->name
+                    : null;
+            },
         ];
 
         /** @var ?Definition $eventQueueDefinition */
@@ -221,6 +227,7 @@ final class EventEnginePass implements CompilerPassInterface
             ...$container->getParameter('event_engine.listeners'),
             ...$container->getParameter('event_engine.pre_processors'),
             ...$container->getParameter('event_engine.controllers'),
+            ...$container->getParameter('event_engine.projectors'),
         ];
 
         foreach ($classes as $class) {

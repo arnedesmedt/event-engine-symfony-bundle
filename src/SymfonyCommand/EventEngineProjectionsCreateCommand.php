@@ -34,7 +34,7 @@ class EventEngineProjectionsCreateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->connection->exec(
-            'CREATE TABLE projections (
+            'CREATE TABLE IF NOT EXISTS projections (
   no BIGSERIAL,
   name VARCHAR(150) NOT NULL,
   position JSONB,

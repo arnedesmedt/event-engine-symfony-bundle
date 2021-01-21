@@ -15,10 +15,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+use function preg_match;
+
 class EventEngineDataResetCommand extends Command
 {
-    /** @var string  */
-    protected static $defaultName = 'event-engine:data:reset'; // phpcs:ignore SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+    /**
+     * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected static $defaultName = 'event-engine:data:reset';
 
     private EventStore $eventStore;
     private DocumentStore $documentStore;
@@ -42,7 +47,7 @@ class EventEngineDataResetCommand extends Command
 
     protected function configure(): void
     {
-        $this->setDescription('Reset all the streams and document stores');
+        $this->setDescription('Reset all the streams, projections and document stores');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -50,7 +55,7 @@ class EventEngineDataResetCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (
-            $_SERVER['APP_ENV'] === 'prod'
+            ! $this->isDevEnv($_SERVER['APP_ENV'])
             && (
                 ! $io->confirm('Resetting the data in production is not a good idea. Are you sure?', false)
                 || ! $io->confirm('Are you really sure?', false)
@@ -66,9 +71,13 @@ class EventEngineDataResetCommand extends Command
 
         $createEventStreams = $application->find('event-engine:event-streams:create');
         $createDocumentStores = $application->find('event-engine:document-stores:create');
+        $createProjections = $application->find('event-engine:projections:create');
+        $stopProjections = $application->find('event-engine:projections:stop');
+        $resetProjections = $application->find('event-engine:projections:reset');
 
         $createEventStreams->run($input, $output);
         $createDocumentStores->run($input, $output);
+        $createProjections->run($input, $output);
 
         foreach ($this->aggregates as $aggregate) {
             $reflectionClass = new ReflectionClass($aggregate);
@@ -90,9 +99,17 @@ class EventEngineDataResetCommand extends Command
 
         $createEventStreams->run($input, $output);
         $createDocumentStores->run($input, $output);
+        $createProjections->run($input, $output);
+        $stopProjections->run($input, $output);
+        $resetProjections->run($input, $output);
 
         $io->comment('Reset executed.');
 
         return 0;
+    }
+
+    private function isDevEnv(string $env): bool
+    {
+        return preg_match('/(dev(.*)|local)/i', $env) === 1;
     }
 }

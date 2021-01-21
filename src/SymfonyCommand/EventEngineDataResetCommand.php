@@ -72,7 +72,7 @@ class EventEngineDataResetCommand extends Command
         $createEventStreams = $application->find('event-engine:event-streams:create');
         $createDocumentStores = $application->find('event-engine:document-stores:create');
         $createProjections = $application->find('event-engine:projections:create');
-        $resetProjections = $application->find('event-engine:projections:reset');
+        $resetProjections = $application->find('event-engine:projectors:reset');
 
         $createEventStreams->run($input, $output);
         $createDocumentStores->run($input, $output);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ADS\Bundle\EventEngineBundle\SymfonyCommand\Projectors;
+namespace ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand;
 
 use ADS\Bundle\EventEngineBundle\Projector\WriteModelStreamProjection;
 use Prooph\EventStore\Projection\ProjectionManager;
@@ -11,13 +11,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-final class ResetProjectors extends Command
+final class ResetProjections extends Command
 {
     /**
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected static $defaultName = 'event-engine:projectors:reset';
+    protected static $defaultName = 'event-engine:projections:reset';
     private ProjectionManager $projectionManager;
 
     public function __construct(ProjectionManager $projectionManager)

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ADS\Bundle\EventEngineBundle\SymfonyCommand;
+namespace ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand;
 
 use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class EventEngineProjectionsCreateCommand extends Command
+final class EventEngineProjectionsCreateCommand extends Command
 {
     /**
      * @var string

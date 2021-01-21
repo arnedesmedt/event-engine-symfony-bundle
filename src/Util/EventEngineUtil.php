@@ -106,12 +106,12 @@ final class EventEngineUtil
 
     public static function fromAggregateNameToStreamName(string $aggregateName): string
     {
-        return sprintf('%s_stream', StringUtil::decamilize($aggregateName));
+        return sprintf('%s_stream', StringUtil::decamelize($aggregateName));
     }
 
     public static function fromAggregateNameToDocumentStoreName(string $aggregateName): string
     {
-        return sprintf('%s_state', StringUtil::decamilize($aggregateName));
+        return sprintf('%s_state', StringUtil::decamelize($aggregateName));
     }
 
     public static function fromAggregateNameToStateClass(string $aggregateName, string $entityNamespace): string

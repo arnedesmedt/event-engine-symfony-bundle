@@ -60,7 +60,7 @@ final class Handler implements EventSubscriberInterface
                     $encodedJson = json_encode(json_decode($matches[3], true));
                     $message = sprintf(
                         'Payload validation error: field \'%s\' [%s] %s',
-                        StringUtil::decamilize($matches[1]),
+                        StringUtil::decamelize($matches[1]),
                         $matches[2],
                         str_replace('"', '\'', $encodedJson)
                     );

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Command;
 
 use ADS\Bundle\EventEngineBundle\Exception\MessageException;
+use ADS\Bundle\EventEngineBundle\Request\DefaultsAreNotRequired;
 
 use function array_pop;
 use function class_exists;
@@ -14,6 +15,8 @@ use function sprintf;
 
 trait DefaultControllerCommand
 {
+    use DefaultsAreNotRequired;
+
     public static function __controller(): string
     {
         $parts = explode('\\', static::class);

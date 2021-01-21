@@ -23,7 +23,7 @@ final class StringUtil
         return $pascal ? $result : lcfirst($result);
     }
 
-    public static function decamilize(string $string, string $delimiter = '_'): string
+    public static function decamelize(string $string, string $delimiter = '_'): string
     {
         $regex = [
             '/([a-z\d])([A-Z])/',

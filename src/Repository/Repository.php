@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Repository;
 
+use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
+use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\DocumentStore\DocumentStore;
@@ -11,15 +13,19 @@ use EventEngine\DocumentStore\Filter\AnyFilter;
 use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\PartialSelect;
 use PDO;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 use Traversable;
 
 use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function array_values;
+use function assert;
 use function iterator_to_array;
+use function json_encode;
 use function sprintf;
 
 class Repository
@@ -28,9 +34,16 @@ class Repository
 
     protected DocumentStore $documentStore;
     protected string $documentStoreName;
+    /** @var class-string */
     protected string $stateClass;
+    /** @var class-string */
+    protected string $aggregateClass;
     protected PDO $connection;
 
+    /**
+     * @param class-string $documentStoreName
+     * @param class-string $stateClass
+     */
     public function __construct(
         DocumentStore $documentStore,
         string $documentStoreName,
@@ -40,6 +53,7 @@ class Repository
         $this->documentStore = $documentStore;
         $this->documentStoreName = $documentStoreName;
         $this->stateClass = $stateClass;
+        $this->aggregateClass = EventEngineUtil::fromStateToAggregateClass($this->stateClass);
         $this->connection = $connection;
     }
 
@@ -67,7 +81,23 @@ class Repository
             return null;
         }
 
-        return $this->stateClass::fromArray($document['state']) ?? null;
+        self::checkDocumentHasState($document);
+
+        return $this->stateClass::fromArray($document['state']);
+    }
+
+    /**
+     * @param array<mixed>|null $document
+     */
+    public function aggregateFromDocument(?array $document): ?AggregateRoot
+    {
+        if ($document === null) {
+            return null;
+        }
+
+        self::checkDocumentHasState($document);
+
+        return $this->aggregateClass::reconstituteFromStateArray($document['state']);
     }
 
     /**
@@ -167,6 +197,16 @@ class Repository
     /**
      * @param string|ValueObject $identifier
      */
+    public function findAggregate($identifier): ?AggregateRoot
+    {
+        return $this->aggregateFromDocument(
+            $this->findDocument($identifier)
+        );
+    }
+
+    /**
+     * @param string|ValueObject $identifier
+     */
     public function hasDocument($identifier): bool
     {
         $document = $this->findDocument($identifier);
@@ -215,10 +255,30 @@ class Repository
     public function needDocumentState(
         $identifier,
         ?Throwable $exception = null
-    ): ?ImmutableRecord {
+    ): ImmutableRecord {
         $document = $this->needDocument($identifier, $exception);
 
-        return $this->stateFromDocument($document);
+        $state = $this->stateFromDocument($document);
+
+        assert($state instanceof ImmutableRecord);
+
+        return $state;
+    }
+
+    /**
+     * @param string|ValueObject $identifier
+     */
+    public function needAggregate(
+        $identifier,
+        ?Throwable $exception = null
+    ): AggregateRoot {
+        $document = $this->needDocument($identifier, $exception);
+
+        $aggregateRoot = $this->aggregateFromDocument($document);
+
+        assert($aggregateRoot instanceof AggregateRoot);
+
+        return $aggregateRoot;
     }
 
     /**
@@ -265,6 +325,21 @@ class Repository
     ): void {
         if ($document !== null) {
             throw $exception;
+        }
+    }
+
+    /**
+     * @param array<mixed> $document
+     */
+    private static function checkDocumentHasState(array $document): void
+    {
+        if (! array_key_exists('state', $document)) {
+            throw new RuntimeException(
+                sprintf(
+                    'No state key found in document: \'%s\'',
+                    json_encode($document)
+                )
+            );
         }
     }
 }

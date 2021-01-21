@@ -175,7 +175,7 @@ final class EventEnginePass implements CompilerPassInterface
                 $reflectionClass = new ReflectionClass($aggregate);
                 $aggregate = $reflectionClass->getShortName();
 
-                $key = sprintf('event_engine.repository.%s', StringUtil::decamilize($aggregate));
+                $key = sprintf('event_engine.repository.%s', StringUtil::decamelize($aggregate));
 
                 $result[$key] = (new Definition(
                     $repository->getClass(),
@@ -205,7 +205,7 @@ final class EventEnginePass implements CompilerPassInterface
                         ->getDefinition(
                             sprintf(
                                 'event_engine.repository.%s',
-                                strtolower(StringUtil::decamilize($matches[1][0]))
+                                strtolower(StringUtil::decamelize($matches[1][0]))
                             )
                         )
                         ->getArguments()

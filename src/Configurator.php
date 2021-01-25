@@ -45,6 +45,8 @@ final class Configurator
     private array $typeClasses;
     /** @var array<class-string> */
     private array $listenerClasses;
+    /** @var array<class-string> */
+    private array $projectorClasses;
     private ?MessageProducer $eventQueue;
 
     /**
@@ -55,6 +57,7 @@ final class Configurator
      * @param array<class-string> $aggregateClasses
      * @param array<class-string> $typeClasses
      * @param array<class-string> $listenerClasses
+     * @param array<class-string> $projectorClasses
      */
     public function __construct(
         Flavour $flavour,
@@ -70,6 +73,7 @@ final class Configurator
         array $aggregateClasses,
         array $typeClasses,
         array $listenerClasses,
+        array $projectorClasses,
         ?MessageProducer $eventQueue
     ) {
         $this->flavour = $flavour;
@@ -86,6 +90,7 @@ final class Configurator
         $this->typeClasses = $typeClasses;
         $this->listenerClasses = $listenerClasses;
         $this->eventQueue = $eventQueue;
+        $this->projectorClasses = $projectorClasses;
     }
 
     public function __invoke(EventEngine $eventEngine): void
@@ -118,6 +123,10 @@ final class Configurator
 
         foreach ($this->aggregateClasses as $aggregateClass) {
             $eventEngine->registerResponseType(EventEngineUtil::fromAggregateClassToStateClass($aggregateClass));
+        }
+
+        foreach ($this->projectorClasses as $projectorClass) {
+            $eventEngine->registerResponseType($projectorClass::getStateClassName());
         }
 
         foreach ($this->typeClasses as $typeClass) {

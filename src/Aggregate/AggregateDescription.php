@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
+use ADS\Bundle\EventEngineBundle\Projector\Projector;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;
+use EventEngine\Persistence\Stream;
 use EventEngine\Runtime\Oop\FlavourHint;
+use LogicException;
+use ReflectionClass;
 use RuntimeException;
 
+use function array_key_exists;
 use function in_array;
 use function is_array;
 use function is_callable;
+use function is_string;
 use function sprintf;
 
 abstract class AggregateDescription implements EventEngineDescription
@@ -80,6 +86,64 @@ abstract class AggregateDescription implements EventEngineDescription
                 ->storeEventsIn(EventEngineUtil::fromAggregateNameToStreamName($aggregateName))
                 ->storeStateIn(EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregateName));
         }
+
+        foreach (static::projectorsList() as $projectorClass) {
+            $reflectionClassProjector = new ReflectionClass($projectorClass);
+
+            if (! $reflectionClassProjector->implementsInterface(Projector::class)) {
+                throw new LogicException(
+                    sprintf(
+                        'The projector class %s doesn\'t implement the interface %s',
+                        $projectorClass,
+                        Projector::class
+                    )
+                );
+            }
+
+            $eventsForProjector = $projectorClass::getEvents();
+
+            /** @var array<class-string> $aggregateRootClasses */
+            $aggregateRootClasses = [];
+
+            foreach ($eventsForProjector as $eventForProjector) {
+                $aggregateRootClasses[] = self::getAggregateFromEvent($eventForProjector);
+            }
+
+            $streams = [];
+            foreach ($aggregateRootClasses as $aggregateRootClass) {
+                $aggregateName = EventEngineUtil::fromAggregateClassToAggregateName($aggregateRootClass);
+                $aggregateStreamName = EventEngineUtil::fromAggregateNameToStreamName($aggregateName);
+
+                $streams[] = Stream::ofLocalProjection($aggregateStreamName);
+            }
+
+            $eventEngine->watch(...$streams)
+                ->with($projectorClass::getProjectionName(), $projectorClass)
+                ->filterEvents($eventsForProjector);
+        }
+    }
+
+    /**
+     * @param class-string $eventClass
+     *
+     * @return class-string
+     */
+    private static function getAggregateFromEvent(string $eventClass): string
+    {
+        $commandEventMappings = static::commandEventMapping();
+        $commandAggregateMappings = static::commandAggregateMapping();
+
+        foreach ($commandEventMappings as $command => $eventClasses) {
+            if (is_string($eventClasses)) {
+                $eventClasses = [$eventClasses];
+            }
+
+            if (array_key_exists($command, $commandAggregateMappings) && in_array($eventClass, $eventClasses, true)) {
+                return $commandAggregateMappings[$command];
+            }
+        }
+
+        throw new LogicException(sprintf('Unable to find aggregate for event %s', $eventClass));
     }
 
     /**
@@ -106,6 +170,11 @@ abstract class AggregateDescription implements EventEngineDescription
      * @return array<string, class-string>
      */
     abstract protected static function commandPreProcessors(): array;
+
+    /**
+     * @return array<int, class-string>
+     */
+    abstract protected static function projectorsList(): array;
 
     /**
      * @return array<string>

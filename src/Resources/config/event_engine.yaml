@@ -27,12 +27,33 @@ services:
         tags:
             - console.command
 
+    event_engine.command.projections_create:
+        class: ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand\EventEngineProjectionsCreateCommand
+        arguments:
+            - '@event_engine.connection'
+        tags:
+            - console.command
+
     event_engine.command.streams_create:
         class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineEventStreamsCreateCommand
         arguments:
             - '@event_engine.connection'
             - '@Prooph\EventStore\EventStore'
             - '%event_engine.aggregates%'
+        tags:
+            - console.command
+
+    event_engine.command.projectors_reset:
+        class: ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand\ResetProjections
+        arguments:
+            - '@Prooph\EventStore\Projection\ProjectionManager'
+        tags:
+            - console.command
+
+    event_engine.command.projectors_run:
+        class: ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand\RunProjections
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\Projector\WriteModelStreamProjection'
         tags:
             - console.command
 
@@ -141,4 +162,16 @@ services:
         tags:
             - 'kernel.event_subscriber'
 
+    Prooph\EventStore\Projection\ProjectionManager:
+        class: Prooph\EventStore\Pdo\Projection\PostgresProjectionManager
+        arguments:
+            - '@Prooph\EventStore\EventStore'
+            - '@event_engine.connection'
 
+    ADS\Bundle\EventEngineBundle\Projector\WriteModelStreamProjection:
+        arguments:
+            - '@Prooph\EventStore\Projection\ProjectionManager'
+            - '@EventEngine\EventEngine'
+    ADS\Bundle\EventEngineBundle\Projector\ReadModelProxy:
+        arguments:
+            - '@EventEngine\EventEngine'

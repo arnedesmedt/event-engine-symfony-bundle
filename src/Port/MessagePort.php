@@ -16,6 +16,7 @@ use Opis\JsonSchema\Schema;
 use Opis\JsonSchema\Validator;
 use ReflectionClass;
 use RuntimeException;
+use stdClass;
 
 use function get_class;
 use function gettype;
@@ -60,6 +61,11 @@ final class MessagePort implements Port
             }
 
             $data = json_decode($encodedData);
+
+            if ($data === []) {
+                $data = new stdClass();
+            }
+
             $this->validator->schemaValidation($data, Schema::fromJsonString($schema));
         }
 

@@ -118,7 +118,7 @@ abstract class AggregateDescription implements EventEngineDescription
             }
 
             $eventEngine->watch(...$streams)
-                ->with($projectorClass::getProjectionName(), $projectorClass)
+                ->with($projectorClass::getProjectionName(), $projectorClass, $projectorClass::getVersion())
                 ->filterEvents($eventsForProjector);
         }
     }

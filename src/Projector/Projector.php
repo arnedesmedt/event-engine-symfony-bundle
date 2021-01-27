@@ -12,4 +12,10 @@ interface Projector extends CustomEventProjector
     public static function getEvents(): array;
 
     public static function getProjectionName(): string;
+
+    public static function getVersion(): string;
+
+    public static function generateOwnCollectionName(): string;
+
+    public static function getStateClassName(): string;
 }

@@ -46,12 +46,39 @@ abstract class DefaultProjector implements Projector
             throw new LogicException('Unable to get last part of class name from ' . $className);
         }
 
-        $snakeCasedClassName = preg_replace('/(?<!^)[A-Z]/', '_$0', $lastPartOfClassName);
+        $cleanedClassName = preg_replace('/Projector$/', '', $lastPartOfClassName);
+        if (! is_string($cleanedClassName)) {
+            throw new LogicException('Unable to remove Projector from: ' . $lastPartOfClassName);
+        }
+
+        $snakeCasedClassName = preg_replace('/(?<!^)[A-Z]/', '_$0', $cleanedClassName);
         if (! is_string($snakeCasedClassName)) {
-            throw new LogicException('Unable to snake case the string: ' . $lastPartOfClassName);
+            throw new LogicException('Unable to snake case the string: ' . $cleanedClassName);
         }
 
         return strtolower($snakeCasedClassName);
+    }
+
+    public static function getVersion(): string
+    {
+        return '0.1.0';
+    }
+
+    public static function generateOwnCollectionName(): string
+    {
+        return self::generateCollectionName(static::getVersion(), static::getProjectionName());
+    }
+
+    public static function getStateClassName(): string
+    {
+        $className = static::class;
+
+        $stateClassName = preg_replace('/(\w*)$/m', 'State', $className, 1);
+        if (! is_string($stateClassName)) {
+            throw new LogicException('Unable to generate state name from: ' . $className);
+        }
+
+        return $stateClassName;
     }
 
     protected static function generateCollectionName(string $projectionVersion, string $projectionName): string

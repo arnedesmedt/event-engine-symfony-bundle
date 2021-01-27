@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Projector;
 
+use ADS\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\Projecting\AggregateProjector;
 use LogicException;
@@ -11,7 +12,6 @@ use LogicException;
 use function is_string;
 use function preg_replace;
 use function strrpos;
-use function strtolower;
 use function substr;
 
 abstract class DefaultProjector implements Projector
@@ -51,12 +51,7 @@ abstract class DefaultProjector implements Projector
             throw new LogicException('Unable to remove Projector from: ' . $lastPartOfClassName);
         }
 
-        $snakeCasedClassName = preg_replace('/(?<!^)[A-Z]/', '_$0', $cleanedClassName);
-        if (! is_string($snakeCasedClassName)) {
-            throw new LogicException('Unable to snake case the string: ' . $cleanedClassName);
-        }
-
-        return strtolower($snakeCasedClassName);
+        return StringUtil::decamelize($cleanedClassName);
     }
 
     public static function getVersion(): string

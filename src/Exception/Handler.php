@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Exception;
 
-use ADS\Bundle\EventEngineBundle\Util\StringUtil;
+use ADS\Util\StringUtil;
 use EventEngine\Aggregate\Exception\AggregateNotFound;
 use EventEngine\JsonSchema\Exception\JsonValidationError;
 use Prooph\EventStore\Exception\ConcurrencyException;

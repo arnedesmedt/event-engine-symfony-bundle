@@ -24,7 +24,8 @@
         "arnedesmedt/value-objects": "^0.1",
         "arnedesmedt/json-immutable-objects": "^0.1",
         "symfony/cache": "^5.1",
-        "symfony/http-kernel": "^5.1"
+        "symfony/http-kernel": "^5.1",
+        "arnedesmedt/php-util": "^0.1.0"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12",

@@ -17,8 +17,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class EventEngineEventStreamsCreateCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'event-engine:event-streams:create'; // phpcs:ignore SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+    /**
+     * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected static $defaultName = 'event-engine:event-streams:create';
 
     private PDO $connection;
     private EventStore $eventStore;

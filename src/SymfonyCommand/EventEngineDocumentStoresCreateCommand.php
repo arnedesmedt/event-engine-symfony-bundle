@@ -13,8 +13,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class EventEngineDocumentStoresCreateCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'event-engine:document-stores:create'; // phpcs:ignore SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+    /**
+     * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected static $defaultName = 'event-engine:document-stores:create';
 
     private DocumentStore $documentStore;
     /** @var array<class-string> */

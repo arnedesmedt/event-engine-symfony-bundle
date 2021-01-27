@@ -24,9 +24,15 @@ final class EventSourceAggregatePort implements Port
      * @param array<int, class-string> $contextServices
      *
      * @return mixed
+     *
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
-    public function callAggregateFactory(string $aggregateType, callable $aggregateFactory, $customCommand, ...$contextServices) // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-    {
+    public function callAggregateFactory(
+        string $aggregateType,
+        callable $aggregateFactory,
+        $customCommand,
+        ...$contextServices
+    ) {
         return $aggregateFactory($customCommand, ...$contextServices);
     }
 
@@ -34,9 +40,14 @@ final class EventSourceAggregatePort implements Port
      * @param AggregateRoot $aggregate
      * @param AggregateCommand $customCommand
      * @param array<int, class-string> $contextServices
+     *
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
-    public function callAggregateWithCommand($aggregate, $customCommand, ...$contextServices): void // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-    {
+    public function callAggregateWithCommand(
+        $aggregate,
+        $customCommand,
+        ...$contextServices
+    ): void {
         $method = lcfirst($customCommand->__aggregateMethod());
 
         if (! method_exists($aggregate, $method)) {
@@ -56,8 +67,10 @@ final class EventSourceAggregatePort implements Port
      * @param mixed $aggregate
      *
      * @return array<Event>
+     *
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
-    public function popRecordedEvents($aggregate): array // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+    public function popRecordedEvents($aggregate): array
     {
         if (! $aggregate instanceof AggregateRoot) {
             throw new RuntimeException(

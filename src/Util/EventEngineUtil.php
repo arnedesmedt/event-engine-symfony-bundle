@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Util;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
+use ADS\Util\StringUtil;
 use ReflectionClass;
 use ReflectionNamedType;
 use RuntimeException;

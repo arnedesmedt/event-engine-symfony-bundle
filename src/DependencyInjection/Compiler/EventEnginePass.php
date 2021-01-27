@@ -17,7 +17,7 @@ use ADS\Bundle\EventEngineBundle\Repository\Repository;
 use ADS\Bundle\EventEngineBundle\Repository\StateRepository;
 use ADS\Bundle\EventEngineBundle\Type\Type;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
-use ADS\Bundle\EventEngineBundle\Util\StringUtil;
+use ADS\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\EventEngineDescription;
 use EventEngine\Messaging\MessageProducer;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
+use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
@@ -37,7 +38,7 @@ abstract class AggregateDescription implements EventEngineDescription
                 continue;
             }
 
-            $newAggregateRoot = self::newAggregateRoot($aggregateRootClass, $usedAggregateRoots);
+            $newAggregateRoot = self::newAggregateRoot($aggregateRootClass, $commandClass, $usedAggregateRoots);
 
             self::handleCommand($commandProcessor, $aggregateRootClass, $commandClass, $newAggregateRoot);
             self::handleEvents($commandProcessor, $commandClass);
@@ -76,10 +77,26 @@ abstract class AggregateDescription implements EventEngineDescription
 
     /**
      * @param class-string $aggregateRootClass
+     * @param class-string $commandClass
      * @param array<class-string> $usedAggregateRoots
      */
-    private static function newAggregateRoot(string $aggregateRootClass, array &$usedAggregateRoots): bool
-    {
+    private static function newAggregateRoot(
+        string $aggregateRootClass,
+        string $commandClass,
+        array &$usedAggregateRoots
+    ): bool {
+        $commandReflectionClass = new ReflectionClass($commandClass);
+
+        if (
+            $commandReflectionClass->implementsInterface(AggregateCommand::class)
+            && $commandClass::__newAggregate()
+        ) {
+            $usedAggregateRoots[] = $aggregateRootClass;
+            $usedAggregateRoots = array_unique($usedAggregateRoots);
+
+            return true;
+        }
+
         $notFound = ! in_array($aggregateRootClass, $usedAggregateRoots);
 
         if ($notFound) {
@@ -218,7 +235,7 @@ abstract class AggregateDescription implements EventEngineDescription
     abstract protected static function aggregateIdentifierMapping(): array;
 
     /**
-     * @return array<string, class-string<AggregateRoot>>
+     * @return array<class-string, class-string<AggregateRoot>>
      */
     abstract protected static function commandAggregateMapping(): array;
 

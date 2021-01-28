@@ -7,6 +7,7 @@ namespace ADS\Bundle\EventEngineBundle\Aggregate;
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
+use EventEngine\Commanding\CommandProcessorDescription;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;
 use EventEngine\Persistence\Stream;
@@ -16,6 +17,8 @@ use ReflectionClass;
 use RuntimeException;
 
 use function array_key_exists;
+use function array_map;
+use function array_unique;
 use function in_array;
 use function is_array;
 use function is_callable;
@@ -30,97 +33,160 @@ abstract class AggregateDescription implements EventEngineDescription
         foreach (static::commandAggregateMapping() as $commandClass => $aggregateRootClass) {
             $commandProcessor = $eventEngine->process($commandClass);
 
-            $preprocessor = static::commandPreprocessors()[$commandClass] ?? false;
-            if ($preprocessor) {
-                $commandProcessor
-                    ->preProcess($preprocessor)
-                    ->withExisting($aggregateRootClass)
-                    ->identifiedBy(static::aggregateIdentifierMapping()[$aggregateRootClass])
-                    ->handle([FlavourHint::class, 'useAggregate']);
-
+            if (self::handlePreprocessors($commandProcessor, $aggregateRootClass, $commandClass)) {
                 continue;
             }
 
-            $usedAggregateRoot = in_array($aggregateRootClass, $usedAggregateRoots);
+            $newAggregateRoot = self::newAggregateRoot($aggregateRootClass, $usedAggregateRoots);
 
-            if (! $usedAggregateRoot) {
-                $usedAggregateRoots[] = $aggregateRootClass;
-            }
-
-            $aggregateRootMethod = $usedAggregateRoot ? 'withExisting' : 'withNew';
-
-            $commandProcessor
-                ->$aggregateRootMethod($aggregateRootClass)
-                ->identifiedBy(static::aggregateIdentifierMapping()[$aggregateRootClass])
-                ->handle(self::handle($usedAggregateRoot, $aggregateRootClass, $commandClass));
-
-            $events = static::commandEventMapping()[$commandClass] ?? [];
-
-            if (! is_array($events)) {
-                $events = [$events];
-            }
-
-            foreach ($events as $eventClass) {
-                $commandProcessor
-                    ->recordThat($eventClass)
-                    ->apply([FlavourHint::class, 'useAggregate']);
-            }
-
-            $services = static::commandServiceMapping()[$commandClass] ?? [];
-
-            if (! is_array($services)) {
-                $services = [$services];
-            }
-
-            foreach ($services as $serviceClass) {
-                $commandProcessor->provideService($serviceClass);
-            }
-
-            if ($usedAggregateRoot) {
-                continue;
-            }
-
-            $aggregateName = EventEngineUtil::fromAggregateClassToAggregateName($aggregateRootClass);
-
-            $commandProcessor
-                ->storeEventsIn(EventEngineUtil::fromAggregateNameToStreamName($aggregateName))
-                ->storeStateIn(EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregateName));
+            self::handleCommand($commandProcessor, $aggregateRootClass, $commandClass, $newAggregateRoot);
+            self::handleEvents($commandProcessor, $commandClass);
+            self::handleServices($commandProcessor, $commandClass);
+            self::handleStorage($commandProcessor, $aggregateRootClass, $newAggregateRoot);
         }
 
         foreach (static::projectorsList() as $projectorClass) {
-            $reflectionClassProjector = new ReflectionClass($projectorClass);
-
-            if (! $reflectionClassProjector->implementsInterface(Projector::class)) {
-                throw new LogicException(
-                    sprintf(
-                        'The projector class %s doesn\'t implement the interface %s',
-                        $projectorClass,
-                        Projector::class
-                    )
-                );
-            }
-
-            $eventsForProjector = $projectorClass::getEvents();
-
-            /** @var array<class-string> $aggregateRootClasses */
-            $aggregateRootClasses = [];
-
-            foreach ($eventsForProjector as $eventForProjector) {
-                $aggregateRootClasses[] = self::getAggregateFromEvent($eventForProjector);
-            }
-
-            $streams = [];
-            foreach ($aggregateRootClasses as $aggregateRootClass) {
-                $aggregateName = EventEngineUtil::fromAggregateClassToAggregateName($aggregateRootClass);
-                $aggregateStreamName = EventEngineUtil::fromAggregateNameToStreamName($aggregateName);
-
-                $streams[] = Stream::ofLocalProjection($aggregateStreamName);
-            }
+            $streams = self::streamsForProjector($projectorClass);
 
             $eventEngine->watch(...$streams)
-                ->with($projectorClass::getProjectionName(), $projectorClass, $projectorClass::getVersion())
-                ->filterEvents($eventsForProjector);
+                ->with($projectorClass::projectionName(), $projectorClass, $projectorClass::version())
+                ->filterEvents($projectorClass::events());
         }
+    }
+
+    private static function handlePreProcessors(
+        CommandProcessorDescription $commandProcessor,
+        string $aggregateRootClass,
+        string $commandClass
+    ): bool {
+        $preprocessor = static::commandPreprocessors()[$commandClass] ?? false;
+
+        if (! $preprocessor) {
+            return false;
+        }
+
+        $commandProcessor
+            ->preProcess($preprocessor)
+            ->withExisting($aggregateRootClass)
+            ->identifiedBy(static::aggregateIdentifierMapping()[$aggregateRootClass])
+            ->handle([FlavourHint::class, 'useAggregate']);
+
+        return true;
+    }
+
+    /**
+     * @param class-string $aggregateRootClass
+     * @param array<class-string> $usedAggregateRoots
+     */
+    private static function newAggregateRoot(string $aggregateRootClass, array &$usedAggregateRoots): bool
+    {
+        $notFound = ! in_array($aggregateRootClass, $usedAggregateRoots);
+
+        if ($notFound) {
+            $usedAggregateRoots[] = $aggregateRootClass;
+        }
+
+        return $notFound;
+    }
+
+    private static function handleCommand(
+        CommandProcessorDescription $commandProcessor,
+        string $aggregateRootClass,
+        string $commandClass,
+        bool $newAggregateRoot
+    ): void {
+        $aggregateRootMethod = $newAggregateRoot ? 'withNew' : 'withExisting';
+
+        $commandProcessor
+            ->$aggregateRootMethod($aggregateRootClass)
+            ->identifiedBy(static::aggregateIdentifierMapping()[$aggregateRootClass])
+            ->handle(self::handle($aggregateRootClass, $commandClass, $newAggregateRoot));
+    }
+
+    private static function handleEvents(
+        CommandProcessorDescription $commandProcessor,
+        string $commandClass
+    ): void {
+        $events = static::commandEventMapping()[$commandClass] ?? [];
+
+        if (! is_array($events)) {
+            $events = [$events];
+        }
+
+        foreach ($events as $eventClass) {
+            $commandProcessor
+                ->recordThat($eventClass)
+                ->apply([FlavourHint::class, 'useAggregate']);
+        }
+    }
+
+    private static function handleServices(
+        CommandProcessorDescription $commandProcessor,
+        string $commandClass
+    ): void {
+        $services = static::commandServiceMapping()[$commandClass] ?? [];
+
+        if (! is_array($services)) {
+            $services = [$services];
+        }
+
+        foreach ($services as $serviceClass) {
+            $commandProcessor->provideService($serviceClass);
+        }
+    }
+
+    /**
+     * @param class-string $aggregateRootClass
+     */
+    private static function handleStorage(
+        CommandProcessorDescription $commandProcessor,
+        string $aggregateRootClass,
+        bool $newAggregateRoot
+    ): void {
+        if (! $newAggregateRoot) {
+            return;
+        }
+
+        $aggregateName = EventEngineUtil::fromAggregateClassToAggregateName($aggregateRootClass);
+
+        $commandProcessor
+            ->storeEventsIn(EventEngineUtil::fromAggregateNameToStreamName($aggregateName))
+            ->storeStateIn(EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregateName));
+    }
+
+    /**
+     * @param class-string $projectorClass
+     *
+     * @return array<Stream>
+     */
+    private static function streamsForProjector(string $projectorClass): array
+    {
+        $reflectionClassProjector = new ReflectionClass($projectorClass);
+
+        if (! $reflectionClassProjector->implementsInterface(Projector::class)) {
+            throw new LogicException(
+                sprintf(
+                    'The projector class %s doesn\'t implement the interface %s',
+                    $projectorClass,
+                    Projector::class
+                )
+            );
+        }
+
+        /** @var array<class-string> $aggregateRootClasses */
+        $aggregateRootClasses = array_unique(
+            array_map(
+                static fn ($eventForProjector) => self::aggregateFromEvent($eventForProjector),
+                $projectorClass::events()
+            )
+        );
+
+        return array_map(
+            static fn ($aggregateRootClass) => Stream::ofLocalProjection(
+                EventEngineUtil::fromAggregateClassToStreamName($aggregateRootClass)
+            ),
+            $aggregateRootClasses
+        );
     }
 
     /**
@@ -128,7 +194,7 @@ abstract class AggregateDescription implements EventEngineDescription
      *
      * @return class-string
      */
-    private static function getAggregateFromEvent(string $eventClass): string
+    private static function aggregateFromEvent(string $eventClass): string
     {
         $commandEventMappings = static::commandEventMapping();
         $commandAggregateMappings = static::commandAggregateMapping();
@@ -179,9 +245,9 @@ abstract class AggregateDescription implements EventEngineDescription
     /**
      * @return array<string>
      */
-    private static function handle(bool $usedAggregateRoot, string $aggregateRootClass, string $commandClass): array
+    private static function handle(string $aggregateRootClass, string $commandClass, bool $newAggregateRoot): array
     {
-        if ($usedAggregateRoot) {
+        if (! $newAggregateRoot) {
             return [FlavourHint::class, 'useAggregate'];
         }
 

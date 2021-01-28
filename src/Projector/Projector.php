@@ -9,13 +9,13 @@ use EventEngine\Projecting\CustomEventProjector;
 interface Projector extends CustomEventProjector
 {
     /** @return array<int, class-string> */
-    public static function getEvents(): array;
+    public static function events(): array;
 
-    public static function getProjectionName(): string;
+    public static function projectionName(): string;
 
-    public static function getVersion(): string;
+    public static function version(): string;
 
     public static function generateOwnCollectionName(): string;
 
-    public static function getStateClassName(): string;
+    public static function stateClassName(): string;
 }

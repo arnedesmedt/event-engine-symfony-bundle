@@ -126,7 +126,7 @@ final class Configurator
         }
 
         foreach ($this->projectorClasses as $projectorClass) {
-            $eventEngine->registerResponseType($projectorClass::getStateClassName());
+            $eventEngine->registerResponseType($projectorClass::stateClassName());
         }
 
         foreach ($this->typeClasses as $typeClass) {

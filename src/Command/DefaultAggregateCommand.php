@@ -18,4 +18,9 @@ trait DefaultAggregateCommand
     {
         return (new ReflectionClass(static::class))->getShortName();
     }
+
+    public static function __newAggregate(): bool
+    {
+        return false;
+    }
 }

@@ -122,4 +122,14 @@ final class EventEngineUtil
 
         return self::fromAggregateClassToStateClass($aggregateClass);
     }
+
+    /**
+     * @param class-string $aggregateClass
+     */
+    public static function fromAggregateClassToStreamName(string $aggregateClass): string
+    {
+        return self::fromAggregateNameToStreamName(
+            self::fromAggregateClassToAggregateName($aggregateClass)
+        );
+    }
 }

@@ -37,7 +37,7 @@ abstract class DefaultProjector implements Projector
         $this->documentStore->dropCollection(static::generateCollectionName($projectionVersion, $projectionName));
     }
 
-    public static function getProjectionName(): string
+    public static function projectionName(): string
     {
         $className = static::class;
 
@@ -54,17 +54,17 @@ abstract class DefaultProjector implements Projector
         return StringUtil::decamelize($cleanedClassName);
     }
 
-    public static function getVersion(): string
+    public static function version(): string
     {
         return '0.1.0';
     }
 
     public static function generateOwnCollectionName(): string
     {
-        return self::generateCollectionName(static::getVersion(), static::getProjectionName());
+        return self::generateCollectionName(static::version(), static::projectionName());
     }
 
-    public static function getStateClassName(): string
+    public static function stateClassName(): string
     {
         $className = static::class;
 

@@ -218,7 +218,7 @@ final class EventEnginePass implements CompilerPassInterface
                     [
                         new Reference(DocumentStore::class),
                         $projector::generateOwnCollectionName(),
-                        $projector::getStateClassName(),
+                        $projector::stateClassName(),
                         new Reference('event_engine.connection'),
                     ]
                 ))->setPublic(true);

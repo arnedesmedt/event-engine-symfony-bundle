@@ -9,6 +9,8 @@ use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\Projecting\AggregateProjector;
 use LogicException;
 
+use function get_class;
+use function in_array;
 use function is_string;
 use function preg_replace;
 use function strrpos;
@@ -41,10 +43,7 @@ abstract class DefaultProjector implements Projector
     {
         $className = static::class;
 
-        $lastPartOfClassName = substr($className, strrpos($className, '\\') + 1);
-        if (! is_string($lastPartOfClassName)) {
-            throw new LogicException('Unable to get last part of class name from ' . $className);
-        }
+        $lastPartOfClassName = self::getLastPartOfClassName($className);
 
         $cleanedClassName = preg_replace('/Projector$/', '', $lastPartOfClassName);
         if (! is_string($cleanedClassName)) {
@@ -79,5 +78,31 @@ abstract class DefaultProjector implements Projector
     protected static function generateCollectionName(string $projectionVersion, string $projectionName): string
     {
         return AggregateProjector::generateCollectionName($projectionVersion, $projectionName);
+    }
+
+    private static function getLastPartOfClassName(string $className): string
+    {
+        $lastPartOfClassName = substr($className, strrpos($className, '\\') + 1);
+        if (! is_string($lastPartOfClassName)) {
+            throw new LogicException('Unable to get last part of class name from ' . $className);
+        }
+
+        return $lastPartOfClassName;
+    }
+
+    /**
+     * @param mixed $event
+     */
+    public function handle(string $projectionVersion, string $projectionName, $event): void
+    {
+        $eventClass = get_class($event);
+
+        if (! in_array($eventClass, static::events(), true)) {
+            return;
+        }
+
+        $eventMethod = 'when' . self::getLastPartOfClassName($eventClass);
+
+        $this->{$eventMethod}($event);
     }
 }

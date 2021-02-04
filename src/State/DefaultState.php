@@ -2,16 +2,20 @@
 
 declare(strict_types=1);
 
-namespace ADS\Bundle\EventEngineBundle\Type;
+namespace ADS\Bundle\EventEngineBundle\State;
 
+use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use LogicException;
 
 use function class_exists;
 use function is_string;
 use function preg_replace;
 
-trait DefaultTypeName
+abstract class DefaultState implements JsonSchemaAwareRecord
 {
+    use JsonSchemaAwareRecordLogic;
+
     /**
      * @return class-string|null
      */
@@ -21,7 +25,7 @@ trait DefaultTypeName
 
         $typeClass = preg_replace('/(\w)+$/', 'Type', $stateClass);
 
-        if (! class_exists($typeClass)) {
+        if (! (is_string($typeClass) && class_exists($typeClass))) {
             return null;
         }
 

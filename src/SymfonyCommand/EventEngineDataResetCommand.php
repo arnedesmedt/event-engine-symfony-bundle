@@ -29,23 +29,18 @@ class EventEngineDataResetCommand extends Command
     private DocumentStore $documentStore;
     /** @var array<class-string> */
     private array $aggregates;
-    /** @var array<class-string> */
-    private array $projectors;
 
     /**
      * @param array<class-string> $aggregates
-     * @param array<class-string> $projectors
      */
     public function __construct(
         EventStore $eventStore,
         DocumentStore $documentStore,
-        array $aggregates,
-        array $projectors
+        array $aggregates
     ) {
         $this->eventStore = $eventStore;
         $this->documentStore = $documentStore;
         $this->aggregates = $aggregates;
-        $this->projectors = $projectors;
 
         parent::__construct();
     }
@@ -79,12 +74,9 @@ class EventEngineDataResetCommand extends Command
         $createProjections = $application->find('event-engine:projections:create');
         $resetProjections = $application->find('event-engine:projections:reset');
 
-        if (! empty($this->projectors)) {
-            $createProjections->run($input, $output);
-        }
-
         $createEventStreams->run($input, $output);
         $createDocumentStores->run($input, $output);
+        $createProjections->run($input, $output);
 
         foreach ($this->aggregates as $aggregate) {
             $reflectionClass = new ReflectionClass($aggregate);
@@ -106,11 +98,8 @@ class EventEngineDataResetCommand extends Command
 
         $createEventStreams->run($input, $output);
         $createDocumentStores->run($input, $output);
-
-        if (! empty($this->projectors)) {
-            $createProjections->run($input, $output);
-            $resetProjections->run($input, $output);
-        }
+        $createProjections->run($input, $output);
+        $resetProjections->run($input, $output);
 
         $io->comment('Reset executed.');
 

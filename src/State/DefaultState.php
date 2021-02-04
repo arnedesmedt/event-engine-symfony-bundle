@@ -19,7 +19,7 @@ abstract class DefaultState implements JsonSchemaAwareRecord
     /**
      * @return class-string|null
      */
-    private static function getTypeClassNameForState(): ?string
+    public static function getTypeClassNameForState(): ?string
     {
         $stateClass = static::class;
 

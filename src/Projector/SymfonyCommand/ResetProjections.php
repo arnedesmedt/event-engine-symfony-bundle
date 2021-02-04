@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand;
 
-use ADS\Bundle\EventEngineBundle\Projector\WriteModelStreamProjection;
 use Prooph\EventStore\Projection\ProjectionManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+
+use function count;
+use function sprintf;
 
 final class ResetProjections extends Command
 {
@@ -35,9 +37,13 @@ final class ResetProjections extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Reset projectors');
-        $io->note('Resetting ' . WriteModelStreamProjection::NAME);
+        $projectionNames = $this->projectionManager->fetchProjectionNames(null);
 
-        $this->projectionManager->resetProjection(WriteModelStreamProjection::NAME);
+        $io->note(sprintf('I found %d projectors (streams) to reset', count($projectionNames)));
+        foreach ($projectionNames as $projectionName) {
+            $io->note('Resetting ' . $projectionName);
+            $this->projectionManager->resetProjection($projectionName);
+        }
 
         $io->success('The projections will reset!');
 

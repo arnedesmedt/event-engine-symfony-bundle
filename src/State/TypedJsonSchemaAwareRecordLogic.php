@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\State;
 
 use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
-use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use LogicException;
 
 use function class_exists;
 use function is_string;
 use function preg_replace;
 
-abstract class DefaultState implements JsonSchemaAwareRecord
+trait TypedJsonSchemaAwareRecordLogic
 {
     use JsonSchemaAwareRecordLogic;
 

@@ -16,6 +16,7 @@ services:
             - '@Prooph\EventStore\EventStore'
             - '@EventEngine\DocumentStore\DocumentStore'
             - '%event_engine.aggregates%'
+            - '%event_engine.projectors%'
         tags:
             - console.command
 

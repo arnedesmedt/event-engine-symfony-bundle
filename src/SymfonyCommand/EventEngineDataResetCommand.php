@@ -29,18 +29,23 @@ class EventEngineDataResetCommand extends Command
     private DocumentStore $documentStore;
     /** @var array<class-string> */
     private array $aggregates;
+    /** @var array<class-string> */
+    private array $projectors;
 
     /**
      * @param array<class-string> $aggregates
+     * @param array<class-string> $projectors
      */
     public function __construct(
         EventStore $eventStore,
         DocumentStore $documentStore,
-        array $aggregates
+        array $aggregates,
+        array $projectors
     ) {
         $this->eventStore = $eventStore;
         $this->documentStore = $documentStore;
         $this->aggregates = $aggregates;
+        $this->projectors = $projectors;
 
         parent::__construct();
     }
@@ -55,7 +60,7 @@ class EventEngineDataResetCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (
-            ! $this->isDevEnv($_SERVER['APP_ENV'])
+            $this->isProductionEnvironment($_SERVER['APP_ENV'])
             && (
                 ! $io->confirm('Resetting the data in production is not a good idea. Are you sure?', false)
                 || ! $io->confirm('Are you really sure?', false)
@@ -74,9 +79,12 @@ class EventEngineDataResetCommand extends Command
         $createProjections = $application->find('event-engine:projections:create');
         $resetProjections = $application->find('event-engine:projections:reset');
 
+        if (! empty($this->projectors)) {
+            $createProjections->run($input, $output);
+        }
+
         $createEventStreams->run($input, $output);
         $createDocumentStores->run($input, $output);
-        $createProjections->run($input, $output);
 
         foreach ($this->aggregates as $aggregate) {
             $reflectionClass = new ReflectionClass($aggregate);
@@ -98,16 +106,19 @@ class EventEngineDataResetCommand extends Command
 
         $createEventStreams->run($input, $output);
         $createDocumentStores->run($input, $output);
-        $createProjections->run($input, $output);
-        $resetProjections->run($input, $output);
+
+        if (! empty($this->projectors)) {
+            $createProjections->run($input, $output);
+            $resetProjections->run($input, $output);
+        }
 
         $io->comment('Reset executed.');
 
         return 0;
     }
 
-    private function isDevEnv(string $env): bool
+    private function isProductionEnvironment(string $env): bool
     {
-        return preg_match('/(dev(.*)|local)/i', $env) === 1;
+        return ! (bool) preg_match('/(dev(.*)|local|test)/i', $env);
     }
 }

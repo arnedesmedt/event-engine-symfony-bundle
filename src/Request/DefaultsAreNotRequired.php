@@ -22,17 +22,13 @@ trait DefaultsAreNotRequired
      */
     private static function __optionalProperties(): array
     {
-        $metadataProperties = [
-            '__propTypeMap',
-            '__schema',
-            '__arrayPropItemTypeMap',
-        ];
+        $propertyNames = array_keys(self::buildPropTypeMap());
 
         return array_filter(
             array_keys(
                 (new ReflectionClass(static::class))->getDefaultProperties()
             ),
-            static fn (string $propertyName) => ! in_array($propertyName, $metadataProperties)
+            static fn (string $propertyName) => in_array($propertyName, $propertyNames)
         );
     }
 }

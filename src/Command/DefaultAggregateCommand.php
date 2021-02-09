@@ -23,4 +23,12 @@ trait DefaultAggregateCommand
     {
         return false;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function __eventsToRecord(): array
+    {
+        return [];
+    }
 }

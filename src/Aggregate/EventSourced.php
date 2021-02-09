@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
+use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
 use ReflectionNamedType;
 use RuntimeException;
@@ -119,5 +120,32 @@ trait EventSourced
      */
     public function preProcessorAggregateMethod(): void
     {
+    }
+
+    public static function aggregateId(): string
+    {
+        $docBlockFactory = DocBlockFactory::createInstance();
+
+        $reflectionClass = new ReflectionClass(self::stateClass());
+        $reflectionProperties = $reflectionClass->getProperties();
+
+        foreach ($reflectionProperties as $reflectionProperty) {
+            $docBlock = $docBlockFactory->create($reflectionProperty);
+            $tags = $docBlock->getTagsByName('ApiProperty');
+
+            if (empty($tags)) {
+                continue;
+            }
+
+            // fixme ApiProperty can have multiple reasons of existence (not only the identifier)
+            return $reflectionProperty->getName();
+        }
+
+        throw new RuntimeException(
+            sprintf(
+                'You have to override the aggregateId method for aggregate root \'%s\'.',
+                static::class
+            )
+        );
     }
 }

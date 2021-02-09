@@ -123,6 +123,7 @@ services:
     ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot: ~
     ADS\Bundle\EventEngineBundle\Aggregate\DeletableAggregate: ~
     ADS\Bundle\EventEngineBundle\Aggregate\EventSourced: ~
+
     ADS\Bundle\EventEngineBundle\Config:
         arguments:
             - '@EventEngine\EventEngine'
@@ -138,7 +139,6 @@ services:
             - '@service_container'
             - '%kernel.environment%'
             - '%kernel.debug%'
-            - '%event_engine.descriptions%'
             - '%event_engine.commands%'
             - '%event_engine.queries%'
             - '%event_engine.events%'
@@ -146,6 +146,8 @@ services:
             - '%event_engine.types%'
             - '%event_engine.listeners%'
             - '%event_engine.projectors%'
+            - '%event_engine.pre_processors%'
+            - '%event_engine.descriptions%'
             - '@?event_engine.event_queue'
     ADS\Bundle\EventEngineBundle\Persistency\SingleStreamStrategy: ~
     ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection:

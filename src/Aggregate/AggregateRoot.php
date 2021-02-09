@@ -32,4 +32,6 @@ interface AggregateRoot
      * @return ImmutableRecord
      */
     public function state(); // phpcs:ignore SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
+
+    public static function aggregateId(): string;
 }

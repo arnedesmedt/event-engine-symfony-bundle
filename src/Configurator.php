@@ -33,6 +33,7 @@ use LogicException;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
 use RuntimeException;
 
@@ -496,17 +497,18 @@ final class Configurator
                     continue;
                 }
 
+                /** @var ReflectionNamedType|null $commandType */
                 $commandType = $firstParameter->getType();
 
                 if (
                     $commandType === null
-                    || ! in_array($commandType . '', $this->commandClasses)
+                    || ! in_array($commandType->getName(), $this->commandClasses)
                 ) {
                     continue;
                 }
 
                 /** @var class-string<AggregateCommand> $commandClass */
-                $commandClass = $commandType . '';
+                $commandClass = $commandType->getName();
 
                 $this->commandAggregateMapping[$commandClass] = $aggregateClass;
             }
@@ -560,14 +562,12 @@ final class Configurator
                     continue;
                 }
 
+                /** @var ReflectionNamedType|null $commandType */
                 $commandType = $firstParameter->getType();
-
-                /** @var class-string<AggregateCommand> $commandClass */
-                $commandClass = $commandType . '';
 
                 if (
                     $commandType === null
-                    || ! in_array($commandClass, $this->commandClasses)
+                    || ! in_array($commandType->getName(), $this->commandClasses)
                 ) {
                     continue;
                 }
@@ -575,9 +575,10 @@ final class Configurator
                 /** @var array<class-string> $mapping */
                 $mapping = array_map(
                     static function (ReflectionParameter $parameter) {
+                        /** @var ReflectionNamedType|null $type */
                         $type = $parameter->getType();
 
-                        return $type ? $type . '' : null;
+                        return $type ? $type->getName() : null;
                     },
                     $parameters
                 );
@@ -585,6 +586,9 @@ final class Configurator
                 if (in_array(null, $mapping)) {
                     continue;
                 }
+
+                /** @var class-string<AggregateCommand> $commandClass */
+                $commandClass = $commandType->getName();
 
                 $this->commandServiceMapping[$commandClass] = $mapping;
             }
@@ -620,11 +624,10 @@ final class Configurator
                 );
             }
 
+            /** @var ReflectionNamedType|null $commandType */
             $commandType = $firstParameter->getType();
 
-            /** @var class-string<Command> $commandClass */
-            $commandClass = $commandType . '';
-            if ($commandType === null || ! in_array($commandClass, $this->commandClasses)) {
+            if ($commandType === null || ! in_array($commandType->getName(), $this->commandClasses)) {
                 throw new RuntimeException(
                     sprintf(
                         'The first parameter of the __invoke method of preProcessor \'%s\' ' .
@@ -633,6 +636,9 @@ final class Configurator
                     )
                 );
             }
+
+            /** @var class-string<Command> $commandClass */
+            $commandClass = $commandType->getName();
 
             $this->commandPreProcessorMapping[$commandClass] = $preProcessorClass;
         }

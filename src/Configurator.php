@@ -83,7 +83,7 @@ final class Configurator
     private array $commandEventMapping = [];
     /** @var array<class-string<AggregateCommand>, array<class-string>> */
     private array $commandServiceMapping = [];
-    /** @var array<class-string<Command>, array<class-string<PreProcessor>|class-string<AggregateCommand>|null>> */
+    /** @var array<class-string<Command>, class-string<PreProcessor>> */
     private array $commandPreProcessorMapping = [];
     /** @var array<class-string<AggregateRoot>, string> */
     private array $aggregateIdentifierMapping = [];
@@ -311,53 +311,15 @@ final class Configurator
 
     private function registerPreProcessors(EventEngine $eventEngine): self
     {
-        foreach ($this->commandPreProcessorMapping() as $commandClass => [$preProcessorClass, $returnCommandClass]) {
-            /** @var class-string<PreProcessor> $preProcessorClass */
-            /** @var class-string<AggregateCommand>|null $returnCommandClass */
-            $commandProcessor = $eventEngine->process($commandClass);
-
-            $this->handlePreprocessors($commandProcessor, $preProcessorClass, $returnCommandClass);
+        foreach ($this->commandPreProcessorMapping() as $commandClass => $preProcessorClass) {
+            $eventEngine
+                ->process($commandClass)
+                ->preProcess($preProcessorClass)
+                ->withNew('test')
+                ->handle([FlavourHint::class, 'useAggregate']);
         }
 
         return $this;
-    }
-
-    /**
-     * @param class-string<PreProcessor> $preProcessorClass
-     * @param class-string<AggregateCommand> $returnCommandClass
-     */
-    private function handlePreProcessors(
-        CommandProcessorDescription $commandProcessor,
-        string $preProcessorClass,
-        ?string $returnCommandClass
-    ): bool {
-        if ($returnCommandClass === null) {
-            throw new RuntimeException(
-                sprintf(
-                    'The preProcessor \'%s\' has no return type for the __invoke method.',
-                    $preProcessorClass
-                )
-            );
-        }
-
-        $aggregateRootClass = $this->commandAggregateMapping()[$returnCommandClass] ?? null;
-
-        if ($aggregateRootClass === null) {
-            throw new RuntimeException(
-                sprintf(
-                    'The preProcessor \'%s\' returns something that is not linked with an aggregate root.',
-                    $preProcessorClass
-                )
-            );
-        }
-
-        $commandProcessor
-            ->preProcess($preProcessorClass)
-            ->withExisting($aggregateRootClass)
-            ->identifiedBy($this->aggregateIdentifierMapping()[$aggregateRootClass])
-            ->handle([FlavourHint::class, 'useAggregate']);
-
-        return true;
     }
 
     private function registerAggregates(EventEngine $eventEngine): self
@@ -623,7 +585,7 @@ final class Configurator
     }
 
     /**
-     * @return array<class-string<Command>, array<class-string<PreProcessor>|class-string<AggregateCommand>|null>>
+     * @return array<class-string<Command>, class-string<PreProcessor>>
      */
     private function commandPreProcessorMapping(): array
     {
@@ -636,8 +598,6 @@ final class Configurator
 
             $invokeMethod = $preProcessorReflection->getMethod('__invoke');
             $invokeParameters = $invokeMethod->getParameters();
-            /** @var ReflectionNamedType|null $invokeReturn */
-            $invokeReturn = $invokeMethod->getReturnType();
 
             $firstParameter = reset($invokeParameters);
 
@@ -666,13 +626,7 @@ final class Configurator
             /** @var class-string<Command> $commandClass */
             $commandClass = $commandType->getName();
 
-            /** @var class-string<AggregateCommand>|null $returnCommandClass */
-            $returnCommandClass = $invokeReturn ? $invokeReturn->getName() : null;
-
-            $this->commandPreProcessorMapping[$commandClass] = [
-                $preProcessorClass,
-                $returnCommandClass,
-            ];
+            $this->commandPreProcessorMapping[$commandClass] = $preProcessorClass;
         }
 
         return $this->commandPreProcessorMapping;

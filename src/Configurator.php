@@ -290,7 +290,11 @@ final class Configurator
         $commandAggregateMappings = $this->commandAggregateMapping();
 
         foreach ($this->commandEventMapping() as $commandClass => $eventClasses) {
-            if (! in_array($eventClass, $eventClasses) || array_key_exists($commandClass, $commandAggregateMappings)) {
+            if (
+                ! (
+                array_key_exists($commandClass, $commandAggregateMappings)
+                && in_array($eventClass, $eventClasses))
+            ) {
                 continue;
             }
 

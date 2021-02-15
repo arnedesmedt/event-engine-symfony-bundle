@@ -4,6 +4,7 @@ services:
         class: Symfony\Component\Cache\Adapter\FilesystemAdapter
 
     event_engine.connection:
+        lazy: true
         class: PDO
         factory:
             - '@doctrine.dbal.default_connection'

@@ -19,6 +19,7 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder
             ->getRootNode()
             ->children()
+                ->scalarNode('pdo_dsn')->end()
                 ->scalarNode('domain_namespace')->defaultValue('App\Domain')->end()
                 ->scalarNode('entity_namespace')->defaultValue('App\Domain\Entity')->end()
                 ->arrayNode('document_store')

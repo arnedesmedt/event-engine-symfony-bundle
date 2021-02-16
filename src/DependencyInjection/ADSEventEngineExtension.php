@@ -47,5 +47,10 @@ final class ADSEventEngineExtension extends ConfigurableExtension
             'event_engine.domain_namespace',
             $mergedConfig['domain_namespace']
         );
+
+        $container->setParameter(
+            'event_engine.pdo_dsn',
+            $mergedConfig['pdo_dsn']
+        );
     }
 }

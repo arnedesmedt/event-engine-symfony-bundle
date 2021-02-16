@@ -6,7 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\Persistency;
 
 class PDO extends \PDO
 {
-    /** @var array<string, mixed> */
+    /** @var array<mixed> */
     protected array $connectionParameters = [];
     /** @var array<int, mixed> */
     protected array $attributes = [];
@@ -18,10 +18,10 @@ class PDO extends \PDO
     public function __construct(string $dsn, ?string $username = null, ?string $password = null, ?array $options = null)
     {
         $this->connectionParameters = [
-            'dsn' => $dsn,
-            'username' => $username,
-            'password' => $password,
-            'options' => $options,
+            $dsn,
+            $username,
+            $password,
+            $options,
         ];
     }
 

@@ -41,8 +41,11 @@ class PDO extends \PDO
 
     /**
      * @param mixed $value
+     *
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingAnyTypeHint
      */
-    public function setAttribute(int $attribute, $value): bool
+    public function setAttribute($attribute, $value)
     {
         $this->attributes[$attribute] = $value;
 

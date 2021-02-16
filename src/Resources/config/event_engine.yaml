@@ -4,6 +4,7 @@ services:
         class: Symfony\Component\Cache\Adapter\FilesystemAdapter
 
     event_engine.connection:
+        public: true
         class: ADS\Bundle\EventEngineBundle\Persistency\PDO
         arguments:
             $dsn: '%event_engine.pdo_dsn%'

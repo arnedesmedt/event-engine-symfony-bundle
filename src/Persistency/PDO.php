@@ -46,7 +46,7 @@ class PDO extends \PDO
         return true;
     }
 
-    public function prepare($query, $options)
+    public function prepare($query, $options = null)
     {
         $this->enableConnection();
         parent::prepare($query, $options);

@@ -13,6 +13,8 @@
 
     <file>src/</file>
 
+    <exclude-pattern>src/Persistency/PDO.php</exclude-pattern>
+
     <rule ref="Doctrine">
         <exclude name="Generic.Formatting.MultipleStatementAlignment"/>
         <exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion"/>

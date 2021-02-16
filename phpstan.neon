@@ -2,4 +2,5 @@ parameters:
     inferPrivatePropertyTypeFromConstructor: true
     excludes_analyse:
         - src/DependencyInjection/Configuration.php
+        - src/Persistency/PDO.php
 

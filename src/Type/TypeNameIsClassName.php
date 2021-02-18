@@ -8,7 +8,7 @@ use ReflectionClass;
 
 trait TypeNameIsClassName
 {
-    public static function __typeName(): string
+    public static function __type(): string
     {
         return (new ReflectionClass(static::class))->getShortName();
     }

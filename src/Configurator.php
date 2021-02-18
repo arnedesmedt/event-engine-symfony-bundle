@@ -221,7 +221,7 @@ final class Configurator
         }
 
         foreach ($this->typeClasses as $typeClass) {
-            $eventEngine->registerType($typeClass::__typeName(), $typeClass::__schema());
+            $eventEngine->registerType($typeClass);
         }
 
         return $this;

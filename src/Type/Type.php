@@ -8,5 +8,4 @@ use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 
 interface Type extends JsonSchemaAwareRecord
 {
-    public static function __typeName(): string;
 }

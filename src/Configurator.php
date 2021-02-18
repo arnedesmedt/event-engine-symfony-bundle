@@ -212,16 +212,22 @@ final class Configurator
 
     private function registerTypes(EventEngine $eventEngine): self
     {
-        foreach ($this->aggregateClasses as $aggregateClass) {
-            $eventEngine->registerResponseType(EventEngineUtil::fromAggregateClassToStateClass($aggregateClass));
-        }
+        $types = array_unique(
+            [
+                ...array_map(
+                    static fn ($aggregateClass) => EventEngineUtil::fromAggregateClassToStateClass($aggregateClass),
+                    $this->aggregateClasses
+                ),
+                ...array_map(
+                    static fn ($projectorClass) => $projectorClass::stateClassName(),
+                    $this->projectorClasses
+                ),
+                ...$this->typeClasses,
+            ]
+        );
 
-        foreach ($this->projectorClasses as $projectorClass) {
-            $eventEngine->registerResponseType($projectorClass::stateClassName());
-        }
-
-        foreach ($this->typeClasses as $typeClass) {
-            $eventEngine->registerType($typeClass);
+        foreach ($types as $type) {
+            $eventEngine->registerType($type);
         }
 
         return $this;

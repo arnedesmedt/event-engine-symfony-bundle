@@ -57,14 +57,19 @@ final class EventEnginePass implements CompilerPassInterface
             }
         );
 
-        $resources = array_map(
-            static function (ReflectionClassResource $resource) {
-                /** @var class-string $class */
-                $class = substr($resource . '', 11);
+        $resources = array_filter(
+            array_map(
+                static function (ReflectionClassResource $resource) {
+                    /** @var class-string $class */
+                    $class = substr($resource . '', 11);
 
-                return new ReflectionClass($class);
-            },
-            $resources
+                    return new ReflectionClass($class);
+                },
+                $resources
+            ),
+            static function (ReflectionClass $reflectionClass) {
+                return ! $reflectionClass->isInterface();
+            }
         );
 
         $mappers = [

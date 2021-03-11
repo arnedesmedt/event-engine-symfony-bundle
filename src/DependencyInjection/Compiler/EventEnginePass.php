@@ -197,7 +197,6 @@ final class EventEnginePass implements CompilerPassInterface
                         new Reference(DocumentStore::class),
                         EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregate),
                         EventEngineUtil::fromAggregateNameToStateClass($aggregate, $entityNamespace),
-                        new Reference('event_engine.connection'),
                     ]
                 ))
                     ->setPublic(true);
@@ -224,7 +223,6 @@ final class EventEnginePass implements CompilerPassInterface
                         new Reference(DocumentStore::class),
                         $projector::generateOwnCollectionName(),
                         $projector::stateClassName(),
-                        new Reference('event_engine.connection'),
                     ]
                 ))->setPublic(true);
 

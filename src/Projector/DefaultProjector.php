@@ -6,6 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\Projector;
 
 use ADS\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
+use EventEngine\Messaging\Message;
 use EventEngine\Projecting\AggregateProjector;
 use LogicException;
 
@@ -96,6 +97,10 @@ abstract class DefaultProjector implements Projector
     public function handle(string $projectionVersion, string $projectionName, $event): void
     {
         $eventClass = get_class($event);
+        if ($event instanceof Message) {
+            $eventClass = $event->messageName();
+            $event = $event->get('message');
+        }
 
         if (! in_array($eventClass, static::events(), true)) {
             return;

@@ -9,7 +9,6 @@ use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\DocumentStore\DocumentStore;
 use LogicException;
-use PDO;
 use ReflectionClass;
 use Throwable;
 
@@ -28,10 +27,9 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
     public function __construct(
         DocumentStore $documentStore,
         string $documentStoreName,
-        string $stateClass,
-        PDO $connection
+        string $stateClass
     ) {
-        parent::__construct($documentStore, $documentStoreName, $stateClass, $connection);
+        parent::__construct($documentStore, $documentStoreName, $stateClass);
 
         $aggregateClass = EventEngineUtil::fromStateToAggregateClass($this->stateClass);
         $reflectionClassAggregate = new ReflectionClass($aggregateClass);

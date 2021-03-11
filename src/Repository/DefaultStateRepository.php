@@ -11,7 +11,6 @@ use EventEngine\DocumentStore\Filter\AnyFilter;
 use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\PartialSelect;
 use LogicException;
-use PDO;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -36,7 +35,6 @@ abstract class DefaultStateRepository implements StateRepository
     protected string $stateClass;
     protected DocumentStore $documentStore;
     protected string $documentStoreName;
-    protected PDO $connection;
 
     /**
      * @param class-string $stateClass
@@ -44,8 +42,7 @@ abstract class DefaultStateRepository implements StateRepository
     public function __construct(
         DocumentStore $documentStore,
         string $documentStoreName,
-        string $stateClass,
-        PDO $connection
+        string $stateClass
     ) {
         $this->documentStore = $documentStore;
         $reflectionClassState = new ReflectionClass($stateClass);
@@ -59,7 +56,6 @@ abstract class DefaultStateRepository implements StateRepository
 
         $this->stateClass = $stateClass;
         $this->documentStoreName = $documentStoreName;
-        $this->connection = $connection;
     }
 
     /**

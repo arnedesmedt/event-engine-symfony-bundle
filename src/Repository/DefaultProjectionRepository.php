@@ -10,8 +10,13 @@ abstract class DefaultProjectionRepository extends DefaultStateRepository implem
 {
     private const STATE_KEY = 'state';
 
-    public function upsertState(string $docId, JsonSchemaAwareRecord $state): void
+    /**
+     * @param mixed $docId
+     */
+    public function upsertState($docId, JsonSchemaAwareRecord $state): void
     {
+        $docId = (string) $docId;
+
         $this->documentStore->upsertDoc(
             $this->documentStoreName,
             $docId,
@@ -21,8 +26,13 @@ abstract class DefaultProjectionRepository extends DefaultStateRepository implem
         );
     }
 
-    public function deleteDoc(string $docId): void
+    /**
+     * @param mixed $docId
+     */
+    public function deleteDoc($docId): void
     {
+        $docId = (string) $docId;
+
         $this->documentStore->deleteDoc(
             $this->documentStoreName,
             $docId

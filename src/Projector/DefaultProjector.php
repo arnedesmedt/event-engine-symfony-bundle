@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Projector;
 
+use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\Messaging\Message;
 use EventEngine\Projecting\AggregateProjector;
-use LogicException;
+use RuntimeException;
 
 use function get_class;
 use function in_array;
-use function is_string;
-use function preg_replace;
-use function strrpos;
-use function substr;
+use function sprintf;
 
 abstract class DefaultProjector implements Projector
 {
@@ -42,16 +40,7 @@ abstract class DefaultProjector implements Projector
 
     public static function projectionName(): string
     {
-        $className = static::class;
-
-        $lastPartOfClassName = self::getLastPartOfClassName($className);
-
-        $cleanedClassName = preg_replace('/Projector$/', '', $lastPartOfClassName);
-        if (! is_string($cleanedClassName)) {
-            throw new LogicException('Unable to remove Projector from: ' . $lastPartOfClassName);
-        }
-
-        return StringUtil::decamelize($cleanedClassName);
+        return StringUtil::decamelize(StringUtil::entityNameFromClassName(static::class));
     }
 
     public static function version(): string
@@ -66,29 +55,12 @@ abstract class DefaultProjector implements Projector
 
     public static function stateClassName(): string
     {
-        $className = static::class;
-
-        $stateClassName = preg_replace('/(\w*)$/m', 'State', $className, 1);
-        if (! is_string($stateClassName)) {
-            throw new LogicException('Unable to generate state name from: ' . $className);
-        }
-
-        return $stateClassName;
+        return StringUtil::entityNamespaceFromClassName(static::class) . '\\State';
     }
 
     protected static function generateCollectionName(string $projectionVersion, string $projectionName): string
     {
         return AggregateProjector::generateCollectionName($projectionVersion, $projectionName);
-    }
-
-    private static function getLastPartOfClassName(string $className): string
-    {
-        $lastPartOfClassName = substr($className, strrpos($className, '\\') + 1);
-        if (! is_string($lastPartOfClassName)) {
-            throw new LogicException('Unable to get last part of class name from ' . $className);
-        }
-
-        return $lastPartOfClassName;
     }
 
     /**
@@ -97,6 +69,7 @@ abstract class DefaultProjector implements Projector
     public function handle(string $projectionVersion, string $projectionName, $event): void
     {
         $eventClass = get_class($event);
+
         if ($event instanceof Message) {
             $eventClass = $event->messageName();
             $event = $event->get('message');
@@ -106,8 +79,19 @@ abstract class DefaultProjector implements Projector
             return;
         }
 
-        $eventMethod = 'when' . self::getLastPartOfClassName($eventClass);
+        if (! $event instanceof Event) {
+            throw new RuntimeException(
+                sprintf(
+                    'The event \'%s\' needs to implement the \'%s\' interface, ' .
+                    'if you want to use it in projections.',
+                    $eventClass,
+                    Event::class
+                )
+            );
+        }
 
-        $this->{$eventMethod}($event);
+        $applyMethod = $event->__applyMethod();
+
+        $this->{$applyMethod}($event);
     }
 }

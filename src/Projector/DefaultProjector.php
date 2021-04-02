@@ -55,7 +55,10 @@ abstract class DefaultProjector implements Projector
 
     public static function stateClassName(): string
     {
-        return StringUtil::entityNamespaceFromClassName(static::class) . '\\State';
+        $projectionNamespace = StringUtil::entityNamespaceFromClassName(static::class);
+        $projectionName = StringUtil::entityNameFromClassName(static::class);
+
+        return sprintf('%s\\%s\\%s', $projectionNamespace, $projectionName, 'State');
     }
 
     protected static function generateCollectionName(string $projectionVersion, string $projectionName): string

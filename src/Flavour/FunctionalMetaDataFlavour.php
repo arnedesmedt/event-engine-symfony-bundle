@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Flavour;
 
+use ADS\Bundle\EventEngineBundle\Resolver\MetaDataResolver;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Messaging\MessageFactory;
@@ -202,10 +203,13 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         }
 
         $queryMessage = $query->get(MessageBag::MESSAGE);
-        $filter = $query->getMetaOrDefault('filter', null);
-        $order = $query->getMetaOrDefault('order', null);
+        $metadata = $query->metadata();
 
-        return $resolver($queryMessage, $filter, $order);
+        if ($resolver instanceof MetaDataResolver) {
+            $resolver->setMetaData($metadata);
+        }
+
+        return $resolver($queryMessage);
     }
 
     public function setMessageFactory(MessageFactory $messageFactory): void

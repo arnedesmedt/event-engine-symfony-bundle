@@ -69,7 +69,7 @@ services:
     EventEngine\Logger\LogEngine: '@EventEngine\Logger\SimpleMessageEngine'
     EventEngine\Persistence\MultiModelStore: '@EventEngine\Persistence\ComposedMultiModelStore'
     EventEngine\Persistence\TransactionalConnection: '@ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection'
-    EventEngine\Runtime\Flavour: '@EventEngine\Runtime\OopFlavour'
+    EventEngine\Runtime\Flavour: '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
     EventEngine\Runtime\Functional\Port: '@ADS\Bundle\EventEngineBundle\Port\MessagePort'
     EventEngine\Runtime\Oop\Port: '@ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort'
     EventEngine\Schema\Schema: '@EventEngine\JsonSchema\OpisJsonSchema'
@@ -116,10 +116,17 @@ services:
     EventEngine\Runtime\FunctionalFlavour:
         arguments:
             - '@EventEngine\Runtime\Functional\Port'
+    ADS\Bundle\EventEngineBundle\Flavour\FunctionalMetaDataFlavour:
+        arguments:
+            - '@EventEngine\Runtime\FunctionalFlavour'
     EventEngine\Runtime\OopFlavour:
         arguments:
             - '@EventEngine\Runtime\Oop\Port'
             - '@EventEngine\Runtime\FunctionalFlavour'
+    ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour:
+        arguments:
+            - '@EventEngine\Runtime\OopFlavour'
+            - '@ADS\Bundle\EventEngineBundle\Flavour\FunctionalMetaDataFlavour'
 
     ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot: ~
     ADS\Bundle\EventEngineBundle\Aggregate\DeletableAggregate: ~

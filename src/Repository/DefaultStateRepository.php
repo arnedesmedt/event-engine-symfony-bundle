@@ -9,6 +9,7 @@ use EventEngine\Data\ImmutableRecord;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\DocumentStore\Filter\AnyFilter;
 use EventEngine\DocumentStore\Filter\Filter;
+use EventEngine\DocumentStore\OrderBy\OrderBy;
 use EventEngine\DocumentStore\PartialSelect;
 use LogicException;
 use ReflectionClass;
@@ -90,8 +91,12 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @return Traversable<array<mixed>>
      */
-    public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): Traversable
-    {
+    public function findDocuments(
+        ?Filter $filter = null,
+        ?int $skip = null,
+        ?int $limit = null,
+        ?OrderBy $orderBy = null
+    ): Traversable {
         if ($filter === null) {
             $filter = new AnyFilter();
         }
@@ -100,7 +105,8 @@ abstract class DefaultStateRepository implements StateRepository
             $this->documentStoreName,
             $filter,
             $skip,
-            $limit
+            $limit,
+            $orderBy
         );
     }
 
@@ -111,7 +117,8 @@ abstract class DefaultStateRepository implements StateRepository
         PartialSelect $partialSelect,
         ?Filter $filter = null,
         ?int $skip = null,
-        ?int $limit = null
+        ?int $limit = null,
+        ?OrderBy $orderBy = null
     ): Traversable {
         if ($filter === null) {
             $filter = new AnyFilter();
@@ -122,7 +129,8 @@ abstract class DefaultStateRepository implements StateRepository
             $partialSelect,
             $filter,
             $skip,
-            $limit
+            $limit,
+            $orderBy
         );
     }
 
@@ -151,10 +159,14 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @return array<ImmutableRecord>
      */
-    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null): array
-    {
+    public function findDocumentStates(
+        ?Filter $filter = null,
+        ?int $skip = null,
+        ?int $limit = null,
+        ?OrderBy $orderBy = null
+    ): array {
         return $this->statesFromDocuments(
-            $this->findDocuments($filter, $skip, $limit)
+            $this->findDocuments($filter, $skip, $limit, $orderBy)
         );
     }
 

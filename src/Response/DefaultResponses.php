@@ -8,8 +8,11 @@ use ADS\Bundle\EventEngineBundle\Exception\ResponseException;
 use EventEngine\Schema\TypeSchema;
 use ReflectionClass;
 use ReflectionMethod;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 use function array_filter;
+use function method_exists;
 use function preg_match;
 use function reset;
 
@@ -28,6 +31,20 @@ trait DefaultResponses
 
     public static function __defaultStatusCode(): ?int
     {
+        if (method_exists(static::class, '__httpMethod')) {
+            $httpMethod = static::__httpMethod();
+
+            switch ($httpMethod) {
+                case Request::METHOD_POST:
+                    return Response::HTTP_CREATED;
+
+                case Request::METHOD_DELETE:
+                    return Response::HTTP_NO_CONTENT;
+            }
+
+            return Response::HTTP_OK;
+        }
+
         return null;
     }
 

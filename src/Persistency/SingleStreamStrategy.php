@@ -38,7 +38,7 @@ final class SingleStreamStrategy implements PostgresPersistenceStrategy
 CREATE TABLE $tableName (
     no BIGSERIAL,
     event_id UUID NOT NULL,
-    event_name VARCHAR(100) NOT NULL,
+    event_name VARCHAR(255) NOT NULL,
     payload JSON NOT NULL,
     metadata JSONB NOT NULL,
     created_at TIMESTAMP(6) NOT NULL,

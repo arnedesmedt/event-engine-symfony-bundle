@@ -98,4 +98,9 @@ interface StateRepository
         $identifier,
         ?Throwable $exception = null
     ): void;
+
+    /**
+     * @return class-string
+     */
+    public function stateClass(): string;
 }

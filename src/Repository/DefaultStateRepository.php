@@ -277,6 +277,11 @@ abstract class DefaultStateRepository implements StateRepository
         );
     }
 
+    public function stateClass(): string
+    {
+        return $this->stateClass;
+    }
+
     /**
      * @param array<mixed> $document
      */

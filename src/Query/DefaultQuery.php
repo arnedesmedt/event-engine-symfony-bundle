@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Query;
 
-use ADS\Bundle\EventEngineBundle\Request\DefaultsAreNotRequired;
+use ADS\JsonImmutableObjects\DefaultsAreNotRequired;
 
 use function count;
 use function explode;

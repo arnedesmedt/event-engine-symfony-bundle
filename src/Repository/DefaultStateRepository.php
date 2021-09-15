@@ -31,6 +31,7 @@ use function count;
 use function is_array;
 use function iterator_to_array;
 use function json_encode;
+use function reset;
 use function sprintf;
 
 abstract class DefaultStateRepository implements StateRepository
@@ -221,6 +222,10 @@ abstract class DefaultStateRepository implements StateRepository
             throw new RuntimeException('List of identifiers is not an array.');
         }
 
+        if (empty($identifiers)) {
+            return true;
+        }
+
         $filters = array_map(
             static fn ($identifier) => new DocIdFilter(
                 $identifier instanceof ValueObject
@@ -232,7 +237,7 @@ abstract class DefaultStateRepository implements StateRepository
 
         $documentIds = $this->documentStore->filterDocIds(
             $this->documentStoreName,
-            new OrFilter(...$filters)
+            count($filters) === 1 ? reset($filters) : new OrFilter(...$filters)
         );
 
         return count($identifiers) === count($documentIds);

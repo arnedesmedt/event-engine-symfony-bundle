@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Repository;
 
+use ADS\ValueObjects\ListValue;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\DocumentStore\Filter\AnyFilter;
+use EventEngine\DocumentStore\Filter\DocIdFilter;
 use EventEngine\DocumentStore\Filter\Filter;
+use EventEngine\DocumentStore\Filter\OrFilter;
 use EventEngine\DocumentStore\OrderBy\OrderBy;
 use EventEngine\DocumentStore\PartialSelect;
 use LogicException;
@@ -24,6 +27,8 @@ use function array_key_exists;
 use function array_map;
 use function array_values;
 use function assert;
+use function count;
+use function is_array;
 use function iterator_to_array;
 use function json_encode;
 use function sprintf;
@@ -201,6 +206,36 @@ abstract class DefaultStateRepository implements StateRepository
         $document = $this->findDocument($identifier);
 
         return $document !== null;
+    }
+
+    /**
+     * @param ListValue|array<mixed> $identifiers
+     */
+    public function hasAllDocuments($identifiers): bool
+    {
+        if ($identifiers instanceof ListValue) {
+            $identifiers = $identifiers->toArray();
+        }
+
+        if (! is_array($identifiers)) {
+            throw new RuntimeException('List of identifiers is not an array.');
+        }
+
+        $filters = array_map(
+            static fn ($identifier) => new DocIdFilter(
+                $identifier instanceof ValueObject
+                        ? $identifier->toValue()
+                        : $identifier
+            ),
+            $identifiers
+        );
+
+        $documentIds = $this->documentStore->filterDocIds(
+            $this->documentStoreName,
+            new OrFilter(...$filters)
+        );
+
+        return count($identifiers) === count($documentIds);
     }
 
     /**

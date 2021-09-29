@@ -53,6 +53,20 @@ interface StateRepository
     public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): Traversable;
 
     /**
+     * @param array<mixed>|ListValue $identifiers
+     *
+     * @return Traversable<mixed>
+     */
+    public function findDocumentsByIds($identifiers): Traversable;
+
+    /**
+     * @param array<mixed>|ListValue $identifiers
+     *
+     * @return array<ImmutableRecord>
+     */
+    public function findDocumentStatesByIds($identifiers): array;
+
+    /**
      * @return Traversable<array<mixed>>
      */
     public function findPartialDocuments(

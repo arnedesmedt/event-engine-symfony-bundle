@@ -6,6 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\Repository;
 
 use ADS\ValueObjects\ListValue;
 use ADS\ValueObjects\ValueObject;
+use ArrayIterator;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\DocumentStore\Filter\AnyFilter;
@@ -195,6 +196,30 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
+     * @inheritDoc
+     */
+    public function findDocumentsByIds($identifiers): Traversable
+    {
+        $filter = $this->identifiersToFilter($identifiers);
+
+        if ($filter === null) {
+            return new ArrayIterator();
+        }
+
+        return $this->findDocuments($filter);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findDocumentStatesByIds($identifiers): array
+    {
+        return $this->statesFromDocuments(
+            $this->findDocumentsByIds($identifiers)
+        );
+    }
+
+    /**
      * @return Traversable<array<mixed>>
      */
     public function findPartialDocuments(
@@ -317,30 +342,9 @@ abstract class DefaultStateRepository implements StateRepository
      */
     public function hasAllDocuments($identifiers): bool
     {
-        if ($identifiers instanceof ListValue) {
-            $identifiers = $identifiers->toArray();
-        }
+        $filter = $this->identifiersToFilter($identifiers);
 
-        if (! is_array($identifiers)) {
-            throw new RuntimeException('List of identifiers is not an array.');
-        }
-
-        if (empty($identifiers)) {
-            return true;
-        }
-
-        $filters = array_map(
-            static fn ($identifier) => new DocIdFilter(
-                $identifier instanceof ValueObject
-                        ? $identifier->toValue()
-                        : $identifier
-            ),
-            $identifiers
-        );
-
-        $documentIds = $this->findDocumentIds(
-            count($filters) === 1 ? reset($filters) : new OrFilter(...$filters)
-        );
+        $documentIds = $this->findDocumentIds($filter);
 
         return count($identifiers) === count($documentIds);
     }
@@ -370,6 +374,35 @@ abstract class DefaultStateRepository implements StateRepository
         if ($document === null) {
             throw $exception;
         }
+    }
+
+    /**
+     * @param array<mixed>|ListValue $identifiers
+     */
+    private function identifiersToFilter($identifiers): ?Filter
+    {
+        if ($identifiers instanceof ListValue) {
+            $identifiers = $identifiers->toArray();
+        }
+
+        if (! is_array($identifiers)) {
+            throw new RuntimeException('List of identifiers is not an array.');
+        }
+
+        if (empty($identifiers)) {
+            return null;
+        }
+
+        $filters = array_map(
+            static fn ($identifier) => new DocIdFilter(
+                $identifier instanceof ValueObject
+                    ? $identifier->toValue()
+                    : $identifier
+            ),
+            $identifiers
+        );
+
+        return count($filters) === 1 ? reset($filters) : new OrFilter(...$filters);
     }
 
     public function stateClass(): string

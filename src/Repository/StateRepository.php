@@ -62,9 +62,23 @@ interface StateRepository
     /**
      * @param array<mixed>|ListValue $identifiers
      *
+     * @return Traversable<mixed>
+     */
+    public function needDocumentsByIds($identifiers): Traversable;
+
+    /**
+     * @param array<mixed>|ListValue $identifiers
+     *
      * @return array<ImmutableRecord>
      */
     public function findDocumentStatesByIds($identifiers): array;
+
+    /**
+     * @param array<mixed>|ListValue $identifiers
+     *
+     * @return array<ImmutableRecord>
+     */
+    public function needDocumentStatesByIds($identifiers): array;
 
     /**
      * @return Traversable<array<mixed>>

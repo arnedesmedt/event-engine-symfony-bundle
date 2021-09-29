@@ -30,6 +30,7 @@ use function array_values;
 use function assert;
 use function count;
 use function is_array;
+use function iterator_count;
 use function iterator_to_array;
 use function json_encode;
 use function reset;
@@ -212,10 +213,41 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
+    public function needDocumentsByIds($identifiers): Traversable
+    {
+        $documents = $this->findDocumentsByIds($identifiers);
+        $countIdentifiers = $identifiers instanceof ListValue
+            ? $identifiers->count()
+            : count($identifiers);
+
+        if (iterator_count($documents) !== $countIdentifiers) {
+            $scalarIdentifiers = $this->identifiersToScalars($identifiers);
+
+            throw new NotFoundHttpException(
+                sprintf('One of the identifiers is not found: \'%s\'.', json_encode($scalarIdentifiers))
+            );
+        }
+
+        return $documents;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function findDocumentStatesByIds($identifiers): array
     {
         return $this->statesFromDocuments(
             $this->findDocumentsByIds($identifiers)
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function needDocumentStatesByIds($identifiers): array
+    {
+        return $this->statesFromDocuments(
+            $this->needDocumentsByIds($identifiers)
         );
     }
 
@@ -381,6 +413,27 @@ abstract class DefaultStateRepository implements StateRepository
      */
     private function identifiersToFilter($identifiers): ?Filter
     {
+        $scalarIdentifiers = $this->identifiersToScalars($identifiers);
+
+        if (empty($scalarIdentifiers)) {
+            return null;
+        }
+
+        $filters = array_map(
+            static fn ($scalarIdentifier) => new DocIdFilter($scalarIdentifier),
+            $scalarIdentifiers
+        );
+
+        return count($filters) === 1 ? reset($filters) : new OrFilter(...$filters);
+    }
+
+    /**
+     * @param array<mixed>|ListValue $identifiers
+     *
+     * @return array<mixed>
+     */
+    private function identifiersToScalars($identifiers): array
+    {
         if ($identifiers instanceof ListValue) {
             $identifiers = $identifiers->toArray();
         }
@@ -390,19 +443,15 @@ abstract class DefaultStateRepository implements StateRepository
         }
 
         if (empty($identifiers)) {
-            return null;
+            return $identifiers;
         }
 
-        $filters = array_map(
-            static fn ($identifier) => new DocIdFilter(
-                $identifier instanceof ValueObject
+        return array_map(
+            static fn ($identifier) => $identifier instanceof ValueObject
                     ? $identifier->toValue()
-                    : $identifier
-            ),
+                    : $identifier,
             $identifiers
         );
-
-        return count($filters) === 1 ? reset($filters) : new OrFilter(...$filters);
     }
 
     public function stateClass(): string

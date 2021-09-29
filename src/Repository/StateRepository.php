@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Repository;
 
+use ADS\ValueObjects\ListValue;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\DocumentStore\Filter\Filter;
@@ -14,16 +15,37 @@ use Traversable;
 interface StateRepository
 {
     /**
-     * @param Traversable<array<mixed>> $documents
+     * @param string|ValueObject $identifier
      *
-     * @return array<ImmutableRecord>
+     * @return array<mixed>
      */
-    public function statesFromDocuments(Traversable $documents): array;
+    public function findDocument($identifier): ?array;
 
     /**
-     * @param array<mixed>|null $document
+     * @param string|ValueObject $identifier
+     *
+     * @return array<mixed>
      */
-    public function stateFromDocument(?array $document): ?ImmutableRecord;
+    public function needDocument(
+        $identifier,
+        ?Throwable $exception = null
+    ): array;
+
+    /**
+     * @param string|ValueObject $identifier
+     */
+    public function dontNeedDocument(
+        $identifier,
+        ?Throwable $exception = null
+    ): void;
+
+    /**
+     * @param string|ValueObject $identifier
+     */
+    public function needDocumentState(
+        $identifier,
+        ?Throwable $exception = null
+    ): ImmutableRecord;
 
     /**
      * @return Traversable<array<mixed>>
@@ -42,26 +64,24 @@ interface StateRepository
 
     public function countDocuments(?Filter $filter = null): int;
 
-    public function hasDocuments(?Filter $filter = null): bool;
+    /**
+     * @return array<mixed>
+     */
+    public function findDocumentIds(?Filter $filter = null): array;
 
-    public function hasNoDocuments(?Filter $filter = null): bool;
+    /**
+     * @param string|ValueObject $identifier
+     */
+    public function findDocumentState($identifier): ?ImmutableRecord;
 
     /**
      * @return array<ImmutableRecord>
      */
     public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null): array;
 
-    /**
-     * @param string|ValueObject $identifier
-     *
-     * @return array<mixed>
-     */
-    public function findDocument($identifier): ?array;
+    public function hasDocuments(?Filter $filter = null): bool;
 
-    /**
-     * @param string|ValueObject $identifier
-     */
-    public function findDocumentState($identifier): ?ImmutableRecord;
+    public function hasNoDocuments(?Filter $filter = null): bool;
 
     /**
      * @param string|ValueObject $identifier
@@ -74,30 +94,9 @@ interface StateRepository
     public function hasNoDocument($identifier): bool;
 
     /**
-     * @param string|ValueObject $identifier
-     *
-     * @return array<mixed>
+     * @param ListValue|array<mixed> $identifiers
      */
-    public function needDocument(
-        $identifier,
-        ?Throwable $exception = null
-    ): array;
-
-    /**
-     * @param string|ValueObject $identifier
-     */
-    public function needDocumentState(
-        $identifier,
-        ?Throwable $exception = null
-    ): ImmutableRecord;
-
-    /**
-     * @param string|ValueObject $identifier
-     */
-    public function dontNeedDocument(
-        $identifier,
-        ?Throwable $exception = null
-    ): void;
+    public function hasAllDocuments($identifiers): bool;
 
     /**
      * @return class-string

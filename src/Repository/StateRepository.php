@@ -62,9 +62,9 @@ interface StateRepository
     /**
      * @param array<mixed>|ListValue $identifiers
      *
-     * @return Traversable<mixed>
+     * @return array<mixed>
      */
-    public function needDocumentsByIds($identifiers): Traversable;
+    public function needDocumentsByIds($identifiers): array;
 
     /**
      * @param array<mixed>|ListValue $identifiers

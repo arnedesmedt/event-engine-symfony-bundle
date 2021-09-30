@@ -30,7 +30,6 @@ use function array_values;
 use function assert;
 use function count;
 use function is_array;
-use function iterator_count;
 use function iterator_to_array;
 use function json_encode;
 use function reset;
@@ -68,16 +67,20 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param Traversable<array<mixed>> $documents
+     * @param Traversable<array<mixed>>|array<array<mixed>> $documents
      *
      * @return array<ImmutableRecord>
      */
-    private function statesFromDocuments(Traversable $documents): array
+    private function statesFromDocuments($documents): array
     {
+        if ($documents instanceof Traversable) {
+            $documents = iterator_to_array($documents);
+        }
+
         return array_filter(
             array_map(
                 [$this, 'stateFromDocument'],
-                array_values(iterator_to_array($documents))
+                array_values($documents)
             )
         );
     }
@@ -213,14 +216,15 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function needDocumentsByIds($identifiers): Traversable
+    public function needDocumentsByIds($identifiers): array
     {
         $documents = $this->findDocumentsByIds($identifiers);
+        $documentsArray = iterator_to_array($documents);
         $countIdentifiers = $identifiers instanceof ListValue
             ? $identifiers->count()
             : count($identifiers);
 
-        if (iterator_count($documents) !== $countIdentifiers) {
+        if (count($documentsArray) !== $countIdentifiers) {
             $scalarIdentifiers = $this->identifiersToScalars($identifiers);
 
             throw new NotFoundHttpException(
@@ -228,7 +232,7 @@ abstract class DefaultStateRepository implements StateRepository
             );
         }
 
-        return $documents;
+        return $documentsArray;
     }
 
     /**

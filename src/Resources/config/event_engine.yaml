@@ -185,3 +185,8 @@ services:
     ADS\Bundle\EventEngineBundle\Projector\ReadModelProxy:
         arguments:
             - '@EventEngine\EventEngine'
+
+    ADS\Bundle\EventEngineBundle\Validator\Validator:
+        decorates: 'validator'
+        arguments:
+            - '@.inner'

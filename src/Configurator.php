@@ -146,8 +146,7 @@ final class Configurator
             ->registerListeners($eventEngine)
             ->registerProjectors($eventEngine)
             ->registerDescriptions($eventEngine)
-            ->registerPreProcessors($eventEngine)
-            ->registerAggregates($eventEngine);
+            ->registerPreProcessorsAndAggregates($eventEngine);
 
         $eventEngine->disableAutoProjecting();
 
@@ -320,25 +319,19 @@ final class Configurator
         return $this;
     }
 
-    private function registerPreProcessors(EventEngine $eventEngine): self
-    {
-        foreach ($this->commandPreProcessorMapping() as $commandClass => $preProcessorClass) {
-            $eventEngine
-                ->process($commandClass)
-                ->preProcess($preProcessorClass)
-                ->withNew('test')
-                ->handle([FlavourHint::class, 'useAggregate']);
-        }
-
-        return $this;
-    }
-
-    private function registerAggregates(EventEngine $eventEngine): self
+    private function registerPreProcessorsAndAggregates(EventEngine $eventEngine): self
     {
         $usedAggregateRoots = [];
+        $preProcessorMapping = $this->commandPreProcessorMapping();
 
         foreach ($this->commandAggregateMapping() as $commandClass => $aggregateRootClass) {
             $commandProcessor = $eventEngine->process($commandClass);
+
+            if (array_key_exists($commandClass, $preProcessorMapping)) {
+                $preProcessorClass = $preProcessorMapping[$commandClass];
+                $commandProcessor->preProcess($preProcessorClass);
+                unset($preProcessorMapping[$commandClass]);
+            }
 
             $newAggregateRoot = $this->newAggregateRoot($aggregateRootClass, $commandClass, $usedAggregateRoots);
 
@@ -347,6 +340,14 @@ final class Configurator
                 ->handleEvents($commandProcessor, $commandClass)
                 ->handleServices($commandProcessor, $commandClass)
                 ->handleStorage($commandProcessor, $aggregateRootClass, $newAggregateRoot);
+        }
+
+        foreach ($preProcessorMapping as $commandClass => $preProcessorClass) {
+            $eventEngine
+                ->process($commandClass)
+                ->preProcess($preProcessorClass)
+                ->withNew('test')
+                ->handle([FlavourHint::class, 'useAggregate']);
         }
 
         return $this;

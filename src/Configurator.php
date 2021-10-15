@@ -43,6 +43,7 @@ use function array_shift;
 use function array_unique;
 use function in_array;
 use function is_callable;
+use function is_int;
 use function is_string;
 use function reset;
 use function sprintf;
@@ -603,7 +604,17 @@ final class Configurator
             return $this->commandPreProcessorMapping;
         }
 
-        foreach ($this->preProcessorClasses as $preProcessorClass) {
+        foreach ($this->preProcessorClasses as $preProcessorClassOrInt => $preProcessorClassOrCommands) {
+            /** @var class-string<PreProcessor> $preProcessorClass */
+            $preProcessorClass = is_int($preProcessorClassOrInt)
+                ? $preProcessorClassOrCommands
+                : $preProcessorClassOrInt;
+
+            /** @var array<class-string<Command>> $commandClasses */
+            $commandClasses = is_int($preProcessorClassOrInt)
+                ? []
+                : $preProcessorClassOrCommands;
+
             $preProcessorReflection = new ReflectionClass($preProcessorClass);
 
             $invokeMethod = $preProcessorReflection->getMethod('__invoke');
@@ -620,23 +631,27 @@ final class Configurator
                 );
             }
 
-            /** @var ReflectionNamedType|null $commandType */
-            $commandType = $firstParameter->getType();
+            if (empty($commandClasses)) {
+                /** @var ReflectionNamedType|null $commandType */
+                $commandType = $firstParameter->getType();
 
-            if ($commandType === null || ! in_array($commandType->getName(), $this->commandClasses)) {
-                throw new RuntimeException(
-                    sprintf(
-                        'The first parameter of the __invoke method of preProcessor \'%s\' ' .
-                        'has no type or is not a command.',
-                        $preProcessorClass
-                    )
-                );
+                if ($commandType === null || ! in_array($commandType->getName(), $this->commandClasses)) {
+                    throw new RuntimeException(
+                        sprintf(
+                            'The first parameter of the __invoke method of preProcessor \'%s\' ' .
+                            'has no type or is not a command.',
+                            $preProcessorClass
+                        )
+                    );
+                }
+
+                /** @var array<class-string<Command>> $commandClasses */
+                $commandClasses = [$commandType->getName()];
             }
 
-            /** @var class-string<Command> $commandClass */
-            $commandClass = $commandType->getName();
-
-            $this->commandPreProcessorMapping[$commandClass] = $preProcessorClass;
+            foreach ($commandClasses as $commandClass) {
+                $this->commandPreProcessorMapping[$commandClass] = $preProcessorClass;
+            }
         }
 
         return $this->commandPreProcessorMapping;

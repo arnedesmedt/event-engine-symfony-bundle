@@ -50,6 +50,12 @@ use function sprintf;
 
 final class Configurator
 {
+    private const ENVIRONMENT_MAP = [
+        'staging' => EventEngine::ENV_DEV,
+        'acceptance' => EventEngine::ENV_PROD,
+        'develop' => EventEngine::ENV_DEV,
+    ];
+
     private Flavour $flavour;
     private MultiModelStore $multiModelStore;
     private SimpleMessageEngine $simpleMessageEngine;
@@ -122,7 +128,7 @@ final class Configurator
         $this->multiModelStore = $multiModelStore;
         $this->simpleMessageEngine = $simpleMessageEngine;
         $this->container = $container;
-        $this->environment = $environment;
+        $this->environment = $this->mapEnvironment($environment);
         $this->debug = $debug;
         $this->commandClasses = $commandClasses;
         $this->queryClasses = $queryClasses;
@@ -697,5 +703,14 @@ final class Configurator
                 $message
             )
         );
+    }
+
+    private function mapEnvironment(string $environment): string
+    {
+        if (! isset(self::ENVIRONMENT_MAP[$environment])) {
+            return $environment;
+        }
+
+        return self::ENVIRONMENT_MAP[$environment];
     }
 }

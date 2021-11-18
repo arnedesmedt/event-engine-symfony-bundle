@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Flavour;
 
+use ADS\Bundle\EventEngineBundle\Message\MessageUuidAware;
 use ADS\Bundle\EventEngineBundle\Resolver\MetaDataResolver;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
@@ -24,10 +25,24 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     }
 
     /**
+     * @param mixed $service
+     */
+    private function addMessageUuid($service, Message $command): void
+    {
+        if (! ($service instanceof MessageUuidAware)) {
+            return;
+        }
+
+        $service->setMessageUuid($command->uuid());
+    }
+
+    /**
      * @inheritDoc
      */
     public function callCommandPreProcessor($preProcessor, Message $command)
     {
+        $this->addMessageUuid($preProcessor, $command);
+
         return $this->functionalFlavour->callCommandPreProcessor($preProcessor, $command);
     }
 
@@ -36,6 +51,8 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
      */
     public function callCommandController($controller, Message $command)
     {
+        $this->addMessageUuid($controller, $command);
+
         return $this->functionalFlavour->callCommandController($controller, $command);
     }
 
@@ -65,6 +82,10 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         Message $command,
         ...$contextServices
     ): Generator {
+        foreach ($contextServices as $contextService) {
+            $this->addMessageUuid($contextService, $command);
+        }
+
         return $this->functionalFlavour->callAggregateFactory(
             $aggregateType,
             $aggregateFunction,
@@ -87,6 +108,10 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         Message $command,
         ...$contextServices
     ): Generator {
+        foreach ($contextServices as $contextService) {
+            $this->addMessageUuid($contextService, $command);
+        }
+
         return $this->functionalFlavour->callSubsequentAggregateFunction(
             $aggregateType,
             $aggregateFunction,

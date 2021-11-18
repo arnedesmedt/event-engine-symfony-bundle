@@ -27,13 +27,13 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     /**
      * @param mixed $service
      */
-    private function addMessageUuid($service, Message $command): void
+    private function addMessageUuid($service, Message $message): void
     {
         if (! ($service instanceof MessageUuidAware)) {
             return;
         }
 
-        $service->setMessageUuid($command->uuid());
+        $service->setMessageUuid($message->uuid());
     }
 
     /**
@@ -233,6 +233,8 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         if ($resolver instanceof MetaDataResolver) {
             $resolver->setMetaData($metadata);
         }
+
+        $this->addMessageUuid($resolver, $query);
 
         return $resolver($queryMessage);
     }

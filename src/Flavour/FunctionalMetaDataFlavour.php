@@ -27,7 +27,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     /**
      * @param mixed $service
      */
-    private function addMessageUuid($service, Message $message): void
+    public static function addMessageUuid($service, Message $message): void
     {
         if (! ($service instanceof MessageUuidAware)) {
             return;
@@ -41,7 +41,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
      */
     public function callCommandPreProcessor($preProcessor, Message $command)
     {
-        $this->addMessageUuid($preProcessor, $command);
+        self::addMessageUuid($preProcessor, $command);
 
         return $this->functionalFlavour->callCommandPreProcessor($preProcessor, $command);
     }
@@ -51,7 +51,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
      */
     public function callCommandController($controller, Message $command)
     {
-        $this->addMessageUuid($controller, $command);
+        self::addMessageUuid($controller, $command);
 
         return $this->functionalFlavour->callCommandController($controller, $command);
     }
@@ -83,7 +83,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         ...$contextServices
     ): Generator {
         foreach ($contextServices as $contextService) {
-            $this->addMessageUuid($contextService, $command);
+            self::addMessageUuid($contextService, $command);
         }
 
         return $this->functionalFlavour->callAggregateFactory(
@@ -109,7 +109,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         ...$contextServices
     ): Generator {
         foreach ($contextServices as $contextService) {
-            $this->addMessageUuid($contextService, $command);
+            self::addMessageUuid($contextService, $command);
         }
 
         return $this->functionalFlavour->callSubsequentAggregateFunction(
@@ -234,7 +234,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
             $resolver->setMetaData($metadata);
         }
 
-        $this->addMessageUuid($resolver, $query);
+        self::addMessageUuid($resolver, $query);
 
         return $resolver($queryMessage);
     }

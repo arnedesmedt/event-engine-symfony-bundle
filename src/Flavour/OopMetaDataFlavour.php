@@ -27,6 +27,8 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
      */
     public function callCommandPreProcessor($preProcessor, Message $command)
     {
+        FunctionalMetaDataFlavour::addMessageUuid($preProcessor, $command);
+
         return $this->oopFlavour->callCommandPreProcessor($preProcessor, $command);
     }
 
@@ -35,6 +37,8 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
      */
     public function callCommandController($controller, Message $command)
     {
+        FunctionalMetaDataFlavour::addMessageUuid($controller, $command);
+
         return $this->oopFlavour->callCommandController($controller, $command);
     }
 
@@ -64,6 +68,10 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
         Message $command,
         ...$contextServices
     ): Generator {
+        foreach ($contextServices as $contextService) {
+            FunctionalMetaDataFlavour::addMessageUuid($contextService, $command);
+        }
+
         return $this->oopFlavour->callAggregateFactory(
             $aggregateType,
             $aggregateFunction,
@@ -86,6 +94,10 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
         Message $command,
         ...$contextServices
     ): Generator {
+        foreach ($contextServices as $contextService) {
+            FunctionalMetaDataFlavour::addMessageUuid($contextService, $command);
+        }
+
         return $this->oopFlavour->callSubsequentAggregateFunction(
             $aggregateType,
             $aggregateFunction,

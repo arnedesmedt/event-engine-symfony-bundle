@@ -107,7 +107,7 @@ final class EventEnginePass implements CompilerPassInterface
                     : null;
             },
             'listeners' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(Listener::class)
+                return $reflectionClass->implementsInterface(Listener::class) && ! $reflectionClass->isAbstract()
                     ? $reflectionClass->name
                     : null;
             },

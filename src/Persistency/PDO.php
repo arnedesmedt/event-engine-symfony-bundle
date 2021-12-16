@@ -88,11 +88,11 @@ class PDO extends \PDO
         return parent::exec($statement);
     }
 
-    public function query($statement, $mode = self::ATTR_DEFAULT_FETCH_MODE, $arg3 = null, array $ctorargs = [])
+    public function query($statement, $mode = self::ATTR_DEFAULT_FETCH_MODE, ...$fetch_mode_args)
     {
         $this->enableConnection();
 
-        return parent::query($statement, $mode, $arg3, $ctorargs);
+        return parent::query($statement, $mode, ...$fetch_mode_args);
     }
 
     public function lastInsertId($name = null)

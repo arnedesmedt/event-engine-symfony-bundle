@@ -12,27 +12,27 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-pdo": "*",
         "ext-json": "*",
-        "event-engine/php-engine": "^0.15",
-        "event-engine/php-json-schema": "2.0-beta.3",
-        "event-engine/php-postgres-document-store": "^0.11",
-        "event-engine/prooph-v7-event-store": "^0.9",
-        "prooph/pdo-event-store": "^1.11",
-        "opis/json-schema": "^1.0",
-        "arnedesmedt/value-objects": "^0.1",
-        "arnedesmedt/json-immutable-objects": "^0.1",
+        "event-engine/php-engine": "^0",
+        "event-engine/php-json-schema": "^2",
+        "event-engine/php-postgres-document-store": "^0",
+        "event-engine/prooph-v7-event-store": "^0",
+        "prooph/pdo-event-store": "^1",
+        "opis/json-schema": "^2",
+        "arnedesmedt/value-objects": "^0",
+        "arnedesmedt/json-immutable-objects": "^0",
         "symfony/cache": "^5.1",
         "symfony/http-kernel": "^5.1",
-        "arnedesmedt/php-util": "^0.1.0",
+        "arnedesmedt/php-util": "^0",
         "symfony/validator": "^5.1"
     },
     "require-dev": {
-        "phpstan/phpstan": "^0.12",
-        "squizlabs/php_codesniffer": "^3.5",
-        "doctrine/coding-standard": "^8.0",
-        "phpro/grumphp": "1.*"
+        "phpstan/phpstan": "^1",
+        "squizlabs/php_codesniffer": "^3",
+        "doctrine/coding-standard": "^9",
+        "phpro/grumphp": "^1"
     },
     "autoload": {
         "psr-4": {

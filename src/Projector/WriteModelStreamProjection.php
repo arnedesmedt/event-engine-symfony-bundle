@@ -16,9 +16,7 @@ class WriteModelStreamProjection
 {
     public const NAME = 'ee_write_model_projection';
 
-    private ReadModelProjector $projection;
-
-    private bool $testMode;
+    private readonly ReadModelProjector $projection;
 
     /**
      * @param array<string, mixed>|null $projectionOptions
@@ -27,13 +25,11 @@ class WriteModelStreamProjection
         ProjectionManager $projectionManager,
         EventEngine $eventEngine,
         ?array $projectionOptions = null,
-        bool $testMode = false
+        private readonly bool $testMode = false
     ) {
         if ($projectionOptions === null) {
             $projectionOptions = [ReadModelProjector::OPTION_PERSIST_BLOCK_SIZE => 1];
         }
-
-        $this->testMode = $testMode;
 
         $sourceStreams = [];
 

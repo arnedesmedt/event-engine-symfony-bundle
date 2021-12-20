@@ -23,24 +23,15 @@ class EventEngineEventStreamsCreateCommand extends Command
      */
     protected static $defaultName = 'event-engine:event-streams:create';
 
-    private PDO $connection;
-    private EventStore $eventStore;
-    /** @var array<class-string> */
-    private array $aggregates;
-
     /**
      * @param array<class-string> $aggregates
      */
     public function __construct(
-        PDO $connection,
-        EventStore $eventStore,
-        array $aggregates
+        private readonly PDO $connection,
+        private readonly EventStore $eventStore,
+        private readonly array $aggregates
     ) {
         parent::__construct();
-
-        $this->connection = $connection;
-        $this->eventStore = $eventStore;
-        $this->aggregates = $aggregates;
     }
 
     protected function configure(): void

@@ -17,17 +17,11 @@ use RuntimeException;
 
 class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
 {
-    private FunctionalFlavour $functionalFlavour;
-
-    public function __construct(FunctionalFlavour $functionalFlavour)
+    public function __construct(private readonly FunctionalFlavour $functionalFlavour)
     {
-        $this->functionalFlavour = $functionalFlavour;
     }
 
-    /**
-     * @param mixed $service
-     */
-    public static function addMessageUuid($service, Message $message): void
+    public static function addMessageUuid(mixed $service, Message $message): void
     {
         if (! ($service instanceof MessageUuidAware)) {
             return;

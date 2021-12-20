@@ -15,35 +15,25 @@ use Traversable;
 interface StateRepository
 {
     /**
-     * @param string|ValueObject $identifier
-     *
      * @return array<mixed>
      */
-    public function findDocument($identifier): ?array;
+    public function findDocument(string|ValueObject $identifier): ?array;
 
     /**
-     * @param string|ValueObject $identifier
-     *
      * @return array<mixed>
      */
     public function needDocument(
-        $identifier,
+        string|ValueObject $identifier,
         ?Throwable $exception = null
     ): array;
 
-    /**
-     * @param string|ValueObject $identifier
-     */
     public function dontNeedDocument(
-        $identifier,
+        string|ValueObject $identifier,
         ?Throwable $exception = null
     ): void;
 
-    /**
-     * @param string|ValueObject $identifier
-     */
     public function needDocumentState(
-        $identifier,
+        string|ValueObject $identifier,
         ?Throwable $exception = null
     ): ImmutableRecord;
 
@@ -53,32 +43,24 @@ interface StateRepository
     public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): Traversable;
 
     /**
-     * @param array<mixed>|ListValue $identifiers
-     *
      * @return Traversable<mixed>
      */
-    public function findDocumentsByIds($identifiers): Traversable;
+    public function findDocumentsByIds(array|ListValue $identifiers): Traversable;
 
     /**
-     * @param array<mixed>|ListValue $identifiers
-     *
      * @return array<mixed>
      */
-    public function needDocumentsByIds($identifiers): array;
+    public function needDocumentsByIds(array|ListValue $identifiers): array;
 
     /**
-     * @param array<mixed>|ListValue $identifiers
-     *
      * @return array<ImmutableRecord>
      */
-    public function findDocumentStatesByIds($identifiers): array;
+    public function findDocumentStatesByIds(array|ListValue $identifiers): array;
 
     /**
-     * @param array<mixed>|ListValue $identifiers
-     *
      * @return array<ImmutableRecord>
      */
-    public function needDocumentStatesByIds($identifiers): array;
+    public function needDocumentStatesByIds(array|ListValue $identifiers): array;
 
     /**
      * @return Traversable<array<mixed>>
@@ -97,10 +79,7 @@ interface StateRepository
      */
     public function findDocumentIds(?Filter $filter = null): array;
 
-    /**
-     * @param string|ValueObject $identifier
-     */
-    public function findDocumentState($identifier): ?ImmutableRecord;
+    public function findDocumentState(string|ValueObject $identifier): ?ImmutableRecord;
 
     /**
      * @return array<ImmutableRecord>
@@ -111,20 +90,11 @@ interface StateRepository
 
     public function hasNoDocuments(?Filter $filter = null): bool;
 
-    /**
-     * @param string|ValueObject $identifier
-     */
-    public function hasDocument($identifier): bool;
+    public function hasDocument(string|ValueObject $identifier): bool;
 
-    /**
-     * @param string|ValueObject $identifier
-     */
-    public function hasNoDocument($identifier): bool;
+    public function hasNoDocument(string|ValueObject $identifier): bool;
 
-    /**
-     * @param ListValue|array<mixed> $identifiers
-     */
-    public function hasAllDocuments($identifiers): bool;
+    public function hasAllDocuments(array|ListValue $identifiers): bool;
 
     /**
      * @return class-string

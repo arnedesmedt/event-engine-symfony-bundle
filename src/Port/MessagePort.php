@@ -18,21 +18,18 @@ use ReflectionClass;
 use RuntimeException;
 use stdClass;
 
-use function get_class;
-use function gettype;
+use function get_debug_type;
 use function is_array;
-use function is_object;
 use function json_decode;
 use function json_encode;
 use function sprintf;
 
+use const JSON_THROW_ON_ERROR;
+
 final class MessagePort implements Port
 {
-    private Validator $validator;
-
-    public function __construct(Validator $validator)
+    public function __construct(private readonly Validator $validator)
     {
-        $this->validator = $validator;
     }
 
     /**
@@ -47,45 +44,43 @@ final class MessagePort implements Port
         $reflectionClass = new ReflectionClass($messageType);
 
         if ($reflectionClass->implementsInterface(JsonSchemaAwareRecord::class)) {
-            $encodedData = json_encode($data);
+            $encodedData = json_encode($data, JSON_THROW_ON_ERROR);
 
             if ($encodedData === false) {
                 throw JsonException::couldNotEncode($data);
             }
 
             $schemaArray = $messageType::__schema()->toArray();
-            $schema = json_encode($schemaArray);
+            $schema = json_encode($schemaArray, JSON_THROW_ON_ERROR);
 
             if ($schema === false) {
                 throw JsonException::couldNotEncode($schemaArray);
             }
 
-            $data = json_decode($encodedData);
+            $data = json_decode($encodedData, null, 512, JSON_THROW_ON_ERROR);
 
             if ($data === []) {
                 $data = new stdClass();
             }
 
-            $this->validator->schemaValidation($data, Schema::fromJsonString($schema));
+            $this->validator->schemaValidation($data, (new Schema())->fromJsonString($schema));
         }
 
-        $encodedData = json_encode($data);
+        $encodedData = json_encode($data, JSON_THROW_ON_ERROR);
 
         if ($encodedData === false) {
             throw JsonException::couldNotEncode($data);
         }
 
-        $data = json_decode($encodedData, true);
+        $data = json_decode($encodedData, true, 512, JSON_THROW_ON_ERROR);
 
         return $messageType::fromArray((array) $data);
     }
 
     /**
-     * @param mixed $customMessage
-     *
      * @return array<mixed>
      */
-    public function serializePayload($customMessage): array
+    public function serializePayload(mixed $customMessage): array
     {
         if (is_array($customMessage)) {
             return $customMessage;
@@ -99,7 +94,7 @@ final class MessagePort implements Port
             sprintf(
                 'Invalid message passed to \'%s\'. This should be an immutable record but got \'%s\' instead.',
                 __METHOD__,
-                is_object($customMessage) ? get_class($customMessage) : gettype($customMessage)
+                get_debug_type($customMessage)
             )
         );
     }
@@ -110,7 +105,7 @@ final class MessagePort implements Port
     public function decorateCommand($customCommand): MessageBag
     {
         return new MessageBag(
-            get_class($customCommand),
+            $customCommand::class,
             MessageBag::TYPE_COMMAND,
             $customCommand
         );
@@ -122,7 +117,7 @@ final class MessagePort implements Port
     public function decorateEvent($customEvent): MessageBag
     {
         return new MessageBag(
-            get_class($customEvent),
+            $customEvent::class,
             MessageBag::TYPE_EVENT,
             $customEvent
         );
@@ -140,7 +135,7 @@ final class MessagePort implements Port
         throw new RuntimeException(
             sprintf(
                 'Unknown command. Cannot get the aggregate id from command \'%s\'.',
-                get_class($command)
+                $command::class
             )
         );
     }
@@ -169,13 +164,7 @@ final class MessagePort implements Port
         return $contextProvider($customCommand);
     }
 
-    /**
-     * @param Query|Message $customQuery
-     * @param mixed $resolver
-     *
-     * @return mixed
-     */
-    public function callResolver($customQuery, $resolver)
+    public function callResolver(Query|Message $customQuery, mixed $resolver): mixed
     {
         return $resolver($customQuery);
     }

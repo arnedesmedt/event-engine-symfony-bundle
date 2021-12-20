@@ -38,7 +38,7 @@ use function array_unique;
 use function preg_match_all;
 use function sprintf;
 use function str_replace;
-use function strpos;
+use function str_starts_with;
 use function strtolower;
 use function substr;
 
@@ -51,10 +51,8 @@ final class EventEnginePass implements CompilerPassInterface
 
         $resources = array_filter(
             $container->getResources(),
-            static function (ResourceInterface $resource) use ($filter) {
-                return $resource instanceof ReflectionClassResource
-                    && strpos($resource . '', $filter) === 0;
-            }
+            static fn (ResourceInterface $resource) => $resource instanceof ReflectionClassResource
+                && str_starts_with($resource . '', $filter)
         );
 
         $resources = array_filter(
@@ -67,22 +65,18 @@ final class EventEnginePass implements CompilerPassInterface
                 },
                 $resources
             ),
-            static function (ReflectionClass $reflectionClass) {
-                return ! $reflectionClass->isInterface();
-            }
+            static fn (ReflectionClass $reflectionClass) => ! $reflectionClass->isInterface()
         );
 
         $mappers = [
-            'commands' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(Command::class)
+            'commands' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(Command::class)
                     ? $reflectionClass->name
-                    : null;
-            },
-            'queries' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(Query::class)
+                    : null,
+            'queries' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(Query::class)
                     ? $reflectionClass->name
-                    : null;
-            },
+                    : null,
             'resolvers' => static function (ReflectionClass $reflectionClass) {
                 /** @var class-string $className */
                 $className = $reflectionClass->name;
@@ -91,26 +85,22 @@ final class EventEnginePass implements CompilerPassInterface
                     ? $className::__resolver()
                     : null;
             },
-            'events' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(Event::class)
+            'events' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(Event::class)
                     ? $reflectionClass->name
-                    : null;
-            },
-            'aggregates' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(AggregateRoot::class)
+                    : null,
+            'aggregates' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(AggregateRoot::class)
                     ? $reflectionClass->name
-                    : null;
-            },
-            'pre_processors' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(PreProcessor::class)
+                    : null,
+            'pre_processors' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(PreProcessor::class)
                     ? $reflectionClass->name
-                    : null;
-            },
-            'listeners' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(Listener::class) && ! $reflectionClass->isAbstract()
+                    : null,
+            'listeners' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(Listener::class) && ! $reflectionClass->isAbstract()
                     ? $reflectionClass->name
-                    : null;
-            },
+                    : null,
             'controllers' => static function (ReflectionClass $reflectionClass) {
                 /** @var class-string $className */
                 $className = $reflectionClass->name;
@@ -119,26 +109,22 @@ final class EventEnginePass implements CompilerPassInterface
                     ? $className::__controller()
                     : null;
             },
-            'descriptions' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(EventEngineDescription::class)
+            'descriptions' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(EventEngineDescription::class)
                     ? $reflectionClass->name
-                    : null;
-            },
-            'child_repositories' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(StateRepository::class)
+                    : null,
+            'child_repositories' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(StateRepository::class)
                     ? $reflectionClass->name
-                    : null;
-            },
-            'types' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(Type::class)
+                    : null,
+            'types' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(Type::class)
                     ? $reflectionClass->name
-                    : null;
-            },
-            'projectors' => static function (ReflectionClass $reflectionClass) {
-                return $reflectionClass->implementsInterface(Projector::class)
+                    : null,
+            'projectors' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
+                ->implementsInterface(Projector::class)
                     ? $reflectionClass->name
-                    : null;
-            },
+                    : null,
         ];
 
         /** @var ?Definition $eventQueueDefinition */
@@ -214,7 +200,10 @@ final class EventEnginePass implements CompilerPassInterface
                 $key = str_replace(
                     '_projector',
                     '',
-                    sprintf('event_engine.repository.%s', StringUtil::decamelize($reflectionClass->getShortName()))
+                    sprintf(
+                        'event_engine.repository.%s',
+                        StringUtil::decamelize($reflectionClass->getShortName())
+                    )
                 );
 
                 $result[$key] = (new Definition(

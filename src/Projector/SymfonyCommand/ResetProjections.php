@@ -20,11 +20,9 @@ final class ResetProjections extends Command
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected static $defaultName = 'event-engine:projections:reset';
-    private ProjectionManager $projectionManager;
 
-    public function __construct(ProjectionManager $projectionManager)
+    public function __construct(private readonly ProjectionManager $projectionManager)
     {
-        $this->projectionManager = $projectionManager;
         parent::__construct();
     }
 

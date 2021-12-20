@@ -14,13 +14,10 @@ use Prooph\EventStore\Projection\AbstractReadModel;
 
 class ReadModelProxy extends AbstractReadModel
 {
-    private EventEngine $eventEngine;
-
     private bool $initialized = false;
 
-    public function __construct(EventEngine $eventEngine)
+    public function __construct(private readonly EventEngine $eventEngine)
     {
-        $this->eventEngine = $eventEngine;
     }
 
     public function handle(string $streamName, Message $event): void

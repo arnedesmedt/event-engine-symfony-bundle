@@ -19,20 +19,14 @@ class EventEngineDocumentStoresCreateCommand extends Command
      */
     protected static $defaultName = 'event-engine:document-stores:create';
 
-    private DocumentStore $documentStore;
-    /** @var array<class-string> */
-    private array $aggregates;
-
     /**
      * @param array<class-string> $aggregates
      */
     public function __construct(
-        DocumentStore $documentStore,
-        array $aggregates
+        private readonly DocumentStore $documentStore,
+        private readonly array $aggregates
     ) {
         parent::__construct();
-        $this->documentStore = $documentStore;
-        $this->aggregates = $aggregates;
     }
 
     protected function configure(): void

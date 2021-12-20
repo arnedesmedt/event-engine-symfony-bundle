@@ -20,11 +20,8 @@ final class SingleStreamStrategy implements PostgresPersistenceStrategy
 {
     use PostgresHelper;
 
-    private MessageConverter $messageConverter;
-
-    public function __construct(?MessageConverter $messageConverter = null)
+    public function __construct(private readonly MessageConverter $messageConverter = new DefaultMessageConverter())
     {
-        $this->messageConverter = $messageConverter ?? new DefaultMessageConverter();
     }
 
     /**

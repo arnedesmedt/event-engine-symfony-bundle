@@ -6,6 +6,8 @@ namespace ADS\Bundle\EventEngineBundle\Flavour;
 
 use ADS\Bundle\EventEngineBundle\Message\MessageUuidAware;
 use ADS\Bundle\EventEngineBundle\Resolver\MetaDataResolver;
+use Closure;
+use EventEngine\Messaging\CommandDispatchResult;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Messaging\MessageFactory;
@@ -17,17 +19,11 @@ use RuntimeException;
 
 class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
 {
-    private FunctionalFlavour $functionalFlavour;
-
-    public function __construct(FunctionalFlavour $functionalFlavour)
+    public function __construct(private readonly FunctionalFlavour $functionalFlavour)
     {
-        $this->functionalFlavour = $functionalFlavour;
     }
 
-    /**
-     * @param mixed $service
-     */
-    public static function addMessageUuid($service, Message $message): void
+    public static function addMessageUuid(mixed $service, Message $message): void
     {
         if (! ($service instanceof MessageUuidAware)) {
             return;
@@ -47,6 +43,8 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     }
 
     /**
+     * @return array<mixed>|CommandDispatchResult
+     *
      * @inheritDoc
      */
     public function callCommandController($controller, Message $command)
@@ -213,7 +211,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     }
 
     /**
-     * @param mixed $resolver
+     * @param Closure|MetaDataResolver $resolver
      *
      * @return mixed
      *

@@ -12,7 +12,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 final class ADSEventEngineExtension extends ConfigurableExtension
 {
     /**
-     * @param array<mixed> $mergedConfig
+     * phpcs:ignore Generic.Files.LineLength.TooLong
+     * @param array{"document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "domain_namespace": string, "pdo_dsn": string} $mergedConfig
      */
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {

@@ -11,5 +11,7 @@ interface MetaDataResolver
      *
      * @return static
      */
-    public function setMetaData(array $metaData);
+    public function setMetaData(array $metaData): static;
+
+    public function __invoke(mixed $message): mixed;
 }

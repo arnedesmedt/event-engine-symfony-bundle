@@ -10,9 +10,7 @@ use ADS\Bundle\EventEngineBundle\Event\Event;
 use EventEngine\Runtime\Oop\Port;
 use RuntimeException;
 
-use function get_class;
-use function gettype;
-use function is_object;
+use function get_debug_type;
 use function lcfirst;
 use function method_exists;
 use function sprintf;
@@ -23,8 +21,6 @@ final class EventSourceAggregatePort implements Port
      * @param AggregateCommand $customCommand
      * @param array<int, class-string> $contextServices
      *
-     * @return mixed
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function callAggregateFactory(
@@ -32,7 +28,7 @@ final class EventSourceAggregatePort implements Port
         callable $aggregateFactory,
         $customCommand,
         ...$contextServices
-    ) {
+    ): mixed {
         return $aggregateFactory($customCommand, ...$contextServices);
     }
 
@@ -54,7 +50,7 @@ final class EventSourceAggregatePort implements Port
             throw new RuntimeException(
                 sprintf(
                     'Aggregate \'%s\' has no method \'%s\'.',
-                    get_class($aggregate),
+                    $aggregate::class,
                     $method
                 )
             );
@@ -77,7 +73,7 @@ final class EventSourceAggregatePort implements Port
                 sprintf(
                     'Cannot apply event. Given aggregate is not an instance of \'%s\'. Got \'%s\'.',
                     AggregateRoot::class,
-                    is_object($aggregate) ? get_class($aggregate) : gettype($aggregate)
+                    get_debug_type($aggregate)
                 )
             );
         }
@@ -86,6 +82,8 @@ final class EventSourceAggregatePort implements Port
     }
 
     /**
+     * @param Event $customEvent
+     *
      * @inheritDoc
      */
     public function applyEvent($aggregate, $customEvent): void
@@ -95,7 +93,7 @@ final class EventSourceAggregatePort implements Port
                 sprintf(
                     'Cannot apply event. Given aggregate is not an instance of \'%s\'. Got \'%s\'',
                     AggregateRoot::class,
-                    is_object($aggregate) ? get_class($aggregate) : gettype($aggregate)
+                    get_debug_type($aggregate)
                 )
             );
         }
@@ -104,18 +102,16 @@ final class EventSourceAggregatePort implements Port
     }
 
     /**
-     * @param mixed $aggregate
-     *
      * @return array<mixed>
      */
-    public function serializeAggregate($aggregate): array
+    public function serializeAggregate(mixed $aggregate): array
     {
         if (! $aggregate instanceof AggregateRoot) {
             throw new RuntimeException(
                 sprintf(
                     'Cannot serialize aggregate. Given aggregate is not an instance of \'%s\'. Got \'%s\'',
                     AggregateRoot::class,
-                    is_object($aggregate) ? get_class($aggregate) : gettype($aggregate)
+                    get_debug_type($aggregate)
                 )
             );
         }
@@ -125,10 +121,8 @@ final class EventSourceAggregatePort implements Port
 
     /**
      * @param iterable<Event> $events
-     *
-     * @return mixed
      */
-    public function reconstituteAggregate(string $aggregateType, iterable $events)
+    public function reconstituteAggregate(string $aggregateType, iterable $events): mixed
     {
         /** @var AggregateRoot $aggregateClass */
         $aggregateClass = $this->aggregateClassByType($aggregateType);
@@ -138,10 +132,8 @@ final class EventSourceAggregatePort implements Port
 
     /**
      * @param array<mixed> $state
-     *
-     * @return mixed
      */
-    public function reconstituteAggregateFromStateArray(string $aggregateType, array $state, int $version)
+    public function reconstituteAggregateFromStateArray(string $aggregateType, array $state, int $version): mixed
     {
         /** @var AggregateRoot $aggregateClass */
         $aggregateClass = $this->aggregateClassByType($aggregateType);

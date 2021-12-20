@@ -45,7 +45,7 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
     }
 
     /**
-     * @param array<mixed>|null $document
+     * @param array<string, mixed>|null $document
      */
     public function aggregateFromDocument(?array $document): ?AggregateRoot
     {
@@ -58,21 +58,15 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
         return $this->aggregateClass::reconstituteFromStateArray($document['state']);
     }
 
-    /**
-     * @param string|ValueObject $identifier
-     */
-    public function findAggregate($identifier): ?AggregateRoot
+    public function findAggregate(string|ValueObject $identifier): ?AggregateRoot
     {
         return $this->aggregateFromDocument(
             $this->findDocument($identifier)
         );
     }
 
-    /**
-     * @param string|ValueObject $identifier
-     */
     public function needAggregate(
-        $identifier,
+        string|ValueObject $identifier,
         ?Throwable $exception = null
     ): AggregateRoot {
         $document = $this->needDocument($identifier, $exception);

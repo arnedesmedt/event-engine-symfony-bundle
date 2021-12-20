@@ -17,22 +17,18 @@ final class Config implements CacheClearerInterface
     public const CONFIG = 'config';
     public const AGGREGATE_IDENTIFIERS = 'aggregateIdentifiers';
 
-    private EventEngine $eventEngine;
-    private AbstractAdapter $cache;
-    private string $environment;
-
-    /** @var array<mixed>|null */
+    /** @var array<string, array<string, string>>|null */
     private ?array $config = null;
 
-    public function __construct(EventEngine $eventEngine, AbstractAdapter $cache, string $environment)
-    {
-        $this->eventEngine = $eventEngine;
-        $this->cache = $cache;
-        $this->environment = $environment;
+    public function __construct(
+        private readonly EventEngine $eventEngine,
+        private readonly AbstractAdapter $cache,
+        private readonly string $environment
+    ) {
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string, array<mixed>>
      */
     public function config(): array
     {
@@ -40,12 +36,13 @@ final class Config implements CacheClearerInterface
             return $this->getConfig();
         }
 
-        return $this->cache->get(
+        /** @var array<string, array<mixed>> $result */
+        $result = $this->cache->get(
             self::CONFIG,
-            function () {
-                return $this->getConfig();
-            }
+            fn () => $this->getConfig()
         );
+
+        return $result;
     }
 
     /**
@@ -54,16 +51,15 @@ final class Config implements CacheClearerInterface
     public function aggregateIdentifiers(
         ?string $aggregateRootClass = null,
         ?string $defaultAggregateIdentifier = null
-    ) {
+    ): array|string|null {
+        /** @var array<string, string> $aggregateIdentifiers */
         $aggregateIdentifiers = $this->cache->get(
             self::AGGREGATE_IDENTIFIERS,
             function () {
                 $config = $this->config();
 
                 return array_map(
-                    static function (array $aggregateDescription) {
-                        return $aggregateDescription['aggregateIdentifier'];
-                    },
+                    static fn (array $aggregateDescription) => $aggregateDescription['aggregateIdentifier'],
                     $config['aggregateDescriptions']
                 );
             }
@@ -82,7 +78,7 @@ final class Config implements CacheClearerInterface
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string, array<string, string>>
      */
     private function getConfig(): array
     {

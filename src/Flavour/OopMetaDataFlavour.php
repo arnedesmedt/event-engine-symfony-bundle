@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Flavour;
 
+use Closure;
+use EventEngine\Messaging\CommandDispatchResult;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageFactory;
 use EventEngine\Messaging\MessageFactoryAware;
@@ -13,13 +15,10 @@ use Generator;
 
 final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
 {
-    private OopFlavour $oopFlavour;
-    private FunctionalMetaDataFlavour $functionalMetaDataFlavour;
-
-    public function __construct(OopFlavour $oopFlavour, FunctionalMetaDataFlavour $functionalMetaDataFlavour)
-    {
-        $this->oopFlavour = $oopFlavour;
-        $this->functionalMetaDataFlavour = $functionalMetaDataFlavour;
+    public function __construct(
+        private readonly OopFlavour $oopFlavour,
+        private readonly FunctionalMetaDataFlavour $functionalMetaDataFlavour
+    ) {
     }
 
     /**
@@ -33,6 +32,8 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
     }
 
     /**
+     * @return array<mixed>|CommandDispatchResult
+     *
      * @inheritDoc
      */
     public function callCommandController($controller, Message $command)
@@ -199,7 +200,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
     }
 
     /**
-     * @param mixed $resolver
+     * @param Closure $resolver
      *
      * @return mixed
      *

@@ -55,34 +55,7 @@ final class Configurator
         'acceptance' => EventEngine::ENV_PROD,
         'develop' => EventEngine::ENV_DEV,
     ];
-
-    private Flavour $flavour;
-    private MultiModelStore $multiModelStore;
-    private SimpleMessageEngine $simpleMessageEngine;
-    private ContainerInterface $container;
-    private string $environment;
-    private bool $debug;
-
-    /** @var array<class-string<Command>> */
-    private array $commandClasses;
-    /** @var array<class-string<Query>> */
-    private array $queryClasses;
-    /** @var array<class-string<Event>> */
-    private array $eventClasses;
-    /** @var array<class-string<AggregateRoot>> */
-    private array $aggregateClasses;
-    /** @var array<class-string> */
-    private array $typeClasses;
-    /** @var array<class-string<Listener>> */
-    private array $listenerClasses;
-    /** @var array<class-string<Projector>> */
-    private array $projectorClasses;
-    /** @var array<class-string<PreProcessor>> */
-    private array $preProcessorClasses;
-    /** @var array<class-string<EventEngineDescription>> */
-    private array $descriptionServices;
-
-    private ?MessageProducer $eventQueue;
+    private readonly string $environment;
 
     /** @var array<class-string<AggregateCommand>, class-string<AggregateRoot>> */
     private array $commandAggregateMapping = [];
@@ -96,7 +69,7 @@ final class Configurator
     private array $aggregateIdentifierMapping = [];
 
     /**
-     * @param array<class-string<Command>> $commandClasses
+     * @param array<class-string<Command|ControllerCommand>> $commandClasses
      * @param array<class-string<Query>> $queryClasses
      * @param array<class-string<Event>> $eventClasses
      * @param array<class-string<AggregateRoot>> $aggregateClasses
@@ -107,39 +80,24 @@ final class Configurator
      * @param array<class-string<EventEngineDescription>> $descriptionServices
      */
     public function __construct(
-        Flavour $flavour,
-        MultiModelStore $multiModelStore,
-        SimpleMessageEngine $simpleMessageEngine,
-        ContainerInterface $container,
+        private readonly Flavour $flavour,
+        private readonly MultiModelStore $multiModelStore,
+        private readonly SimpleMessageEngine $simpleMessageEngine,
+        private readonly ContainerInterface $container,
         string $environment,
-        bool $debug,
-        array $commandClasses,
-        array $queryClasses,
-        array $eventClasses,
-        array $aggregateClasses,
-        array $typeClasses,
-        array $listenerClasses,
-        array $projectorClasses,
-        array $preProcessorClasses,
-        array $descriptionServices,
-        ?MessageProducer $eventQueue
+        private readonly bool $debug,
+        private readonly array $commandClasses,
+        private readonly array $queryClasses,
+        private readonly array $eventClasses,
+        private readonly array $aggregateClasses,
+        private readonly array $typeClasses,
+        private readonly array $listenerClasses,
+        private readonly array $projectorClasses,
+        private readonly array $preProcessorClasses,
+        private readonly array $descriptionServices,
+        private readonly ?MessageProducer $eventQueue
     ) {
-        $this->flavour = $flavour;
-        $this->multiModelStore = $multiModelStore;
-        $this->simpleMessageEngine = $simpleMessageEngine;
-        $this->container = $container;
         $this->environment = $this->mapEnvironment($environment);
-        $this->debug = $debug;
-        $this->commandClasses = $commandClasses;
-        $this->queryClasses = $queryClasses;
-        $this->eventClasses = $eventClasses;
-        $this->aggregateClasses = $aggregateClasses;
-        $this->typeClasses = $typeClasses;
-        $this->listenerClasses = $listenerClasses;
-        $this->projectorClasses = $projectorClasses;
-        $this->preProcessorClasses = $preProcessorClasses;
-        $this->descriptionServices = $descriptionServices;
-        $this->eventQueue = $eventQueue;
     }
 
     public function __invoke(EventEngine $eventEngine): void
@@ -682,10 +640,8 @@ final class Configurator
 
     /**
      * @param class-string $message
-     *
-     * @return PayloadSchema|TypeSchema
      */
-    private static function schemaFromMessage(string $message)
+    private static function schemaFromMessage(string $message): PayloadSchema|TypeSchema
     {
         $reflectionClass = new ReflectionClass($message);
 

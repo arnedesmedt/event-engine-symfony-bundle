@@ -25,23 +25,14 @@ class EventEngineDataResetCommand extends Command
      */
     protected static $defaultName = 'event-engine:data:reset';
 
-    private EventStore $eventStore;
-    private DocumentStore $documentStore;
-    /** @var array<class-string> */
-    private array $aggregates;
-
     /**
      * @param array<class-string> $aggregates
      */
     public function __construct(
-        EventStore $eventStore,
-        DocumentStore $documentStore,
-        array $aggregates
+        private readonly EventStore $eventStore,
+        private readonly DocumentStore $documentStore,
+        private readonly array $aggregates
     ) {
-        $this->eventStore = $eventStore;
-        $this->documentStore = $documentStore;
-        $this->aggregates = $aggregates;
-
         parent::__construct();
     }
 

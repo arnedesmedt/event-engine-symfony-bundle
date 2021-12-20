@@ -34,15 +34,11 @@ trait DefaultResponses
         if (method_exists(static::class, '__httpMethod')) {
             $httpMethod = static::__httpMethod();
 
-            switch ($httpMethod) {
-                case Request::METHOD_POST:
-                    return Response::HTTP_CREATED;
-
-                case Request::METHOD_DELETE:
-                    return Response::HTTP_NO_CONTENT;
-            }
-
-            return Response::HTTP_OK;
+            return match ($httpMethod) {
+                Request::METHOD_POST => Response::HTTP_CREATED,
+                Request::METHOD_DELETE => Response::HTTP_NO_CONTENT,
+                default => Response::HTTP_OK,
+            };
         }
 
         return null;

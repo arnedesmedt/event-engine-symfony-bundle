@@ -10,7 +10,6 @@ use ReflectionClass;
 use ReflectionNamedType;
 use RuntimeException;
 
-use function get_class;
 use function method_exists;
 use function sprintf;
 
@@ -19,8 +18,7 @@ trait EventSourced
     /** @var Event[] */
     private array $recordedEvents = [];
 
-    /** @var mixed */
-    private $state;
+    private mixed $state;
 
     public static function reconstituteFromHistory(Event ...$domainEvents): AggregateRoot
     {
@@ -92,7 +90,7 @@ trait EventSourced
             throw new RuntimeException(
                 sprintf(
                     'Unable to apply event \'%s\'. Missing method \'%s\' in class \'%s\'.',
-                    get_class($event),
+                    $event::class,
                     $whenMethod,
                     static::class
                 )

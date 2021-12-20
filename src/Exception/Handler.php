@@ -21,6 +21,8 @@ use function preg_match;
 use function sprintf;
 use function str_replace;
 
+use const JSON_THROW_ON_ERROR;
+
 final class Handler implements EventSubscriberInterface
 {
     /**
@@ -57,7 +59,10 @@ final class Handler implements EventSubscriberInterface
 
                 if (preg_match('/field "(.+)" \[(.+)\] ([.\S\s]+)$/m', $message, $matches)) {
                     /** @var string $encodedJson */
-                    $encodedJson = json_encode(json_decode($matches[3], true));
+                    $encodedJson = json_encode(
+                        json_decode($matches[3], true, 512, JSON_THROW_ON_ERROR),
+                        JSON_THROW_ON_ERROR
+                    );
                     $message = sprintf(
                         'Payload validation error: field \'%s\' [%s] %s',
                         StringUtil::decamelize($matches[1]),

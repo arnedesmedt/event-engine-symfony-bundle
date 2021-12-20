@@ -6,16 +6,15 @@ namespace ADS\Bundle\EventEngineBundle\Repository;
 
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 
+use function strval;
+
 abstract class DefaultProjectionRepository extends DefaultStateRepository implements ProjectionRepository
 {
     private const STATE_KEY = 'state';
 
-    /**
-     * @param mixed $docId
-     */
-    public function upsertState($docId, JsonSchemaAwareRecord $state): void
+    public function upsertState(mixed $docId, JsonSchemaAwareRecord $state): void
     {
-        $docId = (string) $docId;
+        $docId = strval($docId);
 
         $this->documentStore->upsertDoc(
             $this->documentStoreName,
@@ -26,12 +25,9 @@ abstract class DefaultProjectionRepository extends DefaultStateRepository implem
         );
     }
 
-    /**
-     * @param mixed $docId
-     */
-    public function deleteDoc($docId): void
+    public function deleteDoc(mixed $docId): void
     {
-        $docId = (string) $docId;
+        $docId = strval($docId);
 
         $this->documentStore->deleteDoc(
             $this->documentStoreName,

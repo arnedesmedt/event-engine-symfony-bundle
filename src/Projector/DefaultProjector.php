@@ -11,17 +11,13 @@ use EventEngine\Messaging\Message;
 use EventEngine\Projecting\AggregateProjector;
 use RuntimeException;
 
-use function get_class;
 use function in_array;
 use function sprintf;
 
 abstract class DefaultProjector implements Projector
 {
-    protected DocumentStore $documentStore;
-
-    public function __construct(DocumentStore $documentStore)
+    public function __construct(protected DocumentStore $documentStore)
     {
-        $this->documentStore = $documentStore;
     }
 
     public function prepareForRun(string $projectionVersion, string $projectionName): void
@@ -67,11 +63,13 @@ abstract class DefaultProjector implements Projector
     }
 
     /**
-     * @param mixed $event
+     * @param object $event
+     *
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function handle(string $projectionVersion, string $projectionName, $event): void
     {
-        $eventClass = get_class($event);
+        $eventClass = $event::class;
 
         if ($event instanceof Message) {
             $eventClass = $event->messageName();

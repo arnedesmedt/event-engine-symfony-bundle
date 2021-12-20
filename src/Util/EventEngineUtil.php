@@ -124,7 +124,7 @@ final class EventEngineUtil
     }
 
     /**
-     * @param class-string $aggregateClass
+     * @param class-string<AggregateRoot> $aggregateClass
      */
     public static function fromAggregateClassToStreamName(string $aggregateClass): string
     {

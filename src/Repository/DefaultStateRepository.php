@@ -35,24 +35,23 @@ use function json_encode;
 use function reset;
 use function sprintf;
 
+use const JSON_THROW_ON_ERROR;
+
 abstract class DefaultStateRepository implements StateRepository
 {
     public const DOCUMENT_STORE_NOT_FOUND = 'Could not found document store \'%s\' for repository \'%s\'.';
 
     /** @var class-string */
     protected string $stateClass;
-    protected DocumentStore $documentStore;
-    protected string $documentStoreName;
 
     /**
      * @param class-string $stateClass
      */
     public function __construct(
-        DocumentStore $documentStore,
-        string $documentStoreName,
+        protected DocumentStore $documentStore,
+        protected string $documentStoreName,
         string $stateClass
     ) {
-        $this->documentStore = $documentStore;
         $reflectionClassState = new ReflectionClass($stateClass);
         if (! $reflectionClassState->implementsInterface(ImmutableRecord::class)) {
             throw new LogicException(sprintf(
@@ -63,7 +62,6 @@ abstract class DefaultStateRepository implements StateRepository
         }
 
         $this->stateClass = $stateClass;
-        $this->documentStoreName = $documentStoreName;
     }
 
     /**
@@ -71,7 +69,7 @@ abstract class DefaultStateRepository implements StateRepository
      *
      * @return array<ImmutableRecord>
      */
-    private function statesFromDocuments($documents): array
+    private function statesFromDocuments(Traversable|array $documents): array
     {
         if ($documents instanceof Traversable) {
             $documents = iterator_to_array($documents);
@@ -86,7 +84,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param array<mixed>|null $document
+     * @param array<string, mixed>|null $document
      */
     private function stateFromDocument(?array $document): ?ImmutableRecord
     {
@@ -100,11 +98,9 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param string|ValueObject $identifier
-     *
      * @return array<mixed>
      */
-    public function findDocument($identifier): ?array
+    public function findDocument(string|ValueObject $identifier): ?array
     {
         return $this->documentStore->getDoc(
             $this->documentStoreName,
@@ -113,12 +109,10 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param string|ValueObject $identifier
-     *
      * @return array<mixed>
      */
     public function needDocument(
-        $identifier,
+        string|ValueObject $identifier,
         ?Throwable $exception = null
     ): array {
         $document = $this->findDocument($identifier);
@@ -139,16 +133,13 @@ abstract class DefaultStateRepository implements StateRepository
         return (array) $document;
     }
 
-    /**
-     * @param string|ValueObject $identifier
-     */
     public function dontNeedDocument(
-        $identifier,
+        string|ValueObject $identifier,
         ?Throwable $exception = null
     ): void {
         try {
             $document = $this->needDocument($identifier);
-        } catch (NotFoundHttpException $exception) {
+        } catch (NotFoundHttpException) {
             return;
         }
 
@@ -161,11 +152,8 @@ abstract class DefaultStateRepository implements StateRepository
         );
     }
 
-    /**
-     * @param string|ValueObject $identifier
-     */
     public function needDocumentState(
-        $identifier,
+        string|ValueObject $identifier,
         ?Throwable $exception = null
     ): ImmutableRecord {
         $document = $this->needDocument($identifier, $exception);
@@ -178,7 +166,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return Traversable<array<mixed>>
+     * @return Traversable<array<string, mixed>>
      */
     public function findDocuments(
         ?Filter $filter = null,
@@ -207,7 +195,10 @@ abstract class DefaultStateRepository implements StateRepository
         $filter = $this->identifiersToFilter($identifiers);
 
         if ($filter === null) {
-            return new ArrayIterator();
+            /** @var Traversable<array<string, mixed>> $iterator */
+            $iterator = new ArrayIterator();
+
+            return $iterator;
         }
 
         return $this->findDocuments($filter);
@@ -216,7 +207,7 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function needDocumentsByIds($identifiers): array
+    public function needDocumentsByIds(array|ListValue $identifiers): array
     {
         $documents = $this->findDocumentsByIds($identifiers);
         $documentsArray = iterator_to_array($documents);
@@ -228,7 +219,10 @@ abstract class DefaultStateRepository implements StateRepository
             $scalarIdentifiers = $this->identifiersToScalars($identifiers);
 
             throw new NotFoundHttpException(
-                sprintf('One of the identifiers is not found: \'%s\'.', json_encode($scalarIdentifiers))
+                sprintf(
+                    'One of the identifiers is not found: \'%s\'.',
+                    json_encode($scalarIdentifiers, JSON_THROW_ON_ERROR)
+                )
             );
         }
 
@@ -306,10 +300,7 @@ abstract class DefaultStateRepository implements StateRepository
         );
     }
 
-    /**
-     * @param string|ValueObject $identifier
-     */
-    public function findDocumentState($identifier): ?ImmutableRecord
+    public function findDocumentState(string|ValueObject $identifier): ?ImmutableRecord
     {
         return $this->stateFromDocument(
             $this->findDocument($identifier)
@@ -355,20 +346,14 @@ abstract class DefaultStateRepository implements StateRepository
         return $this->countDocuments($filter) === 0;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function hasDocument($identifier): bool
+    public function hasDocument(string|ValueObject $identifier): bool
     {
         $document = $this->findDocument($identifier);
 
         return $document !== null;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function hasNoDocument($identifier): bool
+    public function hasNoDocument(string|ValueObject $identifier): bool
     {
         return ! $this->hasDocument($identifier);
     }
@@ -394,7 +379,7 @@ abstract class DefaultStateRepository implements StateRepository
             throw new RuntimeException(
                 sprintf(
                     'No state key found in document: \'%s\'',
-                    json_encode($document)
+                    json_encode($document, JSON_THROW_ON_ERROR)
                 )
             );
         }
@@ -413,10 +398,11 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param array<mixed>|ListValue $identifiers
+     * @param array<string>|ListValue $identifiers
      */
-    private function identifiersToFilter($identifiers): ?Filter
+    private function identifiersToFilter(array|ListValue $identifiers): ?Filter
     {
+        /** @var array<string> $scalarIdentifiers */
         $scalarIdentifiers = $this->identifiersToScalars($identifiers);
 
         if (empty($scalarIdentifiers)) {
@@ -432,11 +418,11 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param array<mixed>|ListValue $identifiers
+     * @param array<string>|ListValue $identifiers
      *
      * @return array<mixed>
      */
-    private function identifiersToScalars($identifiers): array
+    private function identifiersToScalars(array|ListValue $identifiers): array
     {
         if ($identifiers instanceof ListValue) {
             $identifiers = $identifiers->toArray();

@@ -56,6 +56,7 @@ final class Config implements CacheClearerInterface
         $aggregateIdentifiers = $this->cache->get(
             self::AGGREGATE_IDENTIFIERS,
             function () {
+                /** @var array<string, array<string, array<string, mixed>>> $config */
                 $config = $this->config();
 
                 return array_map(

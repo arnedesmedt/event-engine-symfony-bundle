@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Query;
 
-use PHPStan\Rules\Properties\ReadWritePropertiesExtension;
-
-interface Query extends ReadWritePropertiesExtension
+interface Query
 {
     /**
      * @return class-string|string

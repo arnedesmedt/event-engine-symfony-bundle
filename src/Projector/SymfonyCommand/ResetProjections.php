@@ -21,7 +21,7 @@ final class ResetProjections extends Command
      */
     protected static $defaultName = 'event-engine:projections:reset';
 
-    public function __construct(private readonly ProjectionManager $projectionManager)
+    public function __construct(private ProjectionManager $projectionManager)
     {
         parent::__construct();
     }

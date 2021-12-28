@@ -55,7 +55,8 @@ final class Configurator
         'acceptance' => EventEngine::ENV_PROD,
         'develop' => EventEngine::ENV_DEV,
     ];
-    private readonly string $environment;
+    /** @readonly */
+    private string $environment;
 
     /** @var array<class-string<AggregateCommand>, class-string<AggregateRoot>> */
     private array $commandAggregateMapping = [];
@@ -80,22 +81,22 @@ final class Configurator
      * @param array<class-string<EventEngineDescription>> $descriptionServices
      */
     public function __construct(
-        private readonly Flavour $flavour,
-        private readonly MultiModelStore $multiModelStore,
-        private readonly SimpleMessageEngine $simpleMessageEngine,
-        private readonly ContainerInterface $container,
+        private Flavour $flavour,
+        private MultiModelStore $multiModelStore,
+        private SimpleMessageEngine $simpleMessageEngine,
+        private ContainerInterface $container,
         string $environment,
-        private readonly bool $debug,
-        private readonly array $commandClasses,
-        private readonly array $queryClasses,
-        private readonly array $eventClasses,
-        private readonly array $aggregateClasses,
-        private readonly array $typeClasses,
-        private readonly array $listenerClasses,
-        private readonly array $projectorClasses,
-        private readonly array $preProcessorClasses,
-        private readonly array $descriptionServices,
-        private readonly ?MessageProducer $eventQueue
+        private bool $debug,
+        private array $commandClasses,
+        private array $queryClasses,
+        private array $eventClasses,
+        private array $aggregateClasses,
+        private array $typeClasses,
+        private array $listenerClasses,
+        private array $projectorClasses,
+        private array $preProcessorClasses,
+        private array $descriptionServices,
+        private ?MessageProducer $eventQueue
     ) {
         $this->environment = $this->mapEnvironment($environment);
     }

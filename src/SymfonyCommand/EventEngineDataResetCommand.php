@@ -29,9 +29,9 @@ class EventEngineDataResetCommand extends Command
      * @param array<class-string> $aggregates
      */
     public function __construct(
-        private readonly EventStore $eventStore,
-        private readonly DocumentStore $documentStore,
-        private readonly array $aggregates
+        private EventStore $eventStore,
+        private DocumentStore $documentStore,
+        private array $aggregates
     ) {
         parent::__construct();
     }

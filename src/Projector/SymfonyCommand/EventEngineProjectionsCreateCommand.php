@@ -17,7 +17,7 @@ final class EventEngineProjectionsCreateCommand extends Command
      */
     protected static $defaultName = 'event-engine:projections:create';
 
-    public function __construct(private readonly PDO $connection)
+    public function __construct(private PDO $connection)
     {
         parent::__construct();
     }

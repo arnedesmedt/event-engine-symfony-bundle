@@ -8,11 +8,6 @@ use PDOStatement;
 
 class PDO extends \PDO
 {
-    private string $dsn;
-    private ?string $username;
-    private ?string $password;
-    /** @var mixed[]|null */
-    private ?array $options;
     /** @var array<int, mixed> */
     protected array $attributes = [];
     protected bool $connected = false;
@@ -20,17 +15,8 @@ class PDO extends \PDO
     /**
      * @param array<mixed> $options
      */
-    public function __construct(
-        string $dsn,
-        ?string $username = null,
-        ?string $password = null,
-        ?array $options = null
-    ) {
-
-        $this->dsn = $dsn;
-        $this->username = $username;
-        $this->password = $password;
-        $this->options = $options;
+    public function __construct(private string $dsn, private ?string $username = null, private ?string $password = null, private ?array $options = null)
+    {
     }
 
     public function enableConnection(): void
@@ -144,6 +130,12 @@ class PDO extends \PDO
         return parent::quote($string, $type);
     }
 
+    /**
+     * @param string $function_name
+     * @param callable $callback
+     * @param int $num_args
+     * @param int $flags
+     */
     public function sqliteCreateFunction($function_name, $callback, $num_args = -1, $flags = 0): bool
     {
         $this->enableConnection();

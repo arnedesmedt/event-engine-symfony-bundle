@@ -19,7 +19,7 @@ use RuntimeException;
 
 class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
 {
-    public function __construct(private readonly FunctionalFlavour $functionalFlavour)
+    public function __construct(private FunctionalFlavour $functionalFlavour)
     {
     }
 
@@ -43,11 +43,11 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     }
 
     /**
-     * @return array<mixed>|CommandDispatchResult
+     * @return array<array<mixed>|Message>|CommandDispatchResult
      *
      * @inheritDoc
      */
-    public function callCommandController($controller, Message $command)
+    public function callCommandController($controller, Message $command): array|CommandDispatchResult
     {
         self::addMessageUuid($controller, $command);
 

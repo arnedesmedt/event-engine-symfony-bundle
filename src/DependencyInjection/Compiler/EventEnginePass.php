@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 use function array_filter;
 use function array_map;
+use function array_merge;
 use function array_reduce;
 use function array_unique;
 use function preg_match_all;
@@ -261,13 +262,7 @@ final class EventEnginePass implements CompilerPassInterface
         /** @var array<class-string> $projectors */
         $projectors = $container->getParameter('event_engine.projectors');
 
-        $classes = [
-            ...$resolvers,
-            ...$listeners,
-            ...$preProcessors,
-            ...$controllers,
-            ...$projectors,
-        ];
+        $classes = array_merge($resolvers, $listeners, $preProcessors, $controllers, $projectors);
 
         foreach ($classes as $class) {
             if (! $container->hasDefinition($class)) {

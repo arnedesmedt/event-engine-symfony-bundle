@@ -8,8 +8,6 @@ interface MetaDataResolver
 {
     /**
      * @param array<string, mixed> $metaData
-     *
-     * @return static
      */
     public function setMetaData(array $metaData): static;
 

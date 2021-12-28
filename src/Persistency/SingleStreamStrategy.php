@@ -14,14 +14,16 @@ use Prooph\EventStore\Pdo\Util\PostgresHelper;
 use Prooph\EventStore\StreamName;
 
 use function array_merge;
+use function assert;
 use function sprintf;
 
 final class SingleStreamStrategy implements PostgresPersistenceStrategy
 {
     use PostgresHelper;
 
-    public function __construct(private readonly MessageConverter $messageConverter = new DefaultMessageConverter())
+    public function __construct(private ?MessageConverter $messageConverter = null)
     {
+        $this->messageConverter = $messageConverter ?? new DefaultMessageConverter();
     }
 
     /**
@@ -91,6 +93,7 @@ EOT;
         $data = [];
 
         foreach ($streamEvents as $event) {
+            assert($this->messageConverter instanceof MessageConverter);
             $eventData = $this->messageConverter->convertToArray($event);
 
             $data[] = $eventData['uuid'];

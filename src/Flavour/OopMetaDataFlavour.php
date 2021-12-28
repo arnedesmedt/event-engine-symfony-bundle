@@ -16,8 +16,8 @@ use Generator;
 final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
 {
     public function __construct(
-        private readonly OopFlavour $oopFlavour,
-        private readonly FunctionalMetaDataFlavour $functionalMetaDataFlavour
+        private OopFlavour $oopFlavour,
+        private FunctionalMetaDataFlavour $functionalMetaDataFlavour
     ) {
     }
 
@@ -32,11 +32,11 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
     }
 
     /**
-     * @return array<mixed>|CommandDispatchResult
+     * @return array<array<mixed>|Message>|CommandDispatchResult
      *
      * @inheritDoc
      */
-    public function callCommandController($controller, Message $command)
+    public function callCommandController($controller, Message $command): array|CommandDispatchResult
     {
         FunctionalMetaDataFlavour::addMessageUuid($controller, $command);
 

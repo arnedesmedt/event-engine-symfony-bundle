@@ -16,7 +16,7 @@ class ReadModelProxy extends AbstractReadModel
 {
     private bool $initialized = false;
 
-    public function __construct(private readonly EventEngine $eventEngine)
+    public function __construct(private EventEngine $eventEngine)
     {
     }
 

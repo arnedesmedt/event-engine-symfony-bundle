@@ -18,7 +18,7 @@ final class RunProjections extends Command
      */
     protected static $defaultName = 'event-engine:projections:run';
 
-    public function __construct(private readonly WriteModelStreamProjection $projection)
+    public function __construct(private WriteModelStreamProjection $projection)
     {
         parent::__construct();
     }

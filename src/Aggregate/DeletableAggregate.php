@@ -19,7 +19,7 @@ trait DeletableAggregate
     /**
      * @return static
      */
-    public function delete()
+    public function delete(): static
     {
         $this->deleted = true;
 

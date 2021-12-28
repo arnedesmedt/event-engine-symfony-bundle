@@ -9,5 +9,5 @@ interface Listener
     /**
      * @return array<class-string>|class-string
      */
-    public static function __handleEvents();
+    public static function __handleEvents(): array|string;
 }

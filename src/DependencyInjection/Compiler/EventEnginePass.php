@@ -178,6 +178,7 @@ final class EventEnginePass implements CompilerPassInterface
         $aggregateRepositoryDefinitions = array_reduce(
             $aggregates,
             static function (array $result, $aggregate) use ($entityNamespace, $aggregateRepository) {
+                /** @var class-string $aggregate */
                 $reflectionClass = new ReflectionClass($aggregate);
                 $aggregate = $reflectionClass->getShortName();
 
@@ -201,6 +202,7 @@ final class EventEnginePass implements CompilerPassInterface
         $projectorRepositoryDefinitions = array_reduce(
             $projectors,
             static function (array $result, $projector) use ($projectorRepository): array {
+                /** @var class-string $projector */
                 $reflectionClass = new ReflectionClass($projector);
 
                 $key = str_replace(

@@ -16,6 +16,7 @@ final class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('ads_event_engine');
 
+        // @phpstan-ignore-next-line
         $treeBuilder
             ->getRootNode()
             ->children()

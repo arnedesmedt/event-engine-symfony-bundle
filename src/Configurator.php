@@ -28,6 +28,7 @@ use EventEngine\Persistence\Stream;
 use EventEngine\Runtime\Flavour;
 use EventEngine\Runtime\Oop\FlavourHint;
 use EventEngine\Schema\PayloadSchema;
+use EventEngine\Schema\ResponseTypeSchema;
 use EventEngine\Schema\TypeSchema;
 use LogicException;
 use Psr\Container\ContainerInterface;
@@ -41,6 +42,8 @@ use function array_key_exists;
 use function array_map;
 use function array_shift;
 use function array_unique;
+use function assert;
+use function class_implements;
 use function in_array;
 use function is_callable;
 use function is_int;
@@ -70,7 +73,7 @@ final class Configurator
     private array $aggregateIdentifierMapping = [];
 
     /**
-     * @param array<class-string<Command|ControllerCommand>> $commandClasses
+     * @param array<class-string<Command>> $commandClasses
      * @param array<class-string<Query>> $queryClasses
      * @param array<class-string<Event>> $eventClasses
      * @param array<class-string<AggregateRoot>> $aggregateClasses
@@ -136,10 +139,13 @@ final class Configurator
             $schema = self::schemaFromMessage($commandClass);
             $eventEngine->registerCommand($commandClass, $schema);
 
-            if (! (new ReflectionClass($commandClass))->implementsInterface(ControllerCommand::class)) {
+            $implementedClasses = class_implements($commandClass);
+            if (! $implementedClasses || ! in_array(ControllerCommand::class, $implementedClasses)) {
                 continue;
             }
 
+            // phpcs:ignore SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.NoAssignment
+            /** @var class-string<ControllerCommand> $commandClass */
             $eventEngine->passToController($commandClass, $commandClass::__controller());
         }
 
@@ -158,7 +164,12 @@ final class Configurator
                 continue;
             }
 
-            $queryDescription->setReturnType($queryClass::__defaultResponseSchema());
+            // phpcs:ignore SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable
+            /** @var class-string<HasResponses> $queryClass */
+            $typeSchema = $queryClass::__defaultResponseSchema();
+            assert($typeSchema instanceof ResponseTypeSchema);
+
+            $queryDescription->setReturnType($typeSchema);
         }
 
         return $this;

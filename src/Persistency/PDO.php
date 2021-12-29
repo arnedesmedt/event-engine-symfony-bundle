@@ -140,6 +140,7 @@ class PDO extends \PDO
     {
         $this->enableConnection();
 
+        // @phpstan-ignore-next-line
         return parent::sqliteCreateFunction($function_name, $callback, $num_args, $flags);
     }
 }

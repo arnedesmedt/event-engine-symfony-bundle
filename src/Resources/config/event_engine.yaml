@@ -77,6 +77,9 @@ services:
 
     # Implementations
     Opis\JsonSchema\Validator: ~
+    Prooph\EventStore\Pdo\WriteLockStrategy\PostgresAdvisoryLockStrategy:
+        arguments:
+            - '@event_engine.connection'
     Prooph\EventStore\TransactionalActionEventEmitterEventStore:
         arguments:
             - '@Prooph\EventStore\TransactionalEventStore'
@@ -86,6 +89,10 @@ services:
             - '@EventEngine\Prooph\V7\EventStore\ProophEventStoreMessageFactory'
             - '@event_engine.connection'
             - '@Prooph\EventStore\Pdo\PersistenceStrategy\PostgresPersistenceStrategy'
+            - 10000
+            - 'event_streams'
+            - false
+            - '@Prooph\EventStore\Pdo\WriteLockStrategy\PostgresAdvisoryLockStrategy'
     Prooph\Common\Event\ProophActionEventEmitter:
         arguments:
             - !php/const Prooph\EventStore\TransactionalActionEventEmitterEventStore::ALL_EVENTS

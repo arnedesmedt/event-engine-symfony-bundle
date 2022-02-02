@@ -36,6 +36,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ReflectionUnionType;
 use RuntimeException;
 
 use function array_key_exists;
@@ -609,21 +610,25 @@ final class Configurator
             }
 
             if (empty($commandClasses)) {
-                /** @var ReflectionNamedType|null $commandType */
+                /** @var ReflectionNamedType|ReflectionUnionType|null $commandType */
                 $commandType = $firstParameter->getType();
+                $commandTypes = $commandType instanceof ReflectionUnionType
+                    ? $commandType->getTypes()
+                    : [$commandType];
 
-                if ($commandType === null || ! in_array($commandType->getName(), $this->commandClasses)) {
-                    throw new RuntimeException(
-                        sprintf(
-                            'The first parameter of the __invoke method of preProcessor \'%s\' ' .
-                            'has no type or is not a command.',
-                            $preProcessorClass
-                        )
-                    );
+                foreach ($commandTypes as $commandType) {
+                    if ($commandType === null || ! in_array($commandType->getName(), $this->commandClasses)) {
+                        throw new RuntimeException(
+                            sprintf(
+                                'The first parameter of the __invoke method of preProcessor \'%s\' ' .
+                                'has no type or is not a command.',
+                                $preProcessorClass
+                            )
+                        );
+                    }
+
+                    $commandClasses[] = $commandType->getName();
                 }
-
-                /** @var array<class-string<Command>> $commandClasses */
-                $commandClasses = [$commandType->getName()];
             }
 
             foreach ($commandClasses as $commandClass) {

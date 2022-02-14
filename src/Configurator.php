@@ -468,20 +468,21 @@ final class Configurator
 
             foreach ($publicAggregateMethods as $publicAggregateMethod) {
                 $parameters = $publicAggregateMethod->getParameters();
-                /** @var ReflectionUnionType|ReflectionNamedType|null $firstParameter */
                 $firstParameter = reset($parameters);
 
                 if (! $firstParameter) {
                     continue;
                 }
 
-                $commandTypes = $firstParameter instanceof ReflectionUnionType
-                    ? $firstParameter->getTypes()
-                    : [$firstParameter];
+                /** @var ReflectionNamedType|ReflectionUnionType|null $commandTypes */
+                $commandTypes = $firstParameter->getType();
+                $commandTypes = $commandTypes instanceof ReflectionUnionType
+                    ? $commandTypes->getTypes()
+                    : [$commandTypes];
 
                 $commandTypes = array_filter(
                     $commandTypes,
-                    fn (?ReflectionNamedType $type) => $type !== null
+                    fn ($type) => $type !== null
                         && in_array($type->getName(), $this->commandClasses)
                 );
 
@@ -542,15 +543,17 @@ final class Configurator
                     continue;
                 }
 
-                /** @var ReflectionNamedType|null $commandType */
-                $commandType = $firstParameter->getType();
+                /** @var ReflectionNamedType|ReflectionUnionType|null $commandTypes */
+                $commandTypes = $firstParameter->getType();
+                $commandTypes = $commandTypes instanceof ReflectionUnionType
+                    ? $commandTypes->getTypes()
+                    : [$commandTypes];
 
-                if (
-                    $commandType === null
-                    || ! in_array($commandType->getName(), $this->commandClasses)
-                ) {
-                    continue;
-                }
+                $commandTypes = array_filter(
+                    $commandTypes,
+                    fn ($type) => $type !== null
+                        && in_array($type->getName(), $this->commandClasses)
+                );
 
                 /** @var array<class-string> $mapping */
                 $mapping = array_map(
@@ -567,10 +570,12 @@ final class Configurator
                     continue;
                 }
 
-                /** @var class-string<AggregateCommand> $commandClass */
-                $commandClass = $commandType->getName();
+                foreach ($commandTypes as $commandType) {
+                    /** @var class-string<AggregateCommand> $commandClass */
+                    $commandClass = $commandType->getName();
 
-                $this->commandServiceMapping[$commandClass] = $mapping;
+                    $this->commandServiceMapping[$commandClass] = $mapping;
+                }
             }
         }
 

@@ -36,6 +36,7 @@ use function array_map;
 use function array_merge;
 use function array_reduce;
 use function array_unique;
+use function array_values;
 use function preg_match_all;
 use function sprintf;
 use function str_replace;
@@ -154,7 +155,7 @@ final class EventEnginePass implements CompilerPassInterface
         foreach ($mappers as $name => $mapper) {
             $container->setParameter(
                 sprintf('event_engine.%s', $name),
-                array_unique(array_filter(array_map($mapper, $resources)))
+                array_values(array_unique(array_filter(array_map($mapper, $resources))))
             );
         }
 

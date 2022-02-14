@@ -39,6 +39,7 @@ use ReflectionParameter;
 use ReflectionUnionType;
 use RuntimeException;
 
+use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function array_shift;
@@ -467,26 +468,29 @@ final class Configurator
 
             foreach ($publicAggregateMethods as $publicAggregateMethod) {
                 $parameters = $publicAggregateMethod->getParameters();
+                /** @var ReflectionUnionType|ReflectionNamedType|null $firstParameter */
                 $firstParameter = reset($parameters);
 
                 if (! $firstParameter) {
                     continue;
                 }
 
-                /** @var ReflectionNamedType|null $commandType */
-                $commandType = $firstParameter->getType();
+                $commandTypes = $firstParameter instanceof ReflectionUnionType
+                    ? $firstParameter->getTypes()
+                    : [$firstParameter];
 
-                if (
-                    $commandType === null
-                    || ! in_array($commandType->getName(), $this->commandClasses)
-                ) {
-                    continue;
+                $commandTypes = array_filter(
+                    $commandTypes,
+                    fn (?ReflectionNamedType $type) => $type !== null
+                        && in_array($type->getName(), $this->commandClasses)
+                );
+
+                foreach ($commandTypes as $commandType) {
+                    /** @var class-string<AggregateCommand> $commandClass */
+                    $commandClass = $commandType->getName();
+
+                    $this->commandAggregateMapping[$commandClass] = $aggregateClass;
                 }
-
-                /** @var class-string<AggregateCommand> $commandClass */
-                $commandClass = $commandType->getName();
-
-                $this->commandAggregateMapping[$commandClass] = $aggregateClass;
             }
         }
 

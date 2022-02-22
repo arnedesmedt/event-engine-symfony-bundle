@@ -32,14 +32,17 @@ abstract class DefaultType
 
     public static function created(): ObjectType
     {
-        return JsonSchema::object([])
-            ->describedAs('Created');
+        return self::emptyResponse()->describedAs('Created');
+    }
+
+    public static function deleted(): ObjectType
+    {
+        return self::emptyResponse()->describedAs('Deleted');
     }
 
     public static function ok(): ObjectType
     {
-        return JsonSchema::object([])
-            ->describedAs('OK');
+        return self::emptyResponse()->describedAs('OK');
     }
 
     abstract public static function typeRefName(): string;

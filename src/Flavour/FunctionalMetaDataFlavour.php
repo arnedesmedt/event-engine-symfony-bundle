@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Flavour;
 
-use ADS\Bundle\EventEngineBundle\Message\MessageUuidAware;
+use ADS\Bundle\EventEngineBundle\Message\EventEngineMessageUuidAware;
 use ADS\Bundle\EventEngineBundle\Resolver\MetaDataResolver;
 use Closure;
 use EventEngine\Messaging\CommandDispatchResult;
@@ -25,11 +25,11 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
 
     public static function addMessageUuid(mixed $service, Message $message): void
     {
-        if (! ($service instanceof MessageUuidAware)) {
+        if (! ($service instanceof EventEngineMessageUuidAware)) {
             return;
         }
 
-        $service->setMessageUuid($message->uuid());
+        $service->setEventEngineMessageUuid($message->uuid());
     }
 
     /**

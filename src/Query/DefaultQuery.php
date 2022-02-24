@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Query;
 
-use ADS\JsonImmutableObjects\DefaultsAreNotRequired;
+use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
 use function count;
 use function explode;
@@ -12,7 +12,7 @@ use function implode;
 
 trait DefaultQuery
 {
-    use DefaultsAreNotRequired;
+    use JsonSchemaAwareRecordLogic;
 
     public static function __resolver(): string
     {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Command;
 
 use ADS\Bundle\EventEngineBundle\Exception\MessageException;
-use ADS\JsonImmutableObjects\DefaultsAreNotRequired;
+use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
 use function array_pop;
 use function class_exists;
@@ -15,7 +15,7 @@ use function sprintf;
 
 trait DefaultControllerCommand
 {
-    use DefaultsAreNotRequired;
+    use JsonSchemaAwareRecordLogic;
 
     public static function __controller(): string
     {

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Command;
 
-use ADS\JsonImmutableObjects\DefaultsAreNotRequired;
+use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 use ReflectionClass;
 
 trait DefaultAggregateCommand
 {
-    use DefaultsAreNotRequired;
+    use JsonSchemaAwareRecordLogic;
 
     /**
      * The default aggregate method is the shortname of the class.

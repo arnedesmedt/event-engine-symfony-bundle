@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Query;
 
+use ADS\Bundle\EventEngineBundle\Exception\MessageException;
 use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
-use function count;
-use function explode;
-use function implode;
+use function class_exists;
+use function str_replace;
+use function substr_count;
 
 trait DefaultQuery
 {
@@ -16,10 +17,16 @@ trait DefaultQuery
 
     public static function __resolver(): string
     {
-        $parts = explode('\\', static::class);
+        if (substr_count(static::class, '\\Query\\') > 1) {
+            throw MessageException::nestedMessageFolder(static::class, 'Query');
+        }
 
-        $parts[count($parts) - 2] = $parts[count($parts) - 2] === 'Query' ? 'Resolver' : $parts[count($parts) - 2];
+        $resolverClass = str_replace('\\Query\\', '\\Resolver\\', static::class);
 
-        return implode('\\', $parts);
+        if (! class_exists($resolverClass)) {
+            throw MessageException::noHandlerFound(static::class, 'resolver');
+        }
+
+        return $resolverClass;
     }
 }

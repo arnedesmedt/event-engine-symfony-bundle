@@ -13,12 +13,24 @@ final class MessageException extends Exception
     /**
      * @param class-string $message
      */
-    public static function noControllerFound(string $message): self
+    public static function noHandlerFound(string $message, string $type): self
     {
         return new static(
             sprintf(
-                'Could not find a controller for message \'%s\'.',
+                'Could not find a %s for message \'%s\'.',
+                $type,
                 $message
+            )
+        );
+    }
+
+    public static function nestedMessageFolder(string $class, string $folder): self
+    {
+        return new static(
+            sprintf(
+                'The message \'%s\' has a nested folder structure for the directory \'%s\'.',
+                $class,
+                $folder
             )
         );
     }

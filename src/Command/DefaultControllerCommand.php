@@ -7,11 +7,9 @@ namespace ADS\Bundle\EventEngineBundle\Command;
 use ADS\Bundle\EventEngineBundle\Exception\MessageException;
 use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
-use function array_pop;
 use function class_exists;
-use function explode;
-use function implode;
-use function sprintf;
+use function str_replace;
+use function substr_count;
 
 trait DefaultControllerCommand
 {
@@ -19,15 +17,14 @@ trait DefaultControllerCommand
 
     public static function __controller(): string
     {
-        $parts = explode('\\', static::class);
-        $name = array_pop($parts);
-        array_pop($parts);
-        $namespace = implode('\\', $parts);
+        if (substr_count(static::class, '\\Command\\') > 1) {
+            throw MessageException::nestedMessageFolder(static::class, 'Command');
+        }
 
-        $controllerClass = sprintf('%s\\Controller\\%s', $namespace, $name);
+        $controllerClass = str_replace('\\Command\\', '\\Controller\\', static::class);
 
         if (! class_exists($controllerClass)) {
-            throw MessageException::noControllerFound(static::class);
+            throw MessageException::noHandlerFound(static::class, 'controller');
         }
 
         return $controllerClass;

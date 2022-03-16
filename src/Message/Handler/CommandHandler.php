@@ -7,6 +7,7 @@ namespace ADS\Bundle\EventEngineBundle\Message\Handler;
 use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\MessageBag;
+use EventEngine\Runtime\Flavour;
 use Symfony\Component\Lock\LockFactory;
 
 use function sprintf;
@@ -15,13 +16,16 @@ class CommandHandler extends Handler
 {
     public function __construct(
         EventEngine $eventEngine,
+        Flavour $flavour,
         private LockFactory $aggregateLockFactory,
     ) {
-        parent::__construct($eventEngine);
+        parent::__construct($eventEngine, $flavour);
     }
 
     public function __invoke(MessageBag $messageBag): mixed
     {
+        /** @var MessageBag $messageBag */
+        $messageBag = $this->flavour->convertMessageReceivedFromNetwork($messageBag);
         $message = $messageBag->get(MessageBag::MESSAGE);
         $lock = null;
 

@@ -63,6 +63,9 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
 
     public function prepend(ContainerBuilder $container): void
     {
+        $configs = $container->getExtensionConfig($this->getAlias());
+        $resolvingBag = $container->getParameterBag();
+        $configs = $resolvingBag->resolveValue($configs);
         $container->prependExtensionConfig(
             'framework',
             [
@@ -74,7 +77,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                         'query.bus' => [],
                     ],
                 ],
-                'lock' => ['aggregate' => $container->getParameter('event_engine.pdo_dsn')],
+                'lock' => ['aggregate' => $configs[0]['pdo_dsn']],
             ]
         );
     }

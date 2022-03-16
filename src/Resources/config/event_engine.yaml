@@ -209,11 +209,12 @@ services:
         abstract: true
         arguments:
             - '@EventEngine\EventEngine'
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
 
     ADS\Bundle\EventEngineBundle\Message\Handler\CommandHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
         arguments:
-            $lockFactory: '@lock.aggregate.factory'
+            $aggregateLockFactory: '@lock.aggregate.factory'
         tags:
             - { name: messenger.message_handler, bus: command.bus }
         autoconfigure: false

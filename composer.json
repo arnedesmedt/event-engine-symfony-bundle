@@ -27,7 +27,8 @@
         "symfony/http-kernel": "~6.0",
         "arnedesmedt/php-util": "~0.1",
         "symfony/validator": "~6.0",
-        "symfony/messenger": "~6.0"
+        "symfony/messenger": "~6.0",
+        "symfony/lock": "^6.0"
     },
     "require-dev": {
         "phpstan/phpstan": "~1.0",

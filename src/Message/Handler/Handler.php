@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Message\Handler;
 
 use EventEngine\EventEngine;
-use EventEngine\Messaging\Message;
-use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use EventEngine\Messaging\MessageBag;
 
-final class MessageHandler implements MessageHandlerInterface
+abstract class Handler
 {
     public function __construct(
         private EventEngine $eventEngine
     ) {
     }
 
-    public function __invoke(Message $message): mixed
+    public function __invoke(MessageBag $message): mixed
     {
         return $this->eventEngine->dispatch($message);
     }

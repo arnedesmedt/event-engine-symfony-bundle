@@ -109,7 +109,10 @@ services:
         configurator: '@ADS\Bundle\EventEngineBundle\Configurator'
     ADS\Bundle\EventEngineBundle\Message\ExtendedEventEngine:
         arguments:
-            $flavour: '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@command.bus'
+            - '@event.bus'
+            - '@query.bus'
     EventEngine\JsonSchema\OpisJsonSchema: ~
     EventEngine\Logger\SimpleMessageEngine:
         arguments:
@@ -201,3 +204,24 @@ services:
         decorates: 'validator'
         arguments:
             - '@.inner'
+
+    ADS\Bundle\EventEngineBundle\Message\Handler\Handler:
+        abstract: true
+        arguments:
+            - '@EventEngine\EventEngine'
+
+    ADS\Bundle\EventEngineBundle\Message\Handler\CommandHandler:
+        parent: '@ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    ADS\Bundle\EventEngineBundle\Message\Handler\EventHandler:
+        parent: '@ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
+        tags:
+            - { name: messenger.message_handler, bus: event.bus }
+
+    ADS\Bundle\EventEngineBundle\Message\Handler\QueryHandler:
+        parent: '@ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
+        tags:
+            - { name: messenger.message_handler, bus: query.bus }
+

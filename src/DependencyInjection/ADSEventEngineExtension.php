@@ -67,6 +67,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
             'framework',
             [
                 'messenger' => [
+                    'default_bus' => 'command.bus',
                     'buses' => [
                         'command.bus' => [],
                         'event.bus' => [],

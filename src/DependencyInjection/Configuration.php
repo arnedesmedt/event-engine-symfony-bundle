@@ -35,6 +35,7 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('transactional')->defaultValue(false)->end()
                         ->scalarNode('prefix')->defaultValue('')->end()
                     ->end()
+                ->end()
                 ->arrayNode('event_store')
                     ->addDefaultsIfNotSet()
                     ->children()

@@ -211,17 +211,20 @@ services:
             - '@EventEngine\EventEngine'
 
     ADS\Bundle\EventEngineBundle\Message\Handler\CommandHandler:
-        parent: '@ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
+        parent: 'ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
         tags:
             - { name: messenger.message_handler, bus: command.bus }
+        autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Message\Handler\EventHandler:
-        parent: '@ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
+        parent: 'ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
         tags:
             - { name: messenger.message_handler, bus: event.bus }
+        autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Message\Handler\QueryHandler:
-        parent: '@ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
+        parent: 'ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
         tags:
             - { name: messenger.message_handler, bus: query.bus }
+        autoconfigure: false
 

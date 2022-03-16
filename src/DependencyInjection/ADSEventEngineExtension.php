@@ -6,14 +6,15 @@ namespace ADS\Bundle\EventEngineBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 
-final class ADSEventEngineExtension extends ConfigurableExtension
+final class ADSEventEngineExtension extends ConfigurableExtension implements PrependExtensionInterface
 {
     /**
      * phpcs:ignore Generic.Files.LineLength.TooLong
-     * @param array{"document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "domain_namespace": string, "pdo_dsn": string} $mergedConfig
+     * @param array{"event_store": array{"transactional": bool}, "document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "domain_namespace": string, "pdo_dsn": string} $mergedConfig
      */
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
@@ -40,6 +41,11 @@ final class ADSEventEngineExtension extends ConfigurableExtension
         );
 
         $container->setParameter(
+            'event_engine.event_store.transactional',
+            $mergedConfig['event_store']['transactional']
+        );
+
+        $container->setParameter(
             'event_engine.entity_namespace',
             $mergedConfig['entity_namespace']
         );
@@ -52,6 +58,22 @@ final class ADSEventEngineExtension extends ConfigurableExtension
         $container->setParameter(
             'event_engine.pdo_dsn',
             $mergedConfig['pdo_dsn']
+        );
+    }
+
+    public function prepend(ContainerBuilder $container): void
+    {
+        $container->prependExtensionConfig(
+            'framework',
+            [
+                'messenger' => [
+                    'buses' => [
+                        'command.bus' => [],
+                        'event.bus' => [],
+                        'query.bus' => [],
+                    ],
+                ],
+            ]
         );
     }
 }

@@ -107,6 +107,9 @@ services:
         arguments:
             - '@EventEngine\Schema\Schema'
         configurator: '@ADS\Bundle\EventEngineBundle\Configurator'
+    ADS\Bundle\EventEngineBundle\Message\ExtendedEventEngine:
+        arguments:
+            $flavour: '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
     EventEngine\JsonSchema\OpisJsonSchema: ~
     EventEngine\Logger\SimpleMessageEngine:
         arguments:
@@ -119,6 +122,7 @@ services:
     EventEngine\Prooph\V7\EventStore\ProophEventStore:
         arguments:
             - '@Prooph\EventStore\EventStore'
+            - '%event_engine.event_store.transactional%'
     EventEngine\Prooph\V7\EventStore\ProophEventStoreMessageFactory: ~
     EventEngine\Runtime\FunctionalFlavour:
         arguments:

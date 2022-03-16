@@ -74,7 +74,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                         'query.bus' => [],
                     ],
                 ],
-                'lock' => ['aggregate' => '%event_engine.pdo_dsn%'],
+                'lock' => ['aggregate' => $container->getParameter('event_engine.pdo_dsn')],
             ]
         );
     }

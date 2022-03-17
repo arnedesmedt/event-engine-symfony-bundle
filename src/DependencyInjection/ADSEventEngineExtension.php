@@ -14,7 +14,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
 {
     /**
      * phpcs:ignore Generic.Files.LineLength.TooLong
-     * @param array{"event_store": array{"transactional": bool}, "document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "domain_namespace": string, "pdo_dsn": string} $mergedConfig
+     * @param array{"event_store": array{"transactional": bool}, "document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "domain_namespace": string, "pdo_dsn": string, "pdo_dsn_lock": string} $mergedConfig
      */
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
@@ -59,6 +59,11 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
             'event_engine.pdo_dsn',
             $mergedConfig['pdo_dsn']
         );
+
+        $container->setParameter(
+            'event_engine.pdo_dsn_lock',
+            $mergedConfig['pdo_dsn_lock']
+        );
     }
 
     public function prepend(ContainerBuilder $container): void
@@ -77,7 +82,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                         'query.bus' => [],
                     ],
                 ],
-                'lock' => ['aggregate' => $configs[0]['pdo_dsn']],
+                'lock' => ['aggregate' => $configs[0]['pdo_dsn_lock']],
             ]
         );
     }

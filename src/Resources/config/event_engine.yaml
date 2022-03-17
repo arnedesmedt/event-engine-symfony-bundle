@@ -211,8 +211,9 @@ services:
             - '@EventEngine\EventEngine'
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
 
+    ADS\Bundle\EventEngineBundle\Lock\StoreFactory:
     lock.postgres.store:
-        class: Symfony\Component\Lock\Store\PostgreSqlStore
+        factory: '@ADS\Bundle\EventEngineBundle\Lock\StoreFactory'
         arguments:
             - '%event_engine.pdo_dsn%'
 

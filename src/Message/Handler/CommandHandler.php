@@ -40,10 +40,12 @@ class CommandHandler extends Handler
             $lock->acquire(true);
         }
 
-        $result = parent::__invoke($messageBag);
-
-        if ($lock !== null) {
-            $lock->release();
+        try {
+            $result = parent::__invoke($messageBag);
+        } finally {
+            if ($lock !== null) {
+                $lock->release();
+            }
         }
 
         return $result;

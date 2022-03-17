@@ -211,6 +211,16 @@ services:
             - '@EventEngine\EventEngine'
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
 
+    lock.postgres.store:
+        class: Symfony\Component\Lock\Store\PostgreSqlStore
+        arguments:
+            - '%event_engine.pdo_dsn%'
+
+    lock.aggregate.factory:
+        class: Symfony\Component\Lock\LockFactory
+        arguments:
+            - '@lock.postgres.store'
+
     ADS\Bundle\EventEngineBundle\Message\Handler\CommandHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
         arguments:

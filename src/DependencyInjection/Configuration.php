@@ -21,7 +21,6 @@ final class Configuration implements ConfigurationInterface
             ->getRootNode()
             ->children()
                 ->scalarNode('pdo_dsn')->end()
-                ->scalarNode('pdo_dsn_lock')->end()
                 ->scalarNode('domain_namespace')->defaultValue('App\Domain')->end()
                 ->scalarNode('entity_namespace')->defaultValue('App\Domain\Entity')->end()
                 ->arrayNode('document_store')

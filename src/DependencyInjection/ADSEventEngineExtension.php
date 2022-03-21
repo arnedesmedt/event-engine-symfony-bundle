@@ -63,9 +63,6 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
 
     public function prepend(ContainerBuilder $container): void
     {
-        $configs = $container->getExtensionConfig($this->getAlias());
-        $resolvingBag = $container->getParameterBag();
-        $configs = $resolvingBag->resolveValue($configs);
         $container->prependExtensionConfig(
             'framework',
             [

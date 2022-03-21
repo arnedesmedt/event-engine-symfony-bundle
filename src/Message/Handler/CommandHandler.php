@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Message\Handler;
 
-use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
+use ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Flavour;
-use Symfony\Component\Lock\LockFactory;
-
-use function sprintf;
 
 class CommandHandler extends Handler
 {
     public function __construct(
         EventEngine $eventEngine,
         Flavour $flavour,
-        private LockFactory $aggregateLockFactory,
+        private LockAggregateCommand $lockAggregateCommand
     ) {
         parent::__construct($eventEngine, $flavour);
     }
@@ -26,28 +23,7 @@ class CommandHandler extends Handler
     {
         /** @var MessageBag $messageBag */
         $messageBag = $this->flavour->convertMessageReceivedFromNetwork($messageBag);
-        $message = $messageBag->get(MessageBag::MESSAGE);
-        $lock = null;
 
-        if ($message instanceof AggregateCommand) {
-            $aggregateId = $message->__aggregateId();
-            $commandRouting = $this->eventEngine->compileCacheableConfig()['compiledCommandRouting'];
-            $aggregateType = $commandRouting[$message::class]['aggregateType'];
-
-            $lock = $this->aggregateLockFactory->createLock(
-                sprintf('aggregate:%s-id:%s', $aggregateType, $aggregateId)
-            );
-            $lock->acquire(true);
-        }
-
-        try {
-            $result = parent::__invoke($messageBag);
-        } finally {
-            if ($lock !== null) {
-                $lock->release();
-            }
-        }
-
-        return $result;
+        return ($this->lockAggregateCommand)($messageBag);
     }
 }

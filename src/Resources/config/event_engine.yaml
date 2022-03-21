@@ -226,7 +226,7 @@ services:
     ADS\Bundle\EventEngineBundle\Message\Handler\CommandHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
         arguments:
-            $aggregateLockFactory: '@lock.aggregate.factory'
+            $lockAggregateCommand: '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
         tags:
             - { name: messenger.message_handler, bus: command.bus }
         autoconfigure: false
@@ -243,3 +243,7 @@ services:
             - { name: messenger.message_handler, bus: query.bus }
         autoconfigure: false
 
+    ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand:
+        arguments:
+            - '@EventEngine\EventEngine'
+            - '@lock.aggregate.factory'

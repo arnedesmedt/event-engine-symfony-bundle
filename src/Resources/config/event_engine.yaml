@@ -247,3 +247,4 @@ services:
         arguments:
             - '@EventEngine\EventEngine'
             - '@lock.aggregate.factory'
+            - '@logger'

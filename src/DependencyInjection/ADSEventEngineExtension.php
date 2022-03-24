@@ -74,6 +74,21 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
             'event_engine.messenger.async.transport.query',
             $mergedConfig['messenger']['query_async_transport']
         );
+
+        $container->setParameter(
+            'event_engine.messenger.async.transport.command.retry',
+            $mergedConfig['messenger']['command_async_retry']
+        );
+
+        $container->setParameter(
+            'event_engine.messenger.async.transport.event.retry',
+            $mergedConfig['messenger']['event_async_retry']
+        );
+
+        $container->setParameter(
+            'event_engine.messenger.async.transport.query.retry',
+            $mergedConfig['messenger']['query_async_retry']
+        );
     }
 
     public function prepend(ContainerBuilder $container): void
@@ -82,31 +97,54 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
         $resolvingBag = $container->getParameterBag();
         $configs = $resolvingBag->resolveValue($configs);
 
-        $container->prependExtensionConfig(
-            'framework',
-            [
-                'messenger' => [
-                    'default_bus' => 'command.bus',
-                    'buses' => [
-                        'command.bus' => [],
-                        'event.bus' => [],
-                        'query.bus' => [],
-                    ],
-                    'transports' => [
-                        'command.async' => $configs['event_engine.messenger.async.transport.command']
+        $config = [
+            'messenger' => [
+                'default_bus' => 'command.bus',
+                'buses' => [
+                    'command.bus' => [],
+                    'event.bus' => [],
+                    'query.bus' => [],
+                ],
+                'transports' => [
+                    'command.async' => [
+                        'dsn' => $configs['event_engine.messenger.async.transport.command']
                             ?? 'doctrine:\\default?queue_name=event_engine_command',
-                        'event.async' => $configs['event_engine.messenger.async.transport.event']
+                    ],
+                    'event.async' => [
+                        'dsn' => $configs['event_engine.messenger.async.transport.event']
                             ?? 'doctrine:\\default?queue_name=event_engine_event',
-                        'query.async' => $configs['event_engine.messenger.async.transport.query']
+                    ],
+                    'query.async' => [
+                        'dsn' => $configs['event_engine.messenger.async.transport.query']
                             ?? 'doctrine:\\default?queue_name=event_engine_query',
                     ],
-                    'routing' => [
-                        'ADS\Bundle\EventEngineBundle\Messenger\QueueableCommand' => 'command.async',
-                        'ADS\Bundle\EventEngineBundle\Messenger\QueueableEvent' => 'event.async',
-                        'ADS\Bundle\EventEngineBundle\Messenger\QueueableQuery' => 'query.async',
-                    ],
                 ],
-            ]
+                'routing' => [
+                    'ADS\Bundle\EventEngineBundle\Messenger\QueueableCommand' => 'command.async',
+                    'ADS\Bundle\EventEngineBundle\Messenger\QueueableEvent' => 'event.async',
+                    'ADS\Bundle\EventEngineBundle\Messenger\QueueableQuery' => 'query.async',
+                ],
+            ],
+        ];
+
+        if (isset($configs['event_engine.messenger.async.transport.command.retry'])) {
+            $config['messenger']['transports']['command.async']['retry_strategy']['service'] =
+                $configs['event_engine.messenger.async.transport.command.retry'];
+        }
+
+        if (isset($configs['event_engine.messenger.async.transport.event.retry'])) {
+            $config['messenger']['transports']['event.async']['retry_strategy']['service'] =
+                $configs['event_engine.messenger.async.transport.event.retry'];
+        }
+
+        if (isset($configs['event_engine.messenger.async.transport.query.retry'])) {
+            $config['messenger']['transports']['query.async']['retry_strategy']['service'] =
+                $configs['event_engine.messenger.async.transport.query.retry'];
+        }
+
+        $container->prependExtensionConfig(
+            'framework',
+            $config
         );
     }
 }

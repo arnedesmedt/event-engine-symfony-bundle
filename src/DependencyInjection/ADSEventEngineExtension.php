@@ -14,7 +14,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
 {
     /**
      * phpcs:ignore Generic.Files.LineLength.TooLong
-     * @param array{"event_store": array{"transactional": bool}, "document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "domain_namespace": string, "pdo_dsn": string} $mergedConfig
+     * @param array{"event_store": array{"transactional": bool}, "messenger": array<string, string>, "document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "domain_namespace": string, "pdo_dsn": string} $mergedConfig
      */
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
@@ -59,6 +59,21 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
             'event_engine.pdo_dsn',
             $mergedConfig['pdo_dsn']
         );
+
+        $container->setParameter(
+            'event_engine.messenger.async.transport.command',
+            $mergedConfig['messenger']['command_async_transport']
+        );
+
+        $container->setParameter(
+            'event_engine.messenger.async.transport.event',
+            $mergedConfig['messenger']['event_async_transport']
+        );
+
+        $container->setParameter(
+            'event_engine.messenger.async.transport.query',
+            $mergedConfig['messenger']['query_async_transport']
+        );
     }
 
     public function prepend(ContainerBuilder $container): void
@@ -72,6 +87,16 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                         'command.bus' => [],
                         'event.bus' => [],
                         'query.bus' => [],
+                    ],
+                    'transports' => [
+                        'command.async' => $container->getParameter('event_engine.messenger.async.transport.command'),
+                        'event.async' => $container->getParameter('event_engine.messenger.async.transport.event'),
+                        'query.async' => $container->getParameter('event_engine.messenger.async.transport.query'),
+                    ],
+                    'routing' => [
+                        'ADS\Bundle\EventEngineBundle\Messenger\QueueableCommand' => 'command.async',
+                        'ADS\Bundle\EventEngineBundle\Messenger\QueueableEvent' => 'event.async',
+                        'ADS\Bundle\EventEngineBundle\Messenger\QueueableQuery' => 'query.async',
                     ],
                 ],
             ]

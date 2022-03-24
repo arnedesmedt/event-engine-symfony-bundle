@@ -42,6 +42,20 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('transactional')->defaultValue(false)->end()
                     ->end()
                 ->end()
+                ->arrayNode('messenger')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('command_async_transport')
+                            ->defaultValue('doctrine:\\default?queue_name=event_engine_command')
+                        ->end()
+                        ->scalarNode('event_async_transport')
+                            ->defaultValue('doctrine:\\default?queue_name=event_engine_event')
+                        ->end()
+                        ->scalarNode('query_async_transport')
+                            ->defaultValue('doctrine:\\default?queue_name=event_engine_query')
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;

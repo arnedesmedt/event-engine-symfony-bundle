@@ -91,6 +91,13 @@ final class MessagePort implements Port
      */
     public function decorateCommand($customCommand): MessageBag
     {
+        if (
+            $customCommand instanceof MessageBag
+            && $customCommand->messageType() === MessageBag::TYPE_COMMAND
+        ) {
+            return $customCommand;
+        }
+
         return new MessageBag(
             $customCommand::class,
             MessageBag::TYPE_COMMAND,
@@ -105,6 +112,13 @@ final class MessagePort implements Port
      */
     public function decorateEvent($customEvent): MessageBag
     {
+        if (
+            $customEvent instanceof MessageBag
+            && $customEvent->messageType() === MessageBag::TYPE_EVENT
+        ) {
+            return $customEvent;
+        }
+
         return new MessageBag(
             $customEvent::class,
             MessageBag::TYPE_EVENT,

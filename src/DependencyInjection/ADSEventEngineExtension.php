@@ -93,9 +93,12 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                         'query.bus' => [],
                     ],
                     'transports' => [
-                        'command.async' => $configs['event_engine.messenger.async.transport.command'],
-                        'event.async' => $configs['event_engine.messenger.async.transport.event'],
-                        'query.async' => $configs['event_engine.messenger.async.transport.query'],
+                        'command.async' => $configs['event_engine.messenger.async.transport.command']
+                            ?? 'doctrine:\\default?queue_name=event_engine_command',
+                        'event.async' => $configs['event_engine.messenger.async.transport.event']
+                            ?? 'doctrine:\\default?queue_name=event_engine_event',
+                        'query.async' => $configs['event_engine.messenger.async.transport.query']
+                            ?? 'doctrine:\\default?queue_name=event_engine_query',
                     ],
                     'routing' => [
                         'ADS\Bundle\EventEngineBundle\Messenger\QueueableCommand' => 'command.async',

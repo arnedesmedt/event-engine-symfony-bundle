@@ -78,6 +78,10 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
 
     public function prepend(ContainerBuilder $container): void
     {
+        $configs = $container->getExtensionConfig($this->getAlias());
+        $resolvingBag = $container->getParameterBag();
+        $configs = $resolvingBag->resolveValue($configs);
+
         $container->prependExtensionConfig(
             'framework',
             [
@@ -89,9 +93,9 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                         'query.bus' => [],
                     ],
                     'transports' => [
-                        'command.async' => $container->getParameter('event_engine.messenger.async.transport.command'),
-                        'event.async' => $container->getParameter('event_engine.messenger.async.transport.event'),
-                        'query.async' => $container->getParameter('event_engine.messenger.async.transport.query'),
+                        'command.async' => $configs['event_engine.messenger.async.transport.command'],
+                        'event.async' => $configs['event_engine.messenger.async.transport.event'],
+                        'query.async' => $configs['event_engine.messenger.async.transport.query'],
                     ],
                     'routing' => [
                         'ADS\Bundle\EventEngineBundle\Messenger\QueueableCommand' => 'command.async',

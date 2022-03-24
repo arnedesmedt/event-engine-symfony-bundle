@@ -108,15 +108,15 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                 'transports' => [
                     'command.async' => [
                         'dsn' => $configs['event_engine.messenger.async.transport.command']
-                            ?? 'doctrine:\\default?queue_name=event_engine_command',
+                            ?? 'doctrine://default?queue_name=event_engine_command',
                     ],
                     'event.async' => [
                         'dsn' => $configs['event_engine.messenger.async.transport.event']
-                            ?? 'doctrine:\\default?queue_name=event_engine_event',
+                            ?? 'doctrine://default?queue_name=event_engine_event',
                     ],
                     'query.async' => [
                         'dsn' => $configs['event_engine.messenger.async.transport.query']
-                            ?? 'doctrine:\\default?queue_name=event_engine_query',
+                            ?? 'doctrine://default?queue_name=event_engine_query',
                     ],
                 ],
                 'routing' => [

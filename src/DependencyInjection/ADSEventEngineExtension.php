@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\DependencyInjection;
 
+use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
+use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
+use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
+use ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry;
+use ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry;
+use ADS\Bundle\EventEngineBundle\Messenger\Retry\QueueRetry;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -109,20 +115,32 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                     'command.async' => [
                         'dsn' => $configs['event_engine.messenger.async.transport.command']
                             ?? 'doctrine://default?queue_name=event_engine_command',
+                        'retry_strategy' => [
+                            'service' => $configs['event_engine.messenger.async.transport.command.retry']
+                                ?? CommandRetry::class,
+                        ],
                     ],
                     'event.async' => [
                         'dsn' => $configs['event_engine.messenger.async.transport.event']
                             ?? 'doctrine://default?queue_name=event_engine_event',
+                        'retry_strategy' => [
+                            'service' => $configs['event_engine.messenger.async.transport.event.retry']
+                                ?? EventRetry::class,
+                        ],
                     ],
                     'query.async' => [
                         'dsn' => $configs['event_engine.messenger.async.transport.query']
                             ?? 'doctrine://default?queue_name=event_engine_query',
+                        'retry_strategy' => [
+                            'service' => $configs['event_engine.messenger.async.transport.query.retry']
+                                ?? QueueRetry::class,
+                        ],
                     ],
                 ],
                 'routing' => [
-                    'ADS\Bundle\EventEngineBundle\Messenger\QueueableCommand' => 'command.async',
-                    'ADS\Bundle\EventEngineBundle\Messenger\QueueableEvent' => 'event.async',
-                    'ADS\Bundle\EventEngineBundle\Messenger\QueueableQuery' => 'query.async',
+                    CommandMessageWrapper::class => 'command.async',
+                    EventMessageWrapper::class => 'event.async',
+                    QueryMessageWrapper::class => 'query.async',
                 ],
             ],
         ];

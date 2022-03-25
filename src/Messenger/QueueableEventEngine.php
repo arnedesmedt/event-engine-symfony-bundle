@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ADS\Bundle\EventEngineBundle\Message;
+namespace ADS\Bundle\EventEngineBundle\Messenger;
 
+use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
+use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
+use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageProducer;
 use EventEngine\Runtime\Flavour;
@@ -15,7 +18,7 @@ use Throwable;
 
 use function reset;
 
-final class ExtendedEventEngine implements MessageProducer
+final class QueueableEventEngine implements MessageProducer
 {
     public function __construct(
         private Flavour $flavour,
@@ -28,6 +31,14 @@ final class ExtendedEventEngine implements MessageProducer
     public function produce(Message $message): mixed
     {
         $transferableMessage = $this->flavour->prepareNetworkTransmission($message);
+
+        if ($transferableMessage->getMetaOrDefault('async', false)) {
+            $transferableMessage = match ($message->messageType()) {
+                Message::TYPE_COMMAND => CommandMessageWrapper::fromMessage($transferableMessage),
+                Message::TYPE_EVENT => EventMessageWrapper::fromMessage($transferableMessage),
+                default => QueryMessageWrapper::fromMessage($transferableMessage),
+            };
+        }
 
         try {
             /** @var Envelope $envelop */

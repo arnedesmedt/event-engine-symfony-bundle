@@ -107,7 +107,7 @@ services:
         arguments:
             - '@EventEngine\Schema\Schema'
         configurator: '@ADS\Bundle\EventEngineBundle\Configurator'
-    ADS\Bundle\EventEngineBundle\Message\ExtendedEventEngine:
+    ADS\Bundle\EventEngineBundle\Messenger\QueueableEventEngine:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@command.bus'
@@ -205,7 +205,7 @@ services:
         arguments:
             - '@.inner'
 
-    ADS\Bundle\EventEngineBundle\Message\Handler\Handler:
+    ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler:
         abstract: true
         arguments:
             - '@EventEngine\EventEngine'
@@ -223,24 +223,56 @@ services:
         arguments:
             - '@lock.postgres.store'
 
-    ADS\Bundle\EventEngineBundle\Message\Handler\CommandHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
+    ADS\Bundle\EventEngineBundle\Messenger\Handler\CommandHandler:
+        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         arguments:
             $lockAggregateCommand: '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
         tags:
-            - { name: messenger.message_handler, bus: command.bus }
+            - name: messenger.message_handler,
+              bus: command.bus
+              handles: EventEngine\Messaging\MessageBag
         autoconfigure: false
 
-    ADS\Bundle\EventEngineBundle\Message\Handler\EventHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
+    ADS\Bundle\EventEngineBundle\Messenger\Handler\EventHandler:
+        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         tags:
-            - { name: messenger.message_handler, bus: event.bus }
+            - name: messenger.message_handler,
+              bus: event.bus
+              handles: EventEngine\Messaging\MessageBag
         autoconfigure: false
 
-    ADS\Bundle\EventEngineBundle\Message\Handler\QueryHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Message\Handler\Handler'
+    ADS\Bundle\EventEngineBundle\Messenger\Handler\QueryHandler:
+        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         tags:
-            - { name: messenger.message_handler, bus: query.bus }
+            - name: messenger.message_handler,
+              bus: query.bus
+              handles: EventEngine\Messaging\MessageBag
+        autoconfigure: false
+
+    ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncCommandHandler:
+        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
+        arguments:
+            $lockAggregateCommand: '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
+        tags:
+            - name: messenger.message_handler,
+              bus: command.bus
+              handles: ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper
+        autoconfigure: false
+
+    ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncEventHandler:
+        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
+        tags:
+            - name: messenger.message_handler,
+              bus: command.bus
+              handles: ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper
+        autoconfigure: false
+
+    ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncQueryHandler:
+        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
+        tags:
+            - name: messenger.message_handler,
+              bus: command.bus
+              handles: ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand:

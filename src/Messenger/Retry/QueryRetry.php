@@ -6,7 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\Messenger\Retry;
 
 use EventEngine\Messaging\MessageBag;
 
-class QueueRetry extends Retry
+class QueryRetry extends Retry
 {
     protected function messageBagAllowed(MessageBag $messageBag): bool
     {

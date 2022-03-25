@@ -9,7 +9,7 @@ use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry;
-use ADS\Bundle\EventEngineBundle\Messenger\Retry\QueueRetry;
+use ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -133,7 +133,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                             ?? 'doctrine://default?queue_name=event_engine_query',
                         'retry_strategy' => [
                             'service' => $configs['event_engine.messenger.async.transport.query.retry']
-                                ?? QueueRetry::class,
+                                ?? QueryRetry::class,
                         ],
                     ],
                 ],

@@ -275,6 +275,14 @@ services:
               handles: ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper
         autoconfigure: false
 
+    ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry:
+        parent: ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry
+    ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry:
+        parent: ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry
+    ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry:
+        parent: ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry
+    ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry: ~
+
     ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand:
         arguments:
             - '@EventEngine\EventEngine'

@@ -61,7 +61,7 @@ final class Configuration implements ConfigurationInterface
                             ->defaultValue('ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry')
                         ->end()
                         ->scalarNode('query_async_retry')
-                            ->defaultValue('ADS\Bundle\EventEngineBundle\Messenger\Retry\QueueRetry')
+                            ->defaultValue('ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry')
                         ->end()
                     ->end()
                 ->end()

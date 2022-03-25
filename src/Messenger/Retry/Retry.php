@@ -7,6 +7,7 @@ namespace ADS\Bundle\EventEngineBundle\Messenger\Retry;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\MessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Queueable;
 use EventEngine\Messaging\MessageBag;
+use EventEngine\Runtime\Flavour;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -14,11 +15,15 @@ use Throwable;
 
 abstract class Retry implements RetryStrategyInterface
 {
+    public function __construct(private Flavour $flavour)
+    {
+    }
+
     public function isRetryable(Envelope $message, ?Throwable $throwable = null): bool
     {
         /** @var MessageWrapper $messageWrapper */
         $messageWrapper = $message->getMessage();
-        $messageBag = $messageWrapper->message();
+        $messageBag = $this->flavour->convertMessageReceivedFromNetwork($messageWrapper->message());
 
         if (! $messageBag instanceof MessageBag || ! $this->messageBagAllowed($messageBag)) {
             return false;
@@ -37,8 +42,9 @@ abstract class Retry implements RetryStrategyInterface
 
     public function getWaitingTime(Envelope $message, ?Throwable $throwable = null): int
     {
-        /** @var MessageBag $messageBag */
-        $messageBag = $message->getMessage();
+        /** @var MessageWrapper $messageWrapper */
+        $messageWrapper = $message->getMessage();
+        $messageBag = $this->flavour->convertMessageReceivedFromNetwork($messageWrapper->message());
         /** @var Queueable $eventEngineMessage */
         $eventEngineMessage = $messageBag->get(MessageBag::MESSAGE);
 

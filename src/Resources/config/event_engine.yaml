@@ -269,7 +269,9 @@ services:
         parent: ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry
     ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry:
         parent: ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry
-    ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry: ~
+    ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry:
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
 
     ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand:
         arguments:

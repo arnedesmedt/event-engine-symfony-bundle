@@ -7,6 +7,7 @@ namespace ADS\Bundle\EventEngineBundle\Messenger;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
+use EventEngine\EventEngine;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageProducer;
 use EventEngine\Runtime\Flavour;
@@ -16,6 +17,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Throwable;
 
+use function array_merge;
 use function reset;
 
 final class QueueableEventEngine implements MessageProducer
@@ -25,7 +27,30 @@ final class QueueableEventEngine implements MessageProducer
         private MessageBusInterface $commandBus,
         private MessageBusInterface $eventBus,
         private MessageBusInterface $queryBus,
+        private EventEngine $eventEngine
     ) {
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @param array<string, mixed> $metadata
+     */
+    public function dispatchAsync(string $messageClass, array $payload = [], array $metadata = []): mixed
+    {
+        $messageBag = $this->eventEngine
+            ->messageFactory()
+            ->createMessageFromArray(
+                $messageClass,
+                [
+                    'payload' => $payload,
+                    'metadata' => array_merge(
+                        ['async' => true],
+                        $metadata
+                    ),
+                ]
+            );
+
+        return $this->produce($messageBag);
     }
 
     public function produce(Message $message): mixed

@@ -113,6 +113,7 @@ services:
             - '@command.bus'
             - '@event.bus'
             - '@query.bus'
+            - '@EventEngine\EventEngine'
     EventEngine\JsonSchema\OpisJsonSchema: ~
     EventEngine\Logger\SimpleMessageEngine:
         arguments:

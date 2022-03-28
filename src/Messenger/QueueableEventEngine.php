@@ -37,16 +37,27 @@ final class QueueableEventEngine implements MessageProducer
      */
     public function dispatchAsync(string $messageClass, array $payload = [], array $metadata = []): mixed
     {
+        $metadata = array_merge(
+            ['async' => true],
+            $metadata
+        );
+
+        return $this->dispatch($messageClass, $payload, $metadata);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @param array<string, mixed> $metadata
+     */
+    public function dispatch(string $messageClass, array $payload = [], array $metadata = []): mixed
+    {
         $messageBag = $this->eventEngine
             ->messageFactory()
             ->createMessageFromArray(
                 $messageClass,
                 [
                     'payload' => $payload,
-                    'metadata' => array_merge(
-                        ['async' => true],
-                        $metadata
-                    ),
+                    'metadata' => $metadata,
                 ]
             );
 

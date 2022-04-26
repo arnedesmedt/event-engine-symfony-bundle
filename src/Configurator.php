@@ -13,7 +13,6 @@ use ADS\Bundle\EventEngineBundle\Event\Listener;
 use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
 use ADS\Bundle\EventEngineBundle\Query\Query;
-use ADS\Bundle\EventEngineBundle\Response\HasResponses;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\Commanding\CommandProcessorDescription;
 use EventEngine\EventEngine;
@@ -44,7 +43,6 @@ use function array_key_exists;
 use function array_map;
 use function array_shift;
 use function array_unique;
-use function assert;
 use function class_implements;
 use function in_array;
 use function is_callable;
@@ -159,19 +157,11 @@ final class Configurator
         foreach ($this->queryClasses as $queryClass) {
             /** @var PayloadSchema $schema */
             $schema = self::schemaFromMessage($queryClass);
-            $queryDescription = $eventEngine->registerQuery($queryClass, $schema)
-                ->resolveWith($queryClass::__resolver());
-
-            if (! (new ReflectionClass($queryClass))->implementsInterface(HasResponses::class)) {
-                continue;
-            }
-
-            // phpcs:ignore SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable
-            /** @var class-string<HasResponses> $queryClass */
+            /** @var ResponseTypeSchema $typeSchema */
             $typeSchema = $queryClass::__defaultResponseSchema();
-            assert($typeSchema instanceof ResponseTypeSchema);
-
-            $queryDescription->setReturnType($typeSchema);
+            $eventEngine->registerQuery($queryClass, $schema)
+                ->resolveWith($queryClass::__resolver())
+                ->setReturnType($typeSchema);
         }
 
         return $this;

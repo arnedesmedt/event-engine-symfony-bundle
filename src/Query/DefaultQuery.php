@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Query;
 
 use ADS\Bundle\EventEngineBundle\Exception\MessageException;
+use ADS\Bundle\EventEngineBundle\Response\DefaultResponses;
 use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
+use EventEngine\Schema\TypeSchema;
 
 use function class_exists;
 use function str_replace;
@@ -14,6 +16,7 @@ use function substr_count;
 trait DefaultQuery
 {
     use JsonSchemaAwareRecordLogic;
+    use DefaultResponses;
 
     public static function __resolver(): string
     {
@@ -28,5 +31,13 @@ trait DefaultQuery
         }
 
         return $resolverClass;
+    }
+
+    /**
+     * @return array<string, TypeSchema>
+     */
+    public static function __extraResponse(): array
+    {
+        return [];
     }
 }

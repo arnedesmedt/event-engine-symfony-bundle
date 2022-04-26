@@ -38,8 +38,8 @@ final class QueueableEventEngine implements MessageProducer
     public function dispatchAsync(string $messageClass, array $payload = [], array $metadata = []): mixed
     {
         $metadata = array_merge(
+            $metadata,
             ['async' => true],
-            $metadata
         );
 
         return $this->dispatch($messageClass, $payload, $metadata);

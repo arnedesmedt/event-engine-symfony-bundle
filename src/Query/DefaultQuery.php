@@ -12,6 +12,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use ADS\Bundle\EventEngineBundle\Response\DefaultResponses;
 
 use function array_filter;
 use function class_exists;
@@ -24,6 +25,7 @@ use function substr_count;
 trait DefaultQuery
 {
     use JsonSchemaAwareRecordLogic;
+    use DefaultResponses;
 
     public static function __resolver(): string
     {

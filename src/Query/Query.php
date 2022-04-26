@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Query;
 
 use EventEngine\Schema\TypeSchema;
+use ADS\Bundle\EventEngineBundle\Response\HasResponses;
 
-interface Query
+interface Query extends HasResponses
 {
     /**
      * @return class-string|string

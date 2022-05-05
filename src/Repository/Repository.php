@@ -6,15 +6,21 @@ namespace ADS\Bundle\EventEngineBundle\Repository;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
+use ADS\ValueObjects\ListValue;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\DocumentStore\DocumentStore;
 use LogicException;
 use ReflectionClass;
 use Throwable;
 
-use function assert;
 use function sprintf;
 
+/**
+ * @template T
+ * @template TAgg
+ * @extends DefaultStateRepository<T>
+ * @implements AggregateRepository<T,TAgg>
+ */
 abstract class Repository extends DefaultStateRepository implements AggregateRepository
 {
     /** @var class-string */
@@ -23,13 +29,15 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
     /**
      * @param class-string $documentStoreName
      * @param class-string $stateClass
+     * @param class-string<ListValue<T>> $statesClass
      */
     public function __construct(
         DocumentStore $documentStore,
         string $documentStoreName,
-        string $stateClass
+        string $stateClass,
+        string $statesClass
     ) {
-        parent::__construct($documentStore, $documentStoreName, $stateClass);
+        parent::__construct($documentStore, $documentStoreName, $stateClass, $statesClass);
 
         $aggregateClass = EventEngineUtil::fromStateToAggregateClass($this->stateClass);
         $reflectionClassAggregate = new ReflectionClass($aggregateClass);
@@ -45,9 +53,9 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
     }
 
     /**
-     * @param array<string, mixed>|null $document
+     * @inheritDoc
      */
-    public function aggregateFromDocument(?array $document): ?AggregateRoot
+    public function aggregateFromDocument(?array $document)
     {
         if ($document === null) {
             return null;
@@ -58,22 +66,27 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
         return $this->aggregateClass::reconstituteFromStateArray($document['state']);
     }
 
-    public function findAggregate(string|ValueObject $identifier): ?AggregateRoot
+    /**
+     * @inheritDoc
+     */
+    public function findAggregate(string|ValueObject $identifier)
     {
         return $this->aggregateFromDocument(
             $this->findDocument($identifier)
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     public function needAggregate(
         string|ValueObject $identifier,
         ?Throwable $exception = null
-    ): AggregateRoot {
+    ) {
         $document = $this->needDocument($identifier, $exception);
 
+        /** @var TAgg $aggregateRoot */
         $aggregateRoot = $this->aggregateFromDocument($document);
-
-        assert($aggregateRoot instanceof AggregateRoot);
 
         return $aggregateRoot;
     }

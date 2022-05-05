@@ -57,6 +57,11 @@ abstract class DefaultProjector implements Projector
         return sprintf('%s\\%s\\%s', $projectionNamespace, $projectionName, 'State');
     }
 
+    public static function statesClassName(): string
+    {
+        return static::stateClassName() . 's';
+    }
+
     protected static function generateCollectionName(string $projectionVersion, string $projectionName): string
     {
         return AggregateProjector::generateCollectionName($projectionVersion, $projectionName);

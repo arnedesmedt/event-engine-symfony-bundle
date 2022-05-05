@@ -12,7 +12,6 @@ use ADS\Bundle\EventEngineBundle\Event\Listener;
 use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
 use ADS\Bundle\EventEngineBundle\Query\Query;
-use ADS\Bundle\EventEngineBundle\Repository\DefaultProjectionRepository;
 use ADS\Bundle\EventEngineBundle\Repository\Repository;
 use ADS\Bundle\EventEngineBundle\Repository\StateRepository;
 use ADS\Bundle\EventEngineBundle\Type\Type;
@@ -165,20 +164,19 @@ final class EventEnginePass implements CompilerPassInterface
 
     private function buildRepositories(ContainerBuilder $container): void
     {
-        $aggregateRepository = $container->getDefinition(Repository::class);
-        $projectorRepository = $container->getDefinition(DefaultProjectionRepository::class);
-        /** @var array<class-string> $childRepositories */
+        $repository = $container->getDefinition(Repository::class);
+        /** @var array<class-string<StateRepository<mixed>>> $childRepositories */
         $childRepositories = $container->getParameter('event_engine.child_repositories');
-        /** @var array<class-string> $aggregates */
+        /** @var array<class-string<AggregateRoot>> $aggregates */
         $aggregates = $container->getParameter('event_engine.aggregates');
-        /** @var array<class-string> $projectors */
+        /** @var array<class-string<Projector>> $projectors */
         $projectors = $container->getParameter('event_engine.projectors');
         /** @var string $entityNamespace */
         $entityNamespace = $container->getParameter('event_engine.entity_namespace');
 
         $aggregateRepositoryDefinitions = array_reduce(
             $aggregates,
-            static function (array $result, $aggregate) use ($entityNamespace, $aggregateRepository) {
+            static function (array $result, $aggregate) use ($entityNamespace, $repository) {
                 /** @var class-string $aggregate */
                 $reflectionClass = new ReflectionClass($aggregate);
                 $aggregate = $reflectionClass->getShortName();
@@ -186,11 +184,12 @@ final class EventEnginePass implements CompilerPassInterface
                 $key = sprintf('event_engine.repository.%s', StringUtil::decamelize($aggregate));
 
                 $result[$key] = (new Definition(
-                    $aggregateRepository->getClass(),
+                    $repository->getClass(),
                     [
                         new Reference(DocumentStore::class),
                         EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregate),
                         EventEngineUtil::fromAggregateNameToStateClass($aggregate, $entityNamespace),
+                        EventEngineUtil::fromAggregateNameToStatesClass($aggregate, $entityNamespace),
                     ]
                 ))
                     ->setPublic(true);
@@ -202,7 +201,7 @@ final class EventEnginePass implements CompilerPassInterface
 
         $projectorRepositoryDefinitions = array_reduce(
             $projectors,
-            static function (array $result, $projector) use ($projectorRepository): array {
+            static function (array $result, $projector) use ($repository): array {
                 /** @var class-string $projector */
                 $reflectionClass = new ReflectionClass($projector);
 
@@ -216,11 +215,12 @@ final class EventEnginePass implements CompilerPassInterface
                 );
 
                 $result[$key] = (new Definition(
-                    $projectorRepository->getClass(),
+                    $repository->getClass(),
                     [
                         new Reference(DocumentStore::class),
                         $projector::generateOwnCollectionName(),
                         $projector::stateClassName(),
+                        $projector::statesClassName(),
                     ]
                 ))->setPublic(true);
 
@@ -232,7 +232,6 @@ final class EventEnginePass implements CompilerPassInterface
         $container->addDefinitions($aggregateRepositoryDefinitions);
         $container->addDefinitions($projectorRepositoryDefinitions);
         $container->removeDefinition(Repository::class);
-        $container->removeDefinition(DefaultProjectionRepository::class);
 
         foreach ($childRepositories as $childRepository) {
             preg_match_all('/\\\([^\\\]+)Repository$/', $childRepository, $matches);

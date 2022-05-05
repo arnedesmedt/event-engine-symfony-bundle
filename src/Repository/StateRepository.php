@@ -6,12 +6,14 @@ namespace ADS\Bundle\EventEngineBundle\Repository;
 
 use ADS\ValueObjects\ListValue;
 use ADS\ValueObjects\ValueObject;
-use EventEngine\Data\ImmutableRecord;
 use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\PartialSelect;
 use Throwable;
 use Traversable;
 
+/**
+ * @template T
+ */
 interface StateRepository
 {
     /**
@@ -32,10 +34,13 @@ interface StateRepository
         ?Throwable $exception = null
     ): void;
 
+    /**
+     * @return T
+     */
     public function needDocumentState(
         string|ValueObject $identifier,
         ?Throwable $exception = null
-    ): ImmutableRecord;
+    );
 
     /**
      * @return Traversable<array<mixed>>
@@ -43,35 +48,35 @@ interface StateRepository
     public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): Traversable;
 
     /**
-     * @param array<string>|ListValue $identifiers
+     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
      *
-     * @return Traversable<array<string, mixed>>
+     * @return Traversable<array{state: array<string, mixed>}>
      */
     public function findDocumentsByIds(array|ListValue $identifiers): Traversable;
 
     /**
-     * @param array<string>|ListValue $identifiers
+     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
      *
-     * @return array<array<string, mixed>>
+     * @return array<array{state: array<string, mixed>}>
      */
     public function needDocumentsByIds(array|ListValue $identifiers): array;
 
     /**
-     * @param array<string>|ListValue $identifiers
+     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
      *
-     * @return array<ImmutableRecord>
+     * @return ListValue<T>
      */
-    public function findDocumentStatesByIds(array|ListValue $identifiers): array;
+    public function findDocumentStatesByIds(array|ListValue $identifiers): ListValue;
 
     /**
-     * @param array<string>|ListValue $identifiers
+     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
      *
-     * @return array<ImmutableRecord>
+     * @return ListValue<T>
      */
-    public function needDocumentStatesByIds(array|ListValue $identifiers): array;
+    public function needDocumentStatesByIds(array|ListValue $identifiers): ListValue;
 
     /**
-     * @return Traversable<array<mixed>>
+     * @return Traversable<array{state: array<string, mixed>}>
      */
     public function findPartialDocuments(
         PartialSelect $partialSelect,
@@ -87,12 +92,15 @@ interface StateRepository
      */
     public function findDocumentIds(?Filter $filter = null): array;
 
-    public function findDocumentState(string|ValueObject $identifier): ?ImmutableRecord;
+    /**
+     * @return T|null
+     */
+    public function findDocumentState(string|ValueObject $identifier);
 
     /**
-     * @return array<ImmutableRecord>
+     * @return ListValue<T>
      */
-    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null): array;
+    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null): ListValue;
 
     public function hasDocuments(?Filter $filter = null): bool;
 
@@ -103,9 +111,16 @@ interface StateRepository
     public function hasNoDocument(string|ValueObject $identifier): bool;
 
     /**
-     * @param array<string>|ListValue $identifiers
+     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
      */
     public function hasAllDocuments(array|ListValue $identifiers): bool;
+
+    /**
+     * @param T $state
+     */
+    public function upsertState(string|ValueObject $identifier, $state): void;
+
+    public function deleteDoc(string|ValueObject $identifier): void;
 
     /**
      * @return class-string

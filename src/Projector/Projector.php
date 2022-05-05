@@ -19,4 +19,6 @@ interface Projector extends CustomEventProjector
     public static function generateOwnCollectionName(): string;
 
     public static function stateClassName(): string;
+
+    public static function statesClassName(): string;
 }

@@ -181,7 +181,6 @@ services:
         arguments:
             - '@Opis\JsonSchema\Validator'
     ADS\Bundle\EventEngineBundle\Repository\Repository: ~
-    ADS\Bundle\EventEngineBundle\Repository\DefaultProjectionRepository: ~
     ADS\Bundle\EventEngineBundle\Util\EventEngineUtil: ~
     ADS\Bundle\EventEngineBundle\Exception\Handler:
         tags:

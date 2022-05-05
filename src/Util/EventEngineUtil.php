@@ -123,6 +123,11 @@ final class EventEngineUtil
         return self::fromAggregateClassToStateClass($aggregateClass);
     }
 
+    public static function fromAggregateNameToStatesClass(string $aggregateName, string $entityNamespace): string
+    {
+        return self::fromAggregateNameToStateClass($aggregateName, $entityNamespace) . 's';
+    }
+
     /**
      * @param class-string<AggregateRoot> $aggregateClass
      */

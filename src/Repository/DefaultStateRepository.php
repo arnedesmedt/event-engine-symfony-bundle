@@ -336,6 +336,10 @@ abstract class DefaultStateRepository implements StateRepository
         );
     }
 
+    /**
+     * phpcs:ignore SlevomatCodingStandard.Commenting.UselessInheritDocComment.UselessInheritDocComment
+     * @inheritDoc
+     */
     public function findDocumentStates(
         ?Filter $filter = null,
         ?int $skip = null,

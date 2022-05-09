@@ -16,8 +16,8 @@ use function sprintf;
 
 /**
  * @template TAgg
- * @template TState
  * @template TStates
+ * @template TState
  * @extends DefaultStateRepository<TStates, TState>
  * @implements AggregateRepository<TAgg,TStates, TState>
  */

@@ -8,9 +8,10 @@ use ADS\ValueObjects\ValueObject;
 use Throwable;
 
 /**
- * @template T
  * @template TAgg
- * @extends StateRepository<T>
+ * @template TStates
+ * @template TState
+ * @extends StateRepository<TStates, TState>
  */
 interface AggregateRepository extends StateRepository
 {

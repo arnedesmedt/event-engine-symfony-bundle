@@ -36,22 +36,23 @@ use function sprintf;
 use const JSON_THROW_ON_ERROR;
 
 /**
- * @template T
- * @implements StateRepository<T>
+ * @template TStates
+ * @template TState
+ * @implements StateRepository<TStates, TState>
  */
 abstract class DefaultStateRepository implements StateRepository
 {
     public const DOCUMENT_STORE_NOT_FOUND = 'Could not found document store \'%s\' for repository \'%s\'.';
 
-    /** @var class-string */
+    /** @var class-string<TState> */
     protected string $stateClass;
 
-    /** @var class-string<ListValue<T>> */
+    /** @var class-string<TStates> */
     protected string $statesClass;
 
     /**
-     * @param class-string $stateClass
-     * @param class-string<ListValue<T>> $statesClass
+     * @param class-string<TState> $stateClass
+     * @param class-string<TStates> $statesClass
      */
     public function __construct(
         protected DocumentStore $documentStore,
@@ -85,9 +86,9 @@ abstract class DefaultStateRepository implements StateRepository
      * phpcs:ignore Generic.Files.LineLength.TooLong
      * @param Traversable<array{state: array<string, mixed>}|null>|array<array{state: array<string, mixed>}|null> $documents
      *
-     * @return ListValue<T>
+     * @return TStates
      */
-    private function statesFromDocuments(Traversable|array $documents): ListValue
+    private function statesFromDocuments(Traversable|array $documents)
     {
         if ($documents instanceof Traversable) {
             $documents = iterator_to_array($documents);
@@ -106,7 +107,7 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @param array{state: array<string, mixed>}|null $document
      *
-     * @return T|null
+     * @return TState|null
      */
     private function stateFromDocument(?array $document)
     {
@@ -177,7 +178,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return T
+     * @return TState
      */
     public function needDocumentState(
         string|ValueObject $identifier,
@@ -185,7 +186,7 @@ abstract class DefaultStateRepository implements StateRepository
     ) {
         $document = $this->needDocument($identifier, $exception);
 
-        /** @var T $state */
+        /** @var TState $state */
         $state = $this->stateFromDocument($document);
 
         return $state;
@@ -258,7 +259,7 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function findDocumentStatesByIds($identifiers): ListValue
+    public function findDocumentStatesByIds($identifiers)
     {
         return $this->statesFromDocuments(
             $this->findDocumentsByIds($identifiers)
@@ -268,7 +269,7 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function needDocumentStatesByIds($identifiers): ListValue
+    public function needDocumentStatesByIds($identifiers)
     {
         return $this->statesFromDocuments(
             $this->needDocumentsByIds($identifiers)
@@ -345,7 +346,7 @@ abstract class DefaultStateRepository implements StateRepository
         ?int $skip = null,
         ?int $limit = null,
         ?OrderBy $orderBy = null
-    ): ListValue {
+    ) {
         return $this->statesFromDocuments(
             $this->findDocuments($filter, $skip, $limit, $orderBy)
         );
@@ -485,6 +486,9 @@ abstract class DefaultStateRepository implements StateRepository
         );
     }
 
+    /**
+     * @return class-string<TState>
+     */
     public function stateClass(): string
     {
         return $this->stateClass;

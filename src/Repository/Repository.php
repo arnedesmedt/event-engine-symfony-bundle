@@ -6,7 +6,6 @@ namespace ADS\Bundle\EventEngineBundle\Repository;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
-use ADS\ValueObjects\ListValue;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\DocumentStore\DocumentStore;
 use LogicException;
@@ -16,20 +15,21 @@ use Throwable;
 use function sprintf;
 
 /**
- * @template T
  * @template TAgg
- * @extends DefaultStateRepository<T>
- * @implements AggregateRepository<T,TAgg>
+ * @template TState
+ * @template TStates
+ * @extends DefaultStateRepository<TStates, TState>
+ * @implements AggregateRepository<TAgg,TStates, TState>
  */
 abstract class Repository extends DefaultStateRepository implements AggregateRepository
 {
-    /** @var class-string */
+    /** @var class-string<TAgg> */
     protected string $aggregateClass;
 
     /**
      * @param class-string $documentStoreName
-     * @param class-string $stateClass
-     * @param class-string<ListValue<T>> $statesClass
+     * @param class-string<TState> $stateClass
+     * @param class-string<TStates> $statesClass
      */
     public function __construct(
         DocumentStore $documentStore,
@@ -39,6 +39,7 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
     ) {
         parent::__construct($documentStore, $documentStoreName, $stateClass, $statesClass);
 
+        /** @var class-string<TAgg> $aggregateClass */
         $aggregateClass = EventEngineUtil::fromStateToAggregateClass($this->stateClass);
         $reflectionClassAggregate = new ReflectionClass($aggregateClass);
         if (! $reflectionClassAggregate->implementsInterface(AggregateRoot::class)) {

@@ -12,7 +12,8 @@ use Throwable;
 use Traversable;
 
 /**
- * @template T
+ * @template TStates
+ * @template TState
  */
 interface StateRepository
 {
@@ -35,7 +36,7 @@ interface StateRepository
     ): void;
 
     /**
-     * @return T
+     * @return TState
      */
     public function needDocumentState(
         string|ValueObject $identifier,
@@ -64,16 +65,16 @@ interface StateRepository
     /**
      * @param array<string>|ListValue<ValueObject|string|int> $identifiers
      *
-     * @return ListValue<T>
+     * @return TStates
      */
-    public function findDocumentStatesByIds(array|ListValue $identifiers): ListValue;
+    public function findDocumentStatesByIds(array|ListValue $identifiers);
 
     /**
      * @param array<string>|ListValue<ValueObject|string|int> $identifiers
      *
-     * @return ListValue<T>
+     * @return TStates
      */
-    public function needDocumentStatesByIds(array|ListValue $identifiers): ListValue;
+    public function needDocumentStatesByIds(array|ListValue $identifiers);
 
     /**
      * @return Traversable<array{state: array<string, mixed>}>
@@ -93,14 +94,14 @@ interface StateRepository
     public function findDocumentIds(?Filter $filter = null): array;
 
     /**
-     * @return T|null
+     * @return TState|null
      */
     public function findDocumentState(string|ValueObject $identifier);
 
     /**
-     * @return ListValue<T>
+     * @return TStates
      */
-    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null): ListValue;
+    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null);
 
     public function hasDocuments(?Filter $filter = null): bool;
 
@@ -116,14 +117,14 @@ interface StateRepository
     public function hasAllDocuments(array|ListValue $identifiers): bool;
 
     /**
-     * @param T $state
+     * @param TState $state
      */
     public function upsertState(string|ValueObject $identifier, $state): void;
 
     public function deleteDoc(string|ValueObject $identifier): void;
 
     /**
-     * @return class-string
+     * @return class-string<TState>
      */
     public function stateClass(): string;
 }

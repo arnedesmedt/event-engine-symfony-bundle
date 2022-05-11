@@ -33,10 +33,7 @@ trait EventSourced
         return $this->state;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function reconstituteFromHistory(Event ...$domainEvents)
+    public static function reconstituteFromHistory(Event ...$domainEvents): static
     {
         $self = new static();
 
@@ -72,7 +69,7 @@ trait EventSourced
     /**
      * @inheritDoc
      */
-    public static function reconstituteFromStateArray(array $state)
+    public static function reconstituteFromStateArray(array $state): static
     {
         $stateClass = static::stateClass();
 

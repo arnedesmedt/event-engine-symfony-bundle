@@ -26,6 +26,14 @@ trait EventSourced
     private $state;
 
     /**
+     * @return TState
+     */
+    public function state()
+    {
+        return $this->state;
+    }
+
+    /**
      * @inheritDoc
      */
     public static function reconstituteFromHistory(Event ...$domainEvents)

@@ -8,9 +8,10 @@ use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Util\StringUtil;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
-use ReflectionNamedType;
 use RuntimeException;
 
+use function preg_quote;
+use function preg_replace;
 use function sprintf;
 use function str_replace;
 use function strlen;
@@ -74,23 +75,25 @@ final class EventEngineUtil
      */
     public static function fromAggregateClassToStateClass(string $aggregateClass): string
     {
-        $reflectionAggregateRoot = new ReflectionClass($aggregateClass);
-        if (! $reflectionAggregateRoot->implementsInterface(AggregateRoot::class)) {
+        $aggregateName = self::fromAggregateClassToAggregateName($aggregateClass);
+
+        $replaced = preg_replace(
+            '~(.*)' . preg_quote($aggregateName, '~') . '~',
+            '$1State',
+            $aggregateClass,
+            1
+        );
+
+        if ($replaced === null) {
             throw new RuntimeException(
                 sprintf(
-                    'Aggregate root \'%s\' doesn\'t implement the \'%s\' interface.',
-                    $aggregateClass,
-                    AggregateRoot::class
+                    'Couldn\'t convert the aggregate class \'%s\' into a state class',
+                    $aggregateClass
                 )
             );
         }
 
-        /** @var ReflectionNamedType $returnType */
-        $returnType = $reflectionAggregateRoot
-            ->getMethod('state')
-            ->getReturnType();
-
-        return $returnType->getName();
+        return $replaced;
     }
 
     public static function fromAggregateNameToAggregateClass(string $aggregateName, string $entityNamespace): string

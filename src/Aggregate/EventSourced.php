@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
+use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
-use ReflectionNamedType;
 use RuntimeException;
 
 use function method_exists;
@@ -49,21 +49,7 @@ trait EventSourced
      */
     private static function stateClass(): string
     {
-        $refObj = new ReflectionClass(static::class);
-
-        /** @var ReflectionNamedType|null $returnType */
-        $returnType = $refObj->getMethod('state')->getReturnType();
-
-        if ($returnType === null) {
-            throw new RuntimeException(
-                sprintf(
-                    'State method of aggregate \'%s\' must have a return type.',
-                    self::class
-                )
-            );
-        }
-
-        return $returnType->getName();
+        return EventEngineUtil::fromAggregateClassToStateClass(static::class);
     }
 
     /**

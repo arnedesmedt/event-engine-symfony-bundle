@@ -17,8 +17,10 @@ use ADS\Bundle\EventEngineBundle\Repository\StateRepository;
 use ADS\Bundle\EventEngineBundle\Type\Type;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ADS\Util\StringUtil;
+use ADS\ValueObjects\Implementation\ListValue\IterableListValue;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\EventEngineDescription;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Messaging\MessageProducer;
 use Exception;
 use ReflectionClass;
@@ -165,9 +167,9 @@ final class EventEnginePass implements CompilerPassInterface
     private function buildRepositories(ContainerBuilder $container): void
     {
         $repository = $container->getDefinition(Repository::class);
-        /** @var array<class-string<StateRepository<mixed>>> $childRepositories */
+        /** @var array<class-string<StateRepository<IterableListValue<JsonSchemaAwareRecord>, JsonSchemaAwareRecord>>> $childRepositories */
         $childRepositories = $container->getParameter('event_engine.child_repositories');
-        /** @var array<class-string<AggregateRoot>> $aggregates */
+        /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $aggregates */
         $aggregates = $container->getParameter('event_engine.aggregates');
         /** @var array<class-string<Projector>> $projectors */
         $projectors = $container->getParameter('event_engine.projectors');

@@ -6,6 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\Util;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Util\StringUtil;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 use ReflectionNamedType;
 use RuntimeException;
@@ -129,7 +130,7 @@ final class EventEngineUtil
     }
 
     /**
-     * @param class-string<AggregateRoot> $aggregateClass
+     * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateClass
      */
     public static function fromAggregateClassToStreamName(string $aggregateClass): string
     {

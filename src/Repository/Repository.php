@@ -6,8 +6,10 @@ namespace ADS\Bundle\EventEngineBundle\Repository;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
+use ADS\ValueObjects\Implementation\ListValue\IterableListValue;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\DocumentStore\DocumentStore;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use LogicException;
 use ReflectionClass;
 use Throwable;
@@ -15,11 +17,11 @@ use Throwable;
 use function sprintf;
 
 /**
- * @template TAgg
- * @template TStates
- * @template TState
+ * @template TAgg of AggregateRoot
+ * @template TStates of IterableListValue
+ * @template TState of JsonSchemaAwareRecord
  * @extends DefaultStateRepository<TStates, TState>
- * @implements AggregateRepository<TAgg,TStates, TState>
+ * @implements AggregateRepository<TAgg, TStates, TState>
  */
 abstract class Repository extends DefaultStateRepository implements AggregateRepository
 {
@@ -64,7 +66,13 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
 
         self::checkDocumentHasState($document);
 
-        return $this->aggregateClass::reconstituteFromStateArray($document['state']);
+        /** @var array<string, mixed> $state */
+        $state = $document['state'];
+
+        /** @var TAgg $aggregate */
+        $aggregate = $this->aggregateClass::reconstituteFromStateArray($state);
+
+        return $aggregate;
     }
 
     /**

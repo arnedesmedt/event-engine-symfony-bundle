@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Repository;
 
+use ADS\ValueObjects\Implementation\ListValue\IterableListValue;
 use ADS\ValueObjects\ListValue;
 use ADS\ValueObjects\ValueObject;
 use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\PartialSelect;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use Throwable;
 use Traversable;
 
 /**
- * @template TStates
- * @template TState
+ * @template TStates of IterableListValue
+ * @template TState of JsonSchemaAwareRecord
  */
 interface StateRepository
 {
@@ -49,28 +51,28 @@ interface StateRepository
     public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): Traversable;
 
     /**
-     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
+     * @param array<string>|ListValue<ValueObject> $identifiers
      *
      * @return Traversable<array{state: array<string, mixed>}>
      */
     public function findDocumentsByIds(array|ListValue $identifiers): Traversable;
 
     /**
-     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
+     * @param array<string>|ListValue<ValueObject> $identifiers
      *
      * @return array<array{state: array<string, mixed>}>
      */
     public function needDocumentsByIds(array|ListValue $identifiers): array;
 
     /**
-     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
+     * @param array<string>|ListValue<ValueObject> $identifiers
      *
      * @return TStates
      */
     public function findDocumentStatesByIds(array|ListValue $identifiers);
 
     /**
-     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
+     * @param array<string>|ListValue<ValueObject> $identifiers
      *
      * @return TStates
      */
@@ -112,7 +114,7 @@ interface StateRepository
     public function hasNoDocument(string|ValueObject $identifier): bool;
 
     /**
-     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
+     * @param array<string>|ListValue<ValueObject> $identifiers
      */
     public function hasAllDocuments(array|ListValue $identifiers): bool;
 

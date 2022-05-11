@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
 use ReflectionNamedType;
@@ -13,16 +14,23 @@ use RuntimeException;
 use function method_exists;
 use function sprintf;
 
+/**
+ * @template TState of JsonSchemaAwareRecord
+ */
 trait EventSourced
 {
     /** @var Event[] */
     private array $recordedEvents = [];
 
-    private mixed $state;
+    /** @var TState */
+    private $state;
 
-    public static function reconstituteFromHistory(Event ...$domainEvents): AggregateRoot
+    /**
+     * @inheritDoc
+     */
+    public static function reconstituteFromHistory(Event ...$domainEvents)
     {
-        $self = new self();
+        $self = new static();
 
         foreach ($domainEvents as $domainEvent) {
             $self->apply($domainEvent);
@@ -32,11 +40,11 @@ trait EventSourced
     }
 
     /**
-     * @return class-string
+     * @return class-string<TState>
      */
     private static function stateClass(): string
     {
-        $refObj = new ReflectionClass(self::class);
+        $refObj = new ReflectionClass(static::class);
 
         /** @var ReflectionNamedType|null $returnType */
         $returnType = $refObj->getMethod('state')->getReturnType();
@@ -54,13 +62,13 @@ trait EventSourced
     }
 
     /**
-     * @param array<string, mixed> $state
+     * @inheritDoc
      */
-    public static function reconstituteFromStateArray(array $state): AggregateRoot
+    public static function reconstituteFromStateArray(array $state)
     {
-        $stateClass = self::stateClass();
+        $stateClass = static::stateClass();
 
-        $self = new self();
+        $self = new static();
         $self->state = $stateClass::fromArray($state);
 
         return $self;
@@ -106,7 +114,7 @@ trait EventSourced
     }
 
     /**
-     * @return array<mixed>
+     * @inheritDoc
      */
     public function toArray(): array
     {

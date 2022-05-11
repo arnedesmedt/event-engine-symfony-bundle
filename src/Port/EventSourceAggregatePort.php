@@ -7,6 +7,7 @@ namespace ADS\Bundle\EventEngineBundle\Port;
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Event\Event;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Runtime\Oop\Port;
 use RuntimeException;
 
@@ -33,7 +34,7 @@ final class EventSourceAggregatePort implements Port
     }
 
     /**
-     * @param AggregateRoot $aggregate
+     * @param AggregateRoot<JsonSchemaAwareRecord> $aggregate
      * @param AggregateCommand $customCommand
      * @param array<int, class-string> $contextServices
      *
@@ -124,7 +125,7 @@ final class EventSourceAggregatePort implements Port
      */
     public function reconstituteAggregate(string $aggregateType, iterable $events): mixed
     {
-        /** @var AggregateRoot $aggregateClass */
+        /** @var AggregateRoot<JsonSchemaAwareRecord> $aggregateClass */
         $aggregateClass = $this->aggregateClassByType($aggregateType);
 
         return $aggregateClass::reconstituteFromHistory(...$events);
@@ -135,7 +136,7 @@ final class EventSourceAggregatePort implements Port
      */
     public function reconstituteAggregateFromStateArray(string $aggregateType, array $state, int $version): mixed
     {
-        /** @var AggregateRoot $aggregateClass */
+        /** @var AggregateRoot<JsonSchemaAwareRecord> $aggregateClass */
         $aggregateClass = $this->aggregateClassByType($aggregateType);
 
         return $aggregateClass::reconstituteFromStateArray($state);

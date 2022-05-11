@@ -61,7 +61,7 @@ final class Configurator
     /** @readonly */
     private string $environment;
 
-    /** @var array<class-string<AggregateCommand>, class-string<AggregateRoot>> */
+    /** @var array<class-string<AggregateCommand>, class-string<AggregateRoot<JsonSchemaAwareRecord>>> */
     private array $commandAggregateMapping = [];
     /** @var array<class-string<AggregateCommand>, array<class-string<Event>>> */
     private array $commandEventMapping = [];
@@ -69,14 +69,14 @@ final class Configurator
     private array $commandServiceMapping = [];
     /** @var array<class-string<Command>, class-string<PreProcessor>> */
     private array $commandPreProcessorMapping = [];
-    /** @var array<class-string<AggregateRoot>, string> */
+    /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */
     private array $aggregateIdentifierMapping = [];
 
     /**
      * @param array<class-string<Command>> $commandClasses
      * @param array<class-string<Query>> $queryClasses
      * @param array<class-string<Event>> $eventClasses
-     * @param array<class-string<AggregateRoot>> $aggregateClasses
+     * @param array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $aggregateClasses
      * @param array<class-string> $typeClasses
      * @param array<class-string<Listener>> $listenerClasses
      * @param array<class-string<Projector>> $projectorClasses
@@ -238,7 +238,7 @@ final class Configurator
      */
     private function streamsForProjector(string $projectorClass): array
     {
-        /** @var array<class-string<AggregateRoot>> $aggregateRootClasses */
+        /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $aggregateRootClasses */
         $aggregateRootClasses = array_unique(
             array_map(
                 fn ($eventClass) => $this->aggregateRootClassFromEventClass($eventClass),
@@ -257,7 +257,7 @@ final class Configurator
     /**
      * @param class-string<Event> $eventClass
      *
-     * @return class-string<AggregateRoot>
+     * @return class-string<AggregateRoot<JsonSchemaAwareRecord>>
      */
     private function aggregateRootClassFromEventClass(string $eventClass): string
     {
@@ -322,9 +322,9 @@ final class Configurator
     }
 
     /**
-     * @param class-string<AggregateRoot> $aggregateRootClass
+     * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateRootClass
      * @param class-string<AggregateCommand> $commandClass
-     * @param array<class-string<AggregateRoot>> $usedAggregateRoots
+     * @param array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $usedAggregateRoots
      */
     private function newAggregateRoot(
         string $aggregateRootClass,
@@ -398,7 +398,7 @@ final class Configurator
     }
 
     /**
-     * @param class-string<AggregateRoot> $aggregateRootClass
+     * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateRootClass
      */
     private function handleStorage(
         CommandProcessorDescription $commandProcessor,
@@ -443,7 +443,7 @@ final class Configurator
     }
 
     /**
-     * @return array<class-string<AggregateCommand>, class-string<AggregateRoot>>
+     * @return array<class-string<AggregateCommand>, class-string<AggregateRoot<JsonSchemaAwareRecord>>>
      */
     private function commandAggregateMapping(): array
     {
@@ -639,7 +639,7 @@ final class Configurator
     }
 
     /**
-     * @return array<class-string<AggregateRoot>, string>
+     * @return array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string>
      */
     private function aggregateIdentifierMapping(): array
     {

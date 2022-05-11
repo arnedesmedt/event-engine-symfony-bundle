@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Repository;
 
+use ADS\ValueObjects\Implementation\ListValue\IterableListValue;
 use ADS\ValueObjects\ListValue;
 use ADS\ValueObjects\ValueObject;
 use ArrayIterator;
@@ -15,6 +16,7 @@ use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\Filter\OrFilter;
 use EventEngine\DocumentStore\OrderBy\OrderBy;
 use EventEngine\DocumentStore\PartialSelect;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -36,8 +38,8 @@ use function sprintf;
 use const JSON_THROW_ON_ERROR;
 
 /**
- * @template TStates
- * @template TState
+ * @template TStates of IterableListValue
+ * @template TState of JsonSchemaAwareRecord
  * @implements StateRepository<TStates, TState>
  */
 abstract class DefaultStateRepository implements StateRepository
@@ -178,7 +180,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return TState
+     * @inheritDoc
      */
     public function needDocumentState(
         string|ValueObject $identifier,
@@ -353,7 +355,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return ListValue<mixed>
+     * @return ListValue<object>
      */
     public function findDocumentIdValueObjects(?Filter $filter = null): ListValue
     {
@@ -440,7 +442,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
+     * @param array<string>|ListValue<ValueObject> $identifiers
      */
     private function identifiersToFilter(array|ListValue $identifiers): ?Filter
     {
@@ -460,7 +462,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param array<string>|ListValue<ValueObject|string|int> $identifiers
+     * @param array<string>|ListValue<ValueObject> $identifiers
      *
      * @return array<mixed>
      */
@@ -495,7 +497,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return class-string<ListValue<mixed>>|null
+     * @return class-string<ListValue<object>>|null
      */
     protected function identifiersClass(): ?string
     {

@@ -5,16 +5,24 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
-use EventEngine\Data\ImmutableRecord;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 
+/**
+ * @template TState of JsonSchemaAwareRecord
+ */
 interface AggregateRoot
 {
-    public static function reconstituteFromHistory(Event ...$domainEvents): AggregateRoot;
+    /**
+     * @return static
+     */
+    public static function reconstituteFromHistory(Event ...$domainEvents): static;
 
     /**
-     * @param array<mixed> $state
+     * @param array<string, mixed> $state
+     *
+     * @return static
      */
-    public static function reconstituteFromStateArray(array $state): AggregateRoot;
+    public static function reconstituteFromStateArray(array $state): static;
 
     /**
      * @return array<Event>
@@ -24,14 +32,14 @@ interface AggregateRoot
     public function apply(Event $event): void;
 
     /**
-     * @return array<mixed>
+     * @return array<string, mixed>
      */
     public function toArray(): array;
 
     /**
-     * @return ImmutableRecord
+     * @return TState
      */
-    public function state(); // phpcs:ignore SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
+    public function state();
 
     public static function aggregateId(): string;
 }

@@ -20,8 +20,8 @@ use function sprintf;
  * @template TAgg of AggregateRoot
  * @template TStates of IterableListValue
  * @template TState of JsonSchemaAwareRecord
- * @extends DefaultStateRepository<TStates, TState>
- * @implements AggregateRepository<TAgg, TStates, TState>
+ * @template-extends DefaultStateRepository<TStates, TState>
+ * @template-implements AggregateRepository<TAgg, TStates, TState>
  */
 abstract class Repository extends DefaultStateRepository implements AggregateRepository
 {

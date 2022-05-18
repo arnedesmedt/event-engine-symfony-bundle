@@ -40,7 +40,7 @@ use const JSON_THROW_ON_ERROR;
 /**
  * @template TStates of IterableListValue
  * @template TState of JsonSchemaAwareRecord
- * @implements StateRepository<TStates, TState>
+ * @template-implements StateRepository<TStates, TState>
  */
 abstract class DefaultStateRepository implements StateRepository
 {

@@ -14,7 +14,7 @@ use Throwable;
  * @template TAgg of AggregateRoot
  * @template TStates of IterableListValue
  * @template TState of JsonSchemaAwareRecord
- * @extends StateRepository<TStates, TState>
+ * @template-extends StateRepository<TStates, TState>
  */
 interface AggregateRepository extends StateRepository
 {

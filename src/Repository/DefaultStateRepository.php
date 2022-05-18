@@ -40,7 +40,8 @@ use const JSON_THROW_ON_ERROR;
 /**
  * @template TStates of IterableListValue
  * @template TState of JsonSchemaAwareRecord
- * @template-implements StateRepository<TStates, TState>
+ * @template TId of ValueObject
+ * @template-implements StateRepository<TStates, TState, TId>
  */
 abstract class DefaultStateRepository implements StateRepository
 {
@@ -123,9 +124,9 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return array{state: array<string, mixed>}|null
+     * @inheritDoc
      */
-    public function findDocument(string|ValueObject $identifier): ?array
+    public function findDocument($identifier): ?array
     {
         /** @var array{state: array<string, mixed>} $document */
         $document = $this->documentStore->getDoc(
@@ -137,10 +138,10 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return array{state: array<string, mixed>}
+     * @inheritDoc
      */
     public function needDocument(
-        string|ValueObject $identifier,
+        $identifier,
         ?Throwable $exception = null
     ): array {
         $document = $this->findDocument($identifier);
@@ -160,8 +161,11 @@ abstract class DefaultStateRepository implements StateRepository
         return $document;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function dontNeedDocument(
-        string|ValueObject $identifier,
+        $identifier,
         ?Throwable $exception = null
     ): void {
         try {
@@ -173,7 +177,7 @@ abstract class DefaultStateRepository implements StateRepository
         throw new ConflictHttpException(
             sprintf(
                 'Resource with id \'%s\' already exists in document store \'%s\'',
-                $identifier,
+                (string) $identifier,
                 $this->documentStoreName
             )
         );
@@ -183,7 +187,7 @@ abstract class DefaultStateRepository implements StateRepository
      * @inheritDoc
      */
     public function needDocumentState(
-        string|ValueObject $identifier,
+        $identifier,
         ?Throwable $exception = null
     ) {
         $document = $this->needDocument($identifier, $exception);
@@ -195,7 +199,8 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return Traversable<array{state: array<string, mixed>}>
+     * phpcs:ignore SlevomatCodingStandard.Commenting.UselessInheritDocComment.UselessInheritDocComment
+     * @inheritDoc
      */
     public function findDocuments(
         ?Filter $filter = null,
@@ -217,9 +222,10 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
+     * phpcs:ignore SlevomatCodingStandard.Commenting.UselessInheritDocComment.UselessInheritDocComment
      * @inheritDoc
      */
-    public function findDocumentsByIds($identifiers): Traversable
+    public function findDocumentsByIds(array|ListValue $identifiers): Traversable
     {
         $filter = $this->identifiersToFilter($identifiers);
 
@@ -261,7 +267,7 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function findDocumentStatesByIds($identifiers)
+    public function findDocumentStatesByIds(array|ListValue $identifiers)
     {
         return $this->statesFromDocuments(
             $this->findDocumentsByIds($identifiers)
@@ -271,7 +277,7 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function needDocumentStatesByIds($identifiers)
+    public function needDocumentStatesByIds(array|ListValue $identifiers)
     {
         return $this->statesFromDocuments(
             $this->needDocumentsByIds($identifiers)
@@ -279,7 +285,8 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return Traversable<array<mixed>>
+     * phpcs:ignore SlevomatCodingStandard.Commenting.UselessInheritDocComment.UselessInheritDocComment
+     * @inheritDoc
      */
     public function findPartialDocuments(
         PartialSelect $partialSelect,
@@ -332,7 +339,7 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function findDocumentState(string|ValueObject $identifier)
+    public function findDocumentState($identifier)
     {
         return $this->stateFromDocument(
             $this->findDocument($identifier)
@@ -340,7 +347,6 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * phpcs:ignore SlevomatCodingStandard.Commenting.UselessInheritDocComment.UselessInheritDocComment
      * @inheritDoc
      */
     public function findDocumentStates(
@@ -354,9 +360,6 @@ abstract class DefaultStateRepository implements StateRepository
         );
     }
 
-    /**
-     * @return ListValue<object>
-     */
     public function findDocumentIdValueObjects(?Filter $filter = null): ListValue
     {
         $documentIds = $this->findDocumentIds($filter);
@@ -382,22 +385,25 @@ abstract class DefaultStateRepository implements StateRepository
         return $this->countDocuments($filter) === 0;
     }
 
-    public function hasDocument(string|ValueObject $identifier): bool
+    /**
+     * @inheritDoc
+     */
+    public function hasDocument($identifier): bool
     {
         $document = $this->findDocument($identifier);
 
         return $document !== null;
     }
 
-    public function hasNoDocument(string|ValueObject $identifier): bool
+    /**
+     * @inheritDoc
+     */
+    public function hasNoDocument($identifier): bool
     {
         return ! $this->hasDocument($identifier);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function hasAllDocuments($identifiers): bool
+    public function hasAllDocuments(array|ListValue $identifiers): bool
     {
         $filter = $this->identifiersToFilter($identifiers);
 
@@ -409,7 +415,7 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function upsertState(string|ValueObject $identifier, $state): void
+    public function upsertState($identifier, $state): void
     {
         $this->documentStore->upsertDoc(
             $this->documentStoreName,
@@ -418,7 +424,10 @@ abstract class DefaultStateRepository implements StateRepository
         );
     }
 
-    public function deleteDoc(string|ValueObject $identifier): void
+    /**
+     * @inheritDoc
+     */
+    public function deleteDoc($identifier): void
     {
         $this->documentStore->deleteDoc(
             $this->documentStoreName,
@@ -442,7 +451,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param array<string>|ListValue<ValueObject> $identifiers
+     * @param array<string|TId>|ListValue<TId> $identifiers
      */
     private function identifiersToFilter(array|ListValue $identifiers): ?Filter
     {
@@ -462,7 +471,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @param array<string>|ListValue<ValueObject> $identifiers
+     * @param array<string|TId>|ListValue<TId> $identifiers
      *
      * @return array<mixed>
      */
@@ -497,7 +506,7 @@ abstract class DefaultStateRepository implements StateRepository
     }
 
     /**
-     * @return class-string<ListValue<object>>|null
+     * @return class-string<ListValue<TId>>|null
      */
     protected function identifiersClass(): ?string
     {

@@ -16,63 +16,73 @@ use Traversable;
 /**
  * @template TStates of IterableListValue
  * @template TState of JsonSchemaAwareRecord
+ * @template TId of ValueObject
  */
 interface StateRepository
 {
     /**
-     * @return array<mixed>
+     * @param string|TId $identifier
+     *
+     * @return array{state: array<string, mixed>}|null
      */
-    public function findDocument(string|ValueObject $identifier): ?array;
+    public function findDocument($identifier): ?array;
 
     /**
-     * @return array<mixed>
+     * @param string|TId $identifier
+     *
+     * @return array{state: array<string, mixed>}
      */
     public function needDocument(
-        string|ValueObject $identifier,
+        $identifier,
         ?Throwable $exception = null
     ): array;
 
+    /**
+     * @param string|TId $identifier
+     */
     public function dontNeedDocument(
-        string|ValueObject $identifier,
+        $identifier,
         ?Throwable $exception = null
     ): void;
 
     /**
+     * @param string|TId $identifier
+     *
      * @return TState
      */
     public function needDocumentState(
-        string|ValueObject $identifier,
+        $identifier,
         ?Throwable $exception = null
     );
 
     /**
-     * @return Traversable<array<mixed>>
+     * @return Traversable<array{state: array<string, mixed>}>
      */
     public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): Traversable;
 
     /**
-     * @param array<string>|ListValue<ValueObject> $identifiers
+     * @param array<string|TId>|ListValue<TId> $identifiers
      *
      * @return Traversable<array{state: array<string, mixed>}>
      */
     public function findDocumentsByIds(array|ListValue $identifiers): Traversable;
 
     /**
-     * @param array<string>|ListValue<ValueObject> $identifiers
+     * @param array<string|TId>|ListValue<TId> $identifiers
      *
      * @return array<array{state: array<string, mixed>}>
      */
     public function needDocumentsByIds(array|ListValue $identifiers): array;
 
     /**
-     * @param array<string>|ListValue<ValueObject> $identifiers
+     * @param array<string|TId>|ListValue<TId> $identifiers
      *
      * @return TStates
      */
     public function findDocumentStatesByIds(array|ListValue $identifiers);
 
     /**
-     * @param array<string>|ListValue<ValueObject> $identifiers
+     * @param array<string|TId>|ListValue<TId> $identifiers
      *
      * @return TStates
      */
@@ -96,34 +106,51 @@ interface StateRepository
     public function findDocumentIds(?Filter $filter = null): array;
 
     /**
+     * @param string|TId $identifier
+     *
      * @return TState|null
      */
-    public function findDocumentState(string|ValueObject $identifier);
+    public function findDocumentState($identifier);
 
     /**
      * @return TStates
      */
     public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null);
 
+    /**
+     * @return ListValue<TId>
+     */
+    public function findDocumentIdValueObjects(?Filter $filter = null): ListValue;
+
     public function hasDocuments(?Filter $filter = null): bool;
 
     public function hasNoDocuments(?Filter $filter = null): bool;
 
-    public function hasDocument(string|ValueObject $identifier): bool;
-
-    public function hasNoDocument(string|ValueObject $identifier): bool;
+    /**
+     * @param string|TId $identifier
+     */
+    public function hasDocument($identifier): bool;
 
     /**
-     * @param array<string>|ListValue<ValueObject> $identifiers
+     * @param string|TId $identifier
+     */
+    public function hasNoDocument($identifier): bool;
+
+    /**
+     * @param array<string|TId>|ListValue<TId> $identifiers
      */
     public function hasAllDocuments(array|ListValue $identifiers): bool;
 
     /**
+     * @param string|TId $identifier
      * @param TState $state
      */
-    public function upsertState(string|ValueObject $identifier, $state): void;
+    public function upsertState($identifier, $state): void;
 
-    public function deleteDoc(string|ValueObject $identifier): void;
+    /**
+     * @param string|TId $identifier
+     */
+    public function deleteDoc($identifier): void;
 
     /**
      * @return class-string<TState>

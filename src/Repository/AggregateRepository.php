@@ -14,7 +14,8 @@ use Throwable;
  * @template TAgg of AggregateRoot
  * @template TStates of IterableListValue
  * @template TState of JsonSchemaAwareRecord
- * @template-extends StateRepository<TStates, TState>
+ * @template TId of ValueObject
+ * @template-extends StateRepository<TStates, TState, TId>
  */
 interface AggregateRepository extends StateRepository
 {
@@ -26,15 +27,19 @@ interface AggregateRepository extends StateRepository
     public function aggregateFromDocument(?array $document);
 
     /**
+     * @param string|TId $identifier
+     *
      * @return TAgg|null
      */
-    public function findAggregate(string|ValueObject $identifier);
+    public function findAggregate($identifier);
 
     /**
+     * @param string|TId $identifier
+     *
      * @return TAgg
      */
     public function needAggregate(
-        string|ValueObject $identifier,
+        $identifier,
         ?Throwable $exception = null
     );
 }

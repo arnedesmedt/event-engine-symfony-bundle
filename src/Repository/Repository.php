@@ -20,8 +20,9 @@ use function sprintf;
  * @template TAgg of AggregateRoot
  * @template TStates of IterableListValue
  * @template TState of JsonSchemaAwareRecord
- * @template-extends DefaultStateRepository<TStates, TState>
- * @template-implements AggregateRepository<TAgg, TStates, TState>
+ * @template TId of ValueObject
+ * @template-extends DefaultStateRepository<TStates, TState, TId>
+ * @template-implements AggregateRepository<TAgg, TStates, TState, TId>
  */
 abstract class Repository extends DefaultStateRepository implements AggregateRepository
 {
@@ -78,7 +79,7 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
     /**
      * @inheritDoc
      */
-    public function findAggregate(string|ValueObject $identifier)
+    public function findAggregate($identifier)
     {
         return $this->aggregateFromDocument(
             $this->findDocument($identifier)
@@ -89,7 +90,7 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
      * @inheritDoc
      */
     public function needAggregate(
-        string|ValueObject $identifier,
+        $identifier,
         ?Throwable $exception = null
     ) {
         $document = $this->needDocument($identifier, $exception);

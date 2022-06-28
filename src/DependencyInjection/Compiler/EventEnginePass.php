@@ -18,6 +18,7 @@ use ADS\Bundle\EventEngineBundle\Type\Type;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ADS\Util\StringUtil;
 use ADS\ValueObjects\Implementation\ListValue\IterableListValue;
+use ADS\ValueObjects\ValueObject;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\EventEngineDescription;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
@@ -161,18 +162,18 @@ final class EventEnginePass implements CompilerPassInterface
         }
 
         $this->buildRepositories($container);
+        $this->buildProjectors($container);
+        $container->removeDefinition(Repository::class);
         $this->makePublic($container);
     }
 
     private function buildRepositories(ContainerBuilder $container): void
     {
         $repository = $container->getDefinition(Repository::class);
-        /** @var array<class-string<StateRepository<IterableListValue<JsonSchemaAwareRecord>, JsonSchemaAwareRecord>>> $childRepositories */
+        /** @var array<class-string<StateRepository<IterableListValue<JsonSchemaAwareRecord>, JsonSchemaAwareRecord, ValueObject>>> $childRepositories */
         $childRepositories = $container->getParameter('event_engine.child_repositories');
         /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $aggregates */
         $aggregates = $container->getParameter('event_engine.aggregates');
-        /** @var array<class-string<Projector>> $projectors */
-        $projectors = $container->getParameter('event_engine.projectors');
         /** @var string $entityNamespace */
         $entityNamespace = $container->getParameter('event_engine.entity_namespace');
 
@@ -200,6 +201,32 @@ final class EventEnginePass implements CompilerPassInterface
             },
             [],
         );
+
+        $container->addDefinitions($aggregateRepositoryDefinitions);
+
+        foreach ($childRepositories as $childRepository) {
+            preg_match_all('/\\\([^\\\]+)Repository$/', $childRepository, $matches);
+
+            $container->getDefinition($childRepository)
+                ->setArguments(
+                    $container
+                        ->getDefinition(
+                            sprintf(
+                                'event_engine.repository.%s',
+                                strtolower(StringUtil::decamelize($matches[1][0]))
+                            )
+                        )
+                        ->getArguments()
+                )
+                ->setPublic(true);
+        }
+    }
+
+    private function buildProjectors(ContainerBuilder $container): void
+    {
+        $repository = $container->getDefinition(Repository::class);
+        /** @var array<class-string<Projector>> $projectors */
+        $projectors = $container->getParameter('event_engine.projectors');
 
         $projectorRepositoryDefinitions = array_reduce(
             $projectors,
@@ -231,26 +258,7 @@ final class EventEnginePass implements CompilerPassInterface
             []
         );
 
-        $container->addDefinitions($aggregateRepositoryDefinitions);
         $container->addDefinitions($projectorRepositoryDefinitions);
-        $container->removeDefinition(Repository::class);
-
-        foreach ($childRepositories as $childRepository) {
-            preg_match_all('/\\\([^\\\]+)Repository$/', $childRepository, $matches);
-
-            $container->getDefinition($childRepository)
-                ->setArguments(
-                    $container
-                        ->getDefinition(
-                            sprintf(
-                                'event_engine.repository.%s',
-                                strtolower(StringUtil::decamelize($matches[1][0]))
-                            )
-                        )
-                        ->getArguments()
-                )
-                ->setPublic(true);
-        }
     }
 
     private function makePublic(ContainerBuilder $container): void

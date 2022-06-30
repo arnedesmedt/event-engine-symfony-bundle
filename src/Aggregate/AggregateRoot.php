@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
-use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 
 /**
  * @template TState of JsonSchemaAwareRecord

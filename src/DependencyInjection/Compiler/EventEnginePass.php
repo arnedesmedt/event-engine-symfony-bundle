@@ -50,14 +50,28 @@ final class EventEnginePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        /** @var string $domainNamespace */
-        $domainNamespace = $container->getParameter('event_engine.domain_namespace');
-        $filter = sprintf('reflection.%s', $domainNamespace);
+        /** @var array<string> $domainNamespaces */
+        $domainNamespaces = $container->getParameter('event_engine.domain_namespace');
+        $filters = array_map(
+            static fn (string $domainNamespace) => sprintf('reflection.%s', $domainNamespace),
+            $domainNamespaces
+        );
 
+        /** @var array<ReflectionClassResource> $resources */
         $resources = array_filter(
             $container->getResources(),
-            static fn (ResourceInterface $resource) => $resource instanceof ReflectionClassResource
-                && str_starts_with($resource . '', $filter)
+            static function (ResourceInterface $resource) use ($filters) {
+                $filtered = false;
+                foreach ($filters as $filter) {
+                    $filtered = str_starts_with($resource . '', $filter);
+
+                    if ($filtered) {
+                        break;
+                    }
+                }
+
+                return $resource instanceof ReflectionClassResource && $filtered;
+            }
         );
 
         $resources = array_filter(

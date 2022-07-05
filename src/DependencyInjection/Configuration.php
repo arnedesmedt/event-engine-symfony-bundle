@@ -22,7 +22,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('pdo_dsn')->end()
                 ->arrayNode('domain_namespace')
-                    ->scalarPrototype()
+                    ->scalarPrototype()->end()
                     ->defaultValue(['App\Domain', 'ADS\Bundle\ApiPlatformEventEngineBundle'])
                     ->end()
                 ->scalarNode('entity_namespace')->defaultValue('App\Domain\Entity')->end()

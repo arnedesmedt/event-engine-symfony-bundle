@@ -45,5 +45,10 @@ abstract class DefaultType
         return self::emptyResponse()->describedAs('OK');
     }
 
+    public static function accepted(): ObjectType
+    {
+        return self::emptyResponse()->describedAs('Accepted');
+    }
+
     abstract public static function typeRefName(): string;
 }

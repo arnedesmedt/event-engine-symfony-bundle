@@ -64,11 +64,14 @@ final class EventEnginePass implements CompilerPassInterface
     {
         $filterClosuresPerParameter = [
             'commands' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
-                ->implementsInterface(Command::class)
+                ->implementsInterface(Command::class) && ! $reflectionClass->isAbstract()
                 ? $reflectionClass
                 : null,
             'controllers' => static function (ReflectionClass $reflectionClass) use ($container) {
-                if (! $reflectionClass->implementsInterface(ControllerCommand::class)) {
+                if (
+                    ! $reflectionClass->implementsInterface(ControllerCommand::class)
+                    || $reflectionClass->isAbstract()
+                ) {
                     return null;
                 }
 
@@ -78,11 +81,11 @@ final class EventEnginePass implements CompilerPassInterface
                 return $container->getReflectionClass($controllerCommandClass::__controller());
             },
             'queries' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
-                ->implementsInterface(Query::class)
+                ->implementsInterface(Query::class) && ! $reflectionClass->isAbstract()
                 ? $reflectionClass
                 : null,
             'resolvers' => static function (ReflectionClass $reflectionClass) use ($container) {
-                if (! $reflectionClass->implementsInterface(Query::class)) {
+                if (! $reflectionClass->implementsInterface(Query::class) || $reflectionClass->isAbstract()) {
                     return null;
                 }
 
@@ -92,7 +95,7 @@ final class EventEnginePass implements CompilerPassInterface
                 return $container->getReflectionClass($queryClass::__resolver());
             },
             'events' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
-                ->implementsInterface(Event::class)
+                ->implementsInterface(Event::class) && ! $reflectionClass->isAbstract()
                 ? $reflectionClass
                 : null,
             'aggregates' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
@@ -100,7 +103,7 @@ final class EventEnginePass implements CompilerPassInterface
                 ? $reflectionClass
                 : null,
             'pre_processors' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
-                ->implementsInterface(PreProcessor::class)
+                ->implementsInterface(PreProcessor::class) && ! $reflectionClass->isAbstract()
                 ? $reflectionClass
                 : null,
             'listeners' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
@@ -108,19 +111,19 @@ final class EventEnginePass implements CompilerPassInterface
                 ? $reflectionClass
                 : null,
             'descriptions' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
-                ->implementsInterface(EventEngineDescription::class)
+                ->implementsInterface(EventEngineDescription::class) && ! $reflectionClass->isAbstract()
                 ? $reflectionClass
                 : null,
             'repositories' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
-                ->implementsInterface(StateRepository::class)
+                ->implementsInterface(StateRepository::class) && ! $reflectionClass->isAbstract()
                 ? $reflectionClass
                 : null,
             'types' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
-                ->implementsInterface(Type::class)
+                ->implementsInterface(Type::class) && ! $reflectionClass->isAbstract()
                 ? $reflectionClass
                 : null,
             'projectors' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
-                ->implementsInterface(Projector::class)
+                ->implementsInterface(Projector::class) && ! $reflectionClass->isAbstract()
                 ? $reflectionClass
                 : null,
         ];

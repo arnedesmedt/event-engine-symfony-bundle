@@ -125,6 +125,11 @@ final class EventEnginePass implements CompilerPassInterface
                 : null,
         ];
 
+        foreach ($filterClosuresPerParameter as $parameter => $closure) {
+            $parameterName = sprintf('event_engine.%s', $parameter);
+            $container->setParameter($parameterName, []);
+        }
+
         foreach ($container->getResources() as $resource) {
             $reflectionClass = $this->reflectionClassFromResource($container, $resource);
 
@@ -141,9 +146,7 @@ final class EventEnginePass implements CompilerPassInterface
 
                 $parameterName = sprintf('event_engine.%s', $parameter);
                 /** @var array<class-string> $parameter */
-                $parameter = $container->hasParameter($parameterName)
-                    ? $container->getParameter($parameterName)
-                    : [];
+                $parameter = $container->getParameter($parameterName);
                 $parameter[] = $transformedReflectionClass->getName();
                 $container->setParameter($parameterName, $parameter);
                 break;
@@ -174,13 +177,6 @@ final class EventEnginePass implements CompilerPassInterface
 
     private function buildRepositories(ContainerBuilder $container): void
     {
-        if (
-            ! $container->hasParameter('event_engine.aggregates') ||
-            ! $container->hasParameter('event_engine.repositories')
-        ) {
-            return;
-        }
-
         $repository = $container->getDefinition(Repository::class);
         /** @var array<class-string> $repositories */
         $repositories = $container->getParameter('event_engine.repositories');
@@ -233,10 +229,6 @@ final class EventEnginePass implements CompilerPassInterface
 
     private function buildProjectors(ContainerBuilder $container): void
     {
-        if (! $container->hasParameter('event_engine.projectors')) {
-            return;
-        }
-
         $repository = $container->getDefinition(Repository::class);
         /** @var array<class-string<Projector>> $projectors */
         $projectors = $container->getParameter('event_engine.projectors');
@@ -276,9 +268,7 @@ final class EventEnginePass implements CompilerPassInterface
 
         foreach (self::SERVICES_TO_MAKE_PUBLIC as $serviceToMakePublic) {
             /** @var array<class-string> $extraServices */
-            $extraServices = $container->hasParameter($serviceToMakePublic)
-                ? $container->getParameter($serviceToMakePublic)
-                : [];
+            $extraServices = $container->getParameter($serviceToMakePublic);
 
             $services = array_merge(
                 $services,

@@ -41,6 +41,14 @@ use function substr;
 
 final class EventEnginePass implements CompilerPassInterface
 {
+    private const SERVICES_TO_MAKE_PUBLIC = [
+        'event_engine.resolvers',
+        'event_engine.listeners',
+        'event_engine.pre_processors',
+        'event_engine.controllers',
+        'event_engine.projectors',
+    ];
+
     public function process(ContainerBuilder $container): void
     {
         $this->addImmutablesAsParameters($container);
@@ -166,6 +174,13 @@ final class EventEnginePass implements CompilerPassInterface
 
     private function buildRepositories(ContainerBuilder $container): void
     {
+        if (
+            ! $container->hasParameter('event_engine.aggregates') ||
+            ! $container->hasParameter('event_engine.repositories')
+        ) {
+            return;
+        }
+
         $repository = $container->getDefinition(Repository::class);
         /** @var array<class-string> $repositories */
         $repositories = $container->getParameter('event_engine.repositories');
@@ -218,6 +233,10 @@ final class EventEnginePass implements CompilerPassInterface
 
     private function buildProjectors(ContainerBuilder $container): void
     {
+        if (! $container->hasParameter('event_engine.projectors')) {
+            return;
+        }
+
         $repository = $container->getDefinition(Repository::class);
         /** @var array<class-string<Projector>> $projectors */
         $projectors = $container->getParameter('event_engine.projectors');
@@ -253,30 +272,31 @@ final class EventEnginePass implements CompilerPassInterface
 
     private function makeDependenciesPublic(ContainerBuilder $container): void
     {
-        /** @var array<class-string> $resolvers */
-        $resolvers = $container->getParameter('event_engine.resolvers');
-        /** @var array<class-string> $listeners */
-        $listeners = $container->getParameter('event_engine.listeners');
-        /** @var array<class-string> $preProcessors */
-        $preProcessors = $container->getParameter('event_engine.pre_processors');
-        /** @var array<class-string> $controllers */
-        $controllers = $container->getParameter('event_engine.controllers');
-        /** @var array<class-string> $projectors */
-        $projectors = $container->getParameter('event_engine.projectors');
+        $services = [];
 
-        $classes = array_merge($resolvers, $listeners, $preProcessors, $controllers, $projectors);
+        foreach (self::SERVICES_TO_MAKE_PUBLIC as $serviceToMakePublic) {
+            /** @var array<class-string> $extraServices */
+            $extraServices = $container->hasParameter($serviceToMakePublic)
+                ? $container->getParameter($serviceToMakePublic)
+                : [];
 
-        foreach ($classes as $class) {
-            if (! $container->hasDefinition($class)) {
+            $services = array_merge(
+                $services,
+                $extraServices
+            );
+        }
+
+        foreach ($services as $service) {
+            if (! $container->hasDefinition($service)) {
                 throw new RuntimeException(
                     sprintf(
-                        'Class \'%s\' can\'t be made public because it\'s not found.',
-                        $class
+                        'Service \'%s\' can\'t be made public because it\'s not found.',
+                        $service
                     )
                 );
             }
 
-            $container->getDefinition($class)->setPublic(true);
+            $container->getDefinition($service)->setPublic(true);
         }
     }
 

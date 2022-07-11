@@ -12,7 +12,7 @@ class AnnotatedTypeRef extends TypeRef implements AnnotatedType
 {
     use HasAnnotations;
 
-    public function fromTypeRef(TypeRef $typeRef): self
+    public static function fromTypeRef(TypeRef $typeRef): self
     {
         return new AnnotatedTypeRef($typeRef->referencedTypeName());
     }

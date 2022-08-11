@@ -98,6 +98,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
         $resolvingBag = $container->getParameterBag();
         $configs = $resolvingBag->resolveValue($configs);
 
+        //phpcs:disable Squiz.Arrays.ArrayDeclaration.MultiLineNotAllowed
         $config = [
             'messenger' => [
                 'default_bus' => 'command.bus',
@@ -107,44 +108,51 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                     'query.bus' => [],
                 ],
                 'transports' => [
-                    'command' => [
+                    'event_engine.command' => [
                         'dsn' => $configs['event_engine.messenger.command.transport']
                             ?? 'doctrine://default?queue_name=event_engine_command',
                         'retry_strategy' => [
                             'service' => $configs['event_engine.messenger.command.retry']
                                 ?? CommandRetry::class,
                         ],
-                        'failure_transport' => 'failed.command',
+                        'failure_transport' => 'failed.event_engine.command',
                     ],
-                    'failed.command' => ['dsn' => 'doctrine://default?queue_name=failed_event_engine_command'],
-                    'event' => [
+                    'failed.event_engine.command' => [
+                        'dsn' => 'doctrine://default?queue_name=failed_event_engine_command',
+                    ],
+                    'event_engine.event' => [
                         'dsn' => $configs['event_engine.messenger.event.transport']
                             ?? 'doctrine://default?queue_name=event_engine_event',
                         'retry_strategy' => [
                             'service' => $configs['event_engine.messenger.event.retry']
                                 ?? EventRetry::class,
                         ],
-                        'failure_transport' => 'failed.event',
+                        'failure_transport' => 'failed.event_engine.event',
                     ],
-                    'failed.event' => ['dsn' => 'doctrine://default?queue_name=failed_event_engine_event'],
-                    'query' => [
+                    'failed.event_engine.event' => [
+                        'dsn' => 'doctrine://default?queue_name=failed_event_engine_event',
+                    ],
+                    'event_engine.query' => [
                         'dsn' => $configs['event_engine.messenger.query.transport']
                             ?? 'doctrine://default?queue_name=event_engine_query',
                         'retry_strategy' => [
                             'service' => $configs['event_engine.messenger.query.retry']
                                 ?? QueryRetry::class,
                         ],
-                        'failure_transport' => 'failed.query',
+                        'failure_transport' => 'failed.event_engine.query',
                     ],
-                    'failed.query' => ['dsn' => 'doctrine://default?queue_name=failed_event_engine_query'],
+                    'failed.event_engine.query' => [
+                        'dsn' => 'doctrine://default?queue_name=failed_event_engine_query',
+                    ],
                 ],
                 'routing' => [
-                    CommandMessageWrapper::class => 'command',
-                    EventMessageWrapper::class => 'event',
-                    QueryMessageWrapper::class => 'query',
+                    CommandMessageWrapper::class => 'event_engine.command',
+                    EventMessageWrapper::class => 'event_engine.event',
+                    QueryMessageWrapper::class => 'event_engine.query',
                 ],
             ],
         ];
+        //phpcs:enable Squiz.Arrays.ArrayDeclaration.MultiLineNotAllowed
 
         $container->prependExtensionConfig(
             'framework',

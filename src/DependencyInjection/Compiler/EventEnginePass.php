@@ -152,7 +152,6 @@ final class EventEnginePass implements CompilerPassInterface
                 $containerParameter = $container->getParameter($parameterName);
                 $containerParameter[] = $transformedReflectionClass->getName();
                 $container->setParameter($parameterName, $containerParameter);
-                break;
             }
         }
     }

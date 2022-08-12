@@ -244,9 +244,9 @@ services:
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncCommandHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         arguments:
-            $lockAggregateCommand: '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
         tags:
             - { name: messenger.message_handler, bus: command.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper }
         autoconfigure: false

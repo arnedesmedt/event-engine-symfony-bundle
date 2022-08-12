@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use phpDocumentor\Reflection\DocBlockFactory;
+use ReflectionAttribute;
 use ReflectionClass;
 use RuntimeException;
 
@@ -127,10 +128,21 @@ trait EventSourced
         $reflectionProperties = $reflectionClass->getProperties();
 
         foreach ($reflectionProperties as $reflectionProperty) {
-            $docBlock = $docBlockFactory->create($reflectionProperty);
-            $tags = $docBlock->getTagsByName('ApiProperty');
+            /** @var array<ReflectionAttribute> $attributes */
+            $attributes = $reflectionProperty->getAttributes();
 
-            if (empty($tags)) {
+            $isIdentifier = false;
+            foreach ($attributes as $attribute) {
+                $arguments = $attribute->getArguments();
+                $isIdentifier = $attribute->getName() === 'ApiPlatform\Core\Annotation\ApiProperty'
+                && ($arguments['identifier'] ?? false);
+
+                if ($isIdentifier) {
+                    break;
+                }
+            }
+
+            if (! $isIdentifier) {
                 continue;
             }
 

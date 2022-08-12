@@ -148,10 +148,10 @@ final class EventEnginePass implements CompilerPassInterface
                 }
 
                 $parameterName = sprintf('event_engine.%s', $parameter);
-                /** @var array<class-string> $parameter */
-                $parameter = $container->getParameter($parameterName);
-                $parameter[] = $transformedReflectionClass->getName();
-                $container->setParameter($parameterName, $parameter);
+                /** @var array<class-string> $containerParameter */
+                $containerParameter = $container->getParameter($parameterName);
+                $containerParameter[] = $transformedReflectionClass->getName();
+                $container->setParameter($parameterName, $containerParameter);
                 break;
             }
         }
@@ -191,16 +191,16 @@ final class EventEnginePass implements CompilerPassInterface
         $aggregateRepositoryDefinitions = array_reduce(
             $aggregates,
             static function (array $result, $aggregate) use ($entityNamespace, $repository) {
-                $aggregate = (new ReflectionClass($aggregate))->getShortName();
-                $identifier = sprintf('event_engine.repository.%s', StringUtil::decamelize($aggregate));
+                $aggregateShortName = (new ReflectionClass($aggregate))->getShortName();
+                $identifier = sprintf('event_engine.repository.%s', StringUtil::decamelize($aggregateShortName));
 
                 $result[$identifier] = (new Definition(
                     $repository->getClass(),
                     [
                         new Reference(DocumentStore::class),
-                        EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregate),
-                        EventEngineUtil::fromAggregateNameToStateClass($aggregate, $entityNamespace),
-                        EventEngineUtil::fromAggregateNameToStatesClass($aggregate, $entityNamespace),
+                        EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregateShortName),
+                        EventEngineUtil::fromAggregateNameToStateClass($aggregateShortName, $entityNamespace),
+                        EventEngineUtil::fromAggregateNameToStatesClass($aggregateShortName, $entityNamespace),
                     ]
                 ))
                     ->setPublic(true);

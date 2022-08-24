@@ -85,4 +85,30 @@ trait DefaultResponses
 
         return $responses;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function __responseClassesPerStatusCode(): array
+    {
+        $reflectionClass = new ReflectionClass(static::class);
+        $staticMethods = $reflectionClass->getMethods(ReflectionMethod::IS_STATIC);
+
+        $responseMethods = array_filter(
+            $staticMethods,
+            static function (ReflectionMethod $reflectionMethod) {
+                $methodName = $reflectionMethod->getShortName();
+
+                return preg_match('/^__extraResponseClasses/', $methodName);
+            }
+        );
+
+        $responses = [];
+
+        foreach ($responseMethods as $responseMethod) {
+            $responses += $responseMethod->invoke(null);
+        }
+
+        return $responses;
+    }
 }

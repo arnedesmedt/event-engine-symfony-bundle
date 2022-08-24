@@ -7,7 +7,6 @@ namespace ADS\Bundle\EventEngineBundle\Aggregate;
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
-use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionAttribute;
 use ReflectionClass;
 use RuntimeException;
@@ -122,8 +121,6 @@ trait EventSourced
 
     public static function aggregateId(): string
     {
-        $docBlockFactory = DocBlockFactory::createInstance();
-
         $reflectionClass = new ReflectionClass(self::stateClass());
         $reflectionProperties = $reflectionClass->getProperties();
 
@@ -134,7 +131,7 @@ trait EventSourced
             $isIdentifier = false;
             foreach ($attributes as $attribute) {
                 $arguments = $attribute->getArguments();
-                $isIdentifier = $attribute->getName() === 'ApiPlatform\Core\Annotation\ApiProperty'
+                $isIdentifier = $attribute->getName() === 'ApiPlatform\Metadata\ApiProperty'
                 && ($arguments['identifier'] ?? false);
 
                 if ($isIdentifier) {

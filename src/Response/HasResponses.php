@@ -13,6 +13,11 @@ interface HasResponses
      */
     public static function __responseSchemasPerStatusCode(): array;
 
+    /**
+     * @return array<int, class-string>
+     */
+    public static function __responseClassesPerStatusCode(): array;
+
     public static function __responseSchemaForStatusCode(int $statusCode): TypeSchema;
 
     public static function __defaultStatusCode(): ?int;

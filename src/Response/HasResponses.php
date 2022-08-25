@@ -9,18 +9,19 @@ use EventEngine\Schema\TypeSchema;
 interface HasResponses
 {
     /**
-     * @return array<int, TypeSchema>
-     */
-    public static function __responseSchemasPerStatusCode(): array;
-
-    /**
-     * @return array<int, class-string>
+     * @return array<int, class-string<TypeSchema>>
      */
     public static function __responseClassesPerStatusCode(): array;
 
-    public static function __responseSchemaForStatusCode(int $statusCode): TypeSchema;
+    /**
+     * @return class-string<TypeSchema>
+     */
+    public static function __responseClassForStatusCode(int $statusCode): string;
+
+    /**
+     * @return class-string<TypeSchema>
+     */
+    public static function __defaultResponseClass(): string;
 
     public static function __defaultStatusCode(): ?int;
-
-    public static function __defaultResponseSchema(): TypeSchema;
 }

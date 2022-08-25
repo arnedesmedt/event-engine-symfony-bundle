@@ -157,10 +157,13 @@ final class Configurator
         foreach ($this->queryClasses as $queryClass) {
             /** @var PayloadSchema $schema */
             $schema = self::schemaFromMessage($queryClass);
-            /** @var class-string<JsonSchemaAwareRecord> $responseClass */
+            /** @var class-string<JsonSchemaAwareRecord|JsonSchemaAwareCollection> $responseClass */
             $responseClass = $queryClass::__defaultResponseClass();
+            $reflectionResponseClass = new ReflectionClass($responseClass);
             /** @var ResponseTypeSchema $typeSchema */
-            $typeSchema = $responseClass::__schema();
+            $typeSchema = $reflectionResponseClass->implementsInterface(JsonSchemaAwareRecord::class)
+                ? $responseClass::__schema()
+                : JsonSchema::array($responseClass::__itemSchema());
             $eventEngine->registerQuery($queryClass, $schema)
                 ->resolveWith($queryClass::__resolver())
                 ->setReturnType($typeSchema);

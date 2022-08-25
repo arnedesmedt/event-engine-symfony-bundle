@@ -34,9 +34,9 @@ trait DefaultQuery
     }
 
     /**
-     * @return array<string, TypeSchema>
+     * @return array<string, class-string<TypeSchema>>
      */
-    public static function __extraResponse(): array
+    public static function __extraResponseClasses(): array
     {
         return [];
     }

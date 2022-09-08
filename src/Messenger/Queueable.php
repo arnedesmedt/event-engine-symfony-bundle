@@ -13,4 +13,6 @@ interface Queueable
     public static function __multiplier(): int;
 
     public static function __maxDelayInMilliseconds(): int;
+
+    public static function __dispatchAsync(mixed $data): bool;
 }

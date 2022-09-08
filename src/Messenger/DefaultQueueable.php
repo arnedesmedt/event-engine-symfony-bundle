@@ -25,4 +25,9 @@ trait DefaultQueueable
     {
         return 5 * 60 * 1000;
     }
+
+    public static function __dispatchAsync(mixed $data): bool
+    {
+        return true;
+    }
 }

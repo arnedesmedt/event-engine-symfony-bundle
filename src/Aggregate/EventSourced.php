@@ -47,7 +47,7 @@ trait EventSourced
     /**
      * @return class-string<TState>
      */
-    private static function stateClass(): string
+    protected static function stateClass(): string
     {
         return EventEngineUtil::fromAggregateClassToStateClass(static::class);
     }
@@ -121,7 +121,7 @@ trait EventSourced
 
     public static function aggregateId(): string
     {
-        $reflectionClass = new ReflectionClass(self::stateClass());
+        $reflectionClass = new ReflectionClass(static::stateClass());
         $reflectionProperties = $reflectionClass->getProperties();
 
         foreach ($reflectionProperties as $reflectionProperty) {

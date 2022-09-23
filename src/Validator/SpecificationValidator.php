@@ -34,7 +34,7 @@ class SpecificationValidator extends ConstraintValidator
             return;
         }
 
-        $neededServices = $this->convertClassesToServices($this->generalServices());
+        $neededServices = $this->convertClassesToServices($value, $this->generalServices());
         $this->specifications($value, ...$neededServices);
     }
 
@@ -44,7 +44,7 @@ class SpecificationValidator extends ConstraintValidator
             return;
         }
 
-        $neededServices = $this->convertClassesToServices($value->specificationServices());
+        $neededServices = $this->convertClassesToServices($value, $value->specificationServices());
         $value->specifications(...$neededServices);
     }
 
@@ -61,10 +61,10 @@ class SpecificationValidator extends ConstraintValidator
      *
      * @return mixed[]
      */
-    protected function convertClassesToServices(array $neededServiceClasses): array
+    protected function convertClassesToServices(ValidationMessage $value, array $neededServiceClasses): array
     {
         return array_map(
-            fn (string $class) => $this->convertClassToService($class),
+            fn (string $class) => $this->convertClassToService($value, $class),
             $neededServiceClasses
         );
     }
@@ -72,7 +72,7 @@ class SpecificationValidator extends ConstraintValidator
     /**
      * @param class-string $class
      */
-    protected function convertClassToService(string $class): mixed
+    protected function convertClassToService(ValidationMessage $value, string $class): mixed
     {
         return $this->container->get($class);
     }

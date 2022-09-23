@@ -282,3 +282,6 @@ services:
     ADS\Bundle\EventEngineBundle\Validator\SpecificationValidator:
         arguments:
             $container: '@service_container'
+
+    ADS\Bundle\EventEngineBundle\Validator\ListenerWithValidatedMessage:
+        abstract: true

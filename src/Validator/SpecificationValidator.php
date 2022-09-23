@@ -10,6 +10,8 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 use function array_map;
+use function array_merge;
+use function array_unique;
 use function method_exists;
 
 class SpecificationValidator extends ConstraintValidator
@@ -29,7 +31,12 @@ class SpecificationValidator extends ConstraintValidator
             return;
         }
 
-        $neededServiceClasses = $value->specificationServices();
+        $neededServiceClasses = array_unique(
+            array_merge(
+                $this->generalServices(),
+                $value->specificationServices()
+            )
+        );
         $neededServices = $this->changeServices(
             array_map(
                 fn (string $class) => $this->changeService($this->container->get($class)),
@@ -42,6 +49,14 @@ class SpecificationValidator extends ConstraintValidator
         }
 
         $value->specifications(...$neededServices);
+    }
+
+    /**
+     * @return array<class-string>
+     */
+    protected function generalServices(): array
+    {
+        return [];
     }
 
     /**

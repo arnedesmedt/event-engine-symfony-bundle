@@ -14,7 +14,7 @@ use function method_exists;
 
 class SpecificationValidator extends ConstraintValidator
 {
-    public function __construct(private readonly ContainerInterface $container)
+    public function __construct(protected readonly ContainerInterface $container)
     {
     }
 
@@ -57,32 +57,23 @@ class SpecificationValidator extends ConstraintValidator
     }
 
     /**
-     * @param array<mixed> $services
-     *
-     * @return array<mixed>
-     */
-    protected function changeServices(array $services): array
-    {
-        return $services;
-    }
-
-    protected function changeService(mixed $service): mixed
-    {
-        return $service;
-    }
-
-    /**
      * @param array<class-string> $neededServiceClasses
      *
      * @return mixed[]
      */
-    private function convertClassesToServices(array $neededServiceClasses): array
+    protected function convertClassesToServices(array $neededServiceClasses): array
     {
-        return $this->changeServices(
-            array_map(
-                fn (string $class) => $this->changeService($this->container->get($class)),
-                $neededServiceClasses
-            )
+        return array_map(
+            fn (string $class) => $this->convertClassToService($class),
+            $neededServiceClasses
         );
+    }
+
+    /**
+     * @param class-string $class
+     */
+    protected function convertClassToService(string $class): mixed
+    {
+        return $this->container->get($class);
     }
 }

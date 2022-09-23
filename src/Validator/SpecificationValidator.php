@@ -24,18 +24,18 @@ class SpecificationValidator extends ConstraintValidator
             return;
         }
 
-        $this->generalValidate();
+        $this->generalValidate($value);
         $this->messageValidate($value);
     }
 
-    private function generalValidate(): void
+    private function generalValidate(ValidationMessage $value): void
     {
         if (! method_exists($this, 'specifications')) {
             return;
         }
 
         $neededServices = $this->convertClassesToServices($this->generalServices());
-        $this->specifications(...$neededServices);
+        $this->specifications($value, ...$neededServices);
     }
 
     private function messageValidate(ValidationMessage $value): void

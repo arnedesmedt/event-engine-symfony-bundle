@@ -279,9 +279,12 @@ services:
             - '@lock.aggregate.factory'
             - '@logger'
 
-    ADS\Bundle\EventEngineBundle\Validator\SpecificationValidator:
+    app.specification.validator:
+        class: 'ADS\Bundle\EventEngineBundle\Validator\SpecificationValidator'
         arguments:
             $container: '@service_container'
 
     ADS\Bundle\EventEngineBundle\Validator\ListenerWithValidatedMessage:
         abstract: true
+        arguments:
+            - '@app.specification.validator'

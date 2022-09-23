@@ -10,8 +10,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 use function array_map;
-use function array_merge;
-use function array_unique;
 use function method_exists;
 
 class SpecificationValidator extends ConstraintValidator
@@ -20,34 +18,33 @@ class SpecificationValidator extends ConstraintValidator
     {
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @inheritDoc
-     */
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (! $value instanceof ValidationMessage) {
             return;
         }
 
-        $neededServiceClasses = array_unique(
-            array_merge(
-                $this->generalServices(),
-                $value->specificationServices()
-            )
-        );
-        $neededServices = $this->changeServices(
-            array_map(
-                fn (string $class) => $this->changeService($this->container->get($class)),
-                $neededServiceClasses
-            )
-        );
+        $this->generalValidate();
+        $this->messageValidate($value);
+    }
 
+    private function generalValidate(): void
+    {
+        if (! method_exists($this, 'specifications')) {
+            return;
+        }
+
+        $neededServices = $this->convertClassesToServices($this->generalServices());
+        $this->specifications(...$neededServices);
+    }
+
+    private function messageValidate(ValidationMessage $value): void
+    {
         if (! method_exists($value, 'specifications')) {
             return;
         }
 
+        $neededServices = $this->convertClassesToServices($value->specificationServices());
         $value->specifications(...$neededServices);
     }
 
@@ -72,5 +69,20 @@ class SpecificationValidator extends ConstraintValidator
     protected function changeService(mixed $service): mixed
     {
         return $service;
+    }
+
+    /**
+     * @param array<class-string> $neededServiceClasses
+     *
+     * @return mixed[]
+     */
+    private function convertClassesToServices(array $neededServiceClasses): array
+    {
+        return $this->changeServices(
+            array_map(
+                fn (string $class) => $this->changeService($this->container->get($class)),
+                $neededServiceClasses
+            )
+        );
     }
 }

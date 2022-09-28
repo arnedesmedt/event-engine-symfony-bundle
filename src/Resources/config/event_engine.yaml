@@ -108,6 +108,7 @@ services:
             - '@EventEngine\Schema\Schema'
         configurator: '@ADS\Bundle\EventEngineBundle\Configurator'
     ADS\Bundle\EventEngineBundle\Messenger\QueueableEventEngine:
+        public: true
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@command.bus'

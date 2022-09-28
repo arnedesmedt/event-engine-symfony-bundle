@@ -283,10 +283,5 @@ services:
         arguments:
             $container: '@service_container'
 
-    'app.specification.validator':
-        alias: 'ADS\Bundle\EventEngineBundle\Validator\SpecificationValidator'
-
     ADS\Bundle\EventEngineBundle\Validator\ListenerWithValidatedMessage:
         abstract: true
-        arguments:
-            - '@app.specification.validator'

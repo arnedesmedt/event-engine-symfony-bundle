@@ -6,10 +6,11 @@ namespace ADS\Bundle\EventEngineBundle\Validator;
 
 use ADS\Bundle\EventEngineBundle\Event\Listener;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
 
 abstract class ListenerWithValidatedMessage implements Listener
 {
-    public function __construct(protected SpecificationValidator $specificationValidator)
+    public function __construct(protected ConstraintValidatorInterface $specificationValidator)
     {
     }
 

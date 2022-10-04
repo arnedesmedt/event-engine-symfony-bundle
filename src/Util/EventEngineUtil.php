@@ -10,8 +10,6 @@ use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 use RuntimeException;
 
-use function preg_quote;
-use function preg_replace;
 use function sprintf;
 use function str_replace;
 use function strlen;
@@ -75,25 +73,7 @@ final class EventEngineUtil
      */
     public static function fromAggregateClassToStateClass(string $aggregateClass): string
     {
-        $aggregateName = self::fromAggregateClassToAggregateName($aggregateClass);
-
-        $replaced = preg_replace(
-            '~(.*)' . preg_quote($aggregateName, '~') . '~',
-            '$1State',
-            $aggregateClass,
-            1
-        );
-
-        if ($replaced === null) {
-            throw new RuntimeException(
-                sprintf(
-                    'Couldn\'t convert the aggregate class \'%s\' into a state class',
-                    $aggregateClass
-                )
-            );
-        }
-
-        return $replaced;
+        return $aggregateClass::stateClass();
     }
 
     public static function fromAggregateNameToAggregateClass(string $aggregateName, string $entityNamespace): string

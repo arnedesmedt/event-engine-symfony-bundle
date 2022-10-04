@@ -11,18 +11,14 @@ use Prooph\EventStore\EventStore;
 use Prooph\EventStore\Stream as ProophStream;
 use Prooph\EventStore\StreamName;
 use ReflectionClass;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand('event-engine:event-streams:create')]
 class EventEngineEventStreamsCreateCommand extends Command
 {
-    /**
-     * @var string
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected static $defaultName = 'event-engine:event-streams:create';
-
     /**
      * @param array<class-string> $aggregates
      */

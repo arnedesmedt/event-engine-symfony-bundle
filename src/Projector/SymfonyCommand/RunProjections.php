@@ -5,19 +5,15 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand;
 
 use ADS\Bundle\EventEngineBundle\Projector\WriteModelStreamProjection;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand('event-engine:projections:run')]
 final class RunProjections extends Command
 {
-    /**
-     * @var string
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected static $defaultName = 'event-engine:projections:run';
-
     public function __construct(private WriteModelStreamProjection $projection)
     {
         parent::__construct();

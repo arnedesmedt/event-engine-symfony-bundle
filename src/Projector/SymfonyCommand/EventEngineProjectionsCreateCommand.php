@@ -5,18 +5,14 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Projector\SymfonyCommand;
 
 use PDO;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand('event-engine:projections:create')]
 final class EventEngineProjectionsCreateCommand extends Command
 {
-    /**
-     * @var string
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected static $defaultName = 'event-engine:projections:create';
-
     public function __construct(private PDO $connection)
     {
         parent::__construct();

@@ -7,18 +7,14 @@ namespace ADS\Bundle\EventEngineBundle\SymfonyCommand;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use ReflectionClass;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand('event-engine:document-stores:create')]
 class EventEngineDocumentStoresCreateCommand extends Command
 {
-    /**
-     * @var string
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected static $defaultName = 'event-engine:document-stores:create';
-
     /**
      * @param array<class-string> $aggregates
      */

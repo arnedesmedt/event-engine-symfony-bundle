@@ -10,6 +10,7 @@ use Prooph\EventStore\EventStore;
 use Prooph\EventStore\StreamName;
 use ReflectionClass;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,14 +18,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function preg_match;
 
+#[AsCommand('event-engine:data:reset')]
 class EventEngineDataResetCommand extends Command
 {
-    /**
-     * @var string
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected static $defaultName = 'event-engine:data:reset';
-
     /**
      * @param array<class-string> $aggregates
      */

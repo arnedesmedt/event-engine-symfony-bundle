@@ -47,7 +47,7 @@ trait EventSourced
     /**
      * @return class-string<TState>
      */
-    protected static function stateClass(): string
+    public static function stateClass(): string
     {
         return EventEngineUtil::fromAggregateClassToStateClass(static::class);
     }

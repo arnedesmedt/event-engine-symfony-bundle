@@ -35,7 +35,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     /**
      * @inheritDoc
      */
-    public function callCommandPreProcessor($preProcessor, Message $command)
+    public function callCommandPreProcessor($preProcessor, Message $command): Message|CommandDispatchResult
     {
         self::addMessageUuid($preProcessor, $command);
 
@@ -62,7 +62,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     /**
      * @inheritDoc
      */
-    public function callContextProvider($contextProvider, Message $command)
+    public function callContextProvider($contextProvider, Message $command): mixed
     {
         return $this->functionalFlavour->callContextProvider($contextProvider, $command);
     }
@@ -119,10 +119,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         );
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function callApplyFirstEvent(callable $applyFunction, Message $event)
+    public function callApplyFirstEvent(callable $applyFunction, Message $event): mixed
     {
         return $this->functionalFlavour->callApplyFirstEvent($applyFunction, $event);
     }
@@ -130,7 +127,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     /**
      * @inheritDoc
      */
-    public function callApplySubsequentEvent(callable $applyFunction, $aggregateState, Message $event)
+    public function callApplySubsequentEvent(callable $applyFunction, $aggregateState, Message $event): mixed
     {
         return $this->functionalFlavour->callApplySubsequentEvent($applyFunction, $aggregateState, $event);
     }
@@ -195,7 +192,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
      *
      * @inheritDoc
      */
-    public function buildAggregateState(string $aggregateType, array $state, int $version)
+    public function buildAggregateState(string $aggregateType, array $state, int $version): mixed
     {
         return $this->functionalFlavour->buildAggregateState($aggregateType, $state, $version);
     }

@@ -24,7 +24,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
     /**
      * @inheritDoc
      */
-    public function callCommandPreProcessor($preProcessor, Message $command)
+    public function callCommandPreProcessor($preProcessor, Message $command): Message|CommandDispatchResult
     {
         FunctionalMetaDataFlavour::addMessageUuid($preProcessor, $command);
 
@@ -51,7 +51,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
     /**
      * @inheritDoc
      */
-    public function callContextProvider($contextProvider, Message $command)
+    public function callContextProvider($contextProvider, Message $command): mixed
     {
         return $this->oopFlavour->callContextProvider($contextProvider, $command);
     }
@@ -108,10 +108,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
         );
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function callApplyFirstEvent(callable $applyFunction, Message $event)
+    public function callApplyFirstEvent(callable $applyFunction, Message $event): mixed
     {
         return $this->oopFlavour->callApplyFirstEvent($applyFunction, $event);
     }
@@ -119,7 +116,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
     /**
      * @inheritDoc
      */
-    public function callApplySubsequentEvent(callable $applyFunction, $aggregateState, Message $event)
+    public function callApplySubsequentEvent(callable $applyFunction, $aggregateState, Message $event): mixed
     {
         return $this->oopFlavour->callApplySubsequentEvent($applyFunction, $aggregateState, $event);
     }
@@ -184,7 +181,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
      *
      * @inheritDoc
      */
-    public function buildAggregateState(string $aggregateType, array $state, int $version)
+    public function buildAggregateState(string $aggregateType, array $state, int $version): mixed
     {
         return $this->oopFlavour->buildAggregateState($aggregateType, $state, $version);
     }

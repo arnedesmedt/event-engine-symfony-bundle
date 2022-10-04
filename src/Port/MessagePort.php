@@ -9,6 +9,7 @@ use ADS\Bundle\EventEngineBundle\Query\Query;
 use Closure;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
+use EventEngine\Messaging\CommandDispatchResult;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Functional\Port;
@@ -32,10 +33,7 @@ final class MessagePort implements Port
     {
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function deserialize(Message $message)
+    public function deserialize(Message $message): mixed
     {
         /** @var class-string $messageType */
         $messageType = $message->messageName();
@@ -160,7 +158,7 @@ final class MessagePort implements Port
      *
      * @inheritDoc
      */
-    public function callCommandController($customCommand, $controller)
+    public function callCommandController($customCommand, $controller): array|CommandDispatchResult|null
     {
         return $controller($customCommand);
     }
@@ -170,7 +168,7 @@ final class MessagePort implements Port
      *
      * @inheritDoc
      */
-    public function callContextProvider($customCommand, $contextProvider)
+    public function callContextProvider($customCommand, $contextProvider): mixed
     {
         return $contextProvider($customCommand);
     }

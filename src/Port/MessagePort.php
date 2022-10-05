@@ -148,7 +148,7 @@ final class MessagePort implements Port
      *
      * @inheritDoc
      */
-    public function callCommandPreProcessor($customCommand, $preProcessor)
+    public function callCommandPreProcessor($customCommand, $preProcessor): mixed
     {
         return $preProcessor($customCommand);
     }

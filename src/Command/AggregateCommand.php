@@ -18,4 +18,11 @@ interface AggregateCommand extends Command
      * @return array<class-string<Event>>
      */
     public static function __eventsToRecord(): array;
+
+    /**
+     * @param array<class-string|string> $services
+     *
+     * @return array<class-string|string>
+     */
+    public static function __replaceServices(array $services): array;
 }

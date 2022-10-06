@@ -31,4 +31,12 @@ trait DefaultAggregateCommand
     {
         return [];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public static function __replaceServices(array $services): array
+    {
+        return $services;
+    }
 }

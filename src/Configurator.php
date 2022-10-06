@@ -65,7 +65,7 @@ final class Configurator
     private array $commandAggregateMapping = [];
     /** @var array<class-string<AggregateCommand>, array<class-string<Event>>> */
     private array $commandEventMapping = [];
-    /** @var array<class-string<AggregateCommand>, array<class-string>> */
+    /** @var array<class-string<AggregateCommand>, array<class-string|string>> */
     private array $commandServiceMapping = [];
     /** @var array<class-string<Command>, class-string<PreProcessor>> */
     private array $commandPreProcessorMapping = [];
@@ -395,8 +395,8 @@ final class Configurator
     ): self {
         $services = $this->commandServiceMapping()[$commandClass] ?? [];
 
-        foreach ($services as $serviceClass) {
-            $commandProcessor->provideService($serviceClass);
+        foreach ($services as $serviceId) {
+            $commandProcessor->provideService($serviceId);
         }
 
         return $this;
@@ -517,7 +517,7 @@ final class Configurator
     }
 
     /**
-     * @return array<class-string<AggregateCommand>, array<class-string>>
+     * @return array<class-string<AggregateCommand>, array<class-string|string>>
      */
     private function commandServiceMapping(): array
     {
@@ -550,7 +550,7 @@ final class Configurator
                         && in_array($type->getName(), $this->commandClasses)
                 );
 
-                /** @var array<class-string> $mapping */
+                /** @var array<class-string|string> $mapping */
                 $mapping = array_map(
                     static function (ReflectionParameter $parameter) {
                         /** @var ReflectionNamedType|null $type */
@@ -568,6 +568,7 @@ final class Configurator
                 foreach ($commandTypes as $commandType) {
                     /** @var class-string<AggregateCommand> $commandClass */
                     $commandClass = $commandType->getName();
+                    $mapping = $commandClass::__replaceServices($mapping);
 
                     $this->commandServiceMapping[$commandClass] = $mapping;
                 }

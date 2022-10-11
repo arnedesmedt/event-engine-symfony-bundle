@@ -28,6 +28,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 use function array_merge;
@@ -214,17 +215,19 @@ final class EventEnginePass implements CompilerPassInterface
         foreach ($repositories as $repository) {
             preg_match_all('/\\\([^\\\]+)Repository$/', $repository, $matches);
 
+            try {
+                $repositoryDefinition = $container->getDefinition(
+                    sprintf(
+                        'event_engine.repository.%s',
+                        strtolower(StringUtil::decamelize($matches[1][0]))
+                    )
+                );
+            } catch (ServiceNotFoundException) {
+                continue;
+            }
+
             $container->getDefinition($repository)
-                ->setArguments(
-                    $container
-                        ->getDefinition(
-                            sprintf(
-                                'event_engine.repository.%s',
-                                strtolower(StringUtil::decamelize($matches[1][0]))
-                            )
-                        )
-                        ->getArguments()
-                )
+                ->setArguments($repositoryDefinition->getArguments())
                 ->setPublic(true);
         }
     }

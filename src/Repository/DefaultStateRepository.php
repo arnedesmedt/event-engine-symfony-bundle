@@ -91,7 +91,7 @@ abstract class DefaultStateRepository implements StateRepository
      *
      * @return TStates
      */
-    private function statesFromDocuments(Traversable|array $documents)
+    protected function statesFromDocuments(Traversable|array $documents)
     {
         if ($documents instanceof Traversable) {
             $documents = iterator_to_array($documents);
@@ -112,7 +112,7 @@ abstract class DefaultStateRepository implements StateRepository
      *
      * @return TState|null
      */
-    private function stateFromDocument(?array $document)
+    protected function stateFromDocument(?array $document)
     {
         if ($document === null) {
             return null;

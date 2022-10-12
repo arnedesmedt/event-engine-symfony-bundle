@@ -24,7 +24,7 @@ interface AggregateRepository extends StateRepository
      *
      * @return TAgg|null
      */
-    public function aggregateFromDocument(?array $document);
+    public function aggregateFromDocumentState(?array $document);
 
     /**
      * @param string|TId $identifier

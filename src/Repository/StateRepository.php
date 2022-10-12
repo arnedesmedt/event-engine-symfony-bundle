@@ -11,7 +11,6 @@ use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\PartialSelect;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use Throwable;
-use Traversable;
 
 /**
  * @template TStates of IterableListValue
@@ -29,10 +28,59 @@ interface StateRepository
 
     /**
      * @param string|TId $identifier
+     */
+    public function findPartialDocument(PartialSelect $select, $identifier): mixed;
+
+    /**
+     * @param string|TId $identifier
+     *
+     * @return array<string, mixed>|null
+     */
+    public function findDocumentState($identifier): ?array;
+
+    /**
+     * @return array<array{state: array<string, mixed>}>
+     */
+    public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): array;
+
+    /**
+     * @return array<mixed>
+     */
+    public function findPartialDocuments(
+        PartialSelect $partialSelect,
+        ?Filter $filter = null,
+        ?int $skip = null,
+        ?int $limit = null
+    ): array;
+
+    /**
+     * @return array<array<string, mixed>>
+     */
+    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null): array;
+
+    /**
+     * @return array<mixed>
+     */
+    public function findDocumentIds(?Filter $filter = null): array;
+
+    public function countDocuments(?Filter $filter = null): int;
+
+    /**
+     * @param string|TId $identifier
      *
      * @return array{state: array<string, mixed>}
      */
     public function needDocument(
+        $identifier,
+        ?Throwable $exception = null
+    ): array;
+
+    /**
+     * @param string|TId $identifier
+     *
+     * @return  array<string, mixed>
+     */
+    public function needDocumentState(
         $identifier,
         ?Throwable $exception = null
     ): array;
@@ -46,26 +94,18 @@ interface StateRepository
     ): void;
 
     /**
-     * @param string|TId $identifier
+     * @param array<string|TId>|ListValue<TId> $identifiers
      *
-     * @return TState
+     * @return array<array{state: array<string, mixed>}>
      */
-    public function needDocumentState(
-        $identifier,
-        ?Throwable $exception = null
-    );
-
-    /**
-     * @return Traversable<array{state: array<string, mixed>}>
-     */
-    public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): Traversable;
+    public function findDocumentsByIds(array|ListValue $identifiers): array;
 
     /**
      * @param array<string|TId>|ListValue<TId> $identifiers
      *
-     * @return Traversable<array{state: array<string, mixed>}>
+     * @return array<array<string, mixed>>
      */
-    public function findDocumentsByIds(array|ListValue $identifiers): Traversable;
+    public function findDocumentStatesByIds(array|ListValue $identifiers): array;
 
     /**
      * @param array<string|TId>|ListValue<TId> $identifiers
@@ -77,45 +117,35 @@ interface StateRepository
     /**
      * @param array<string|TId>|ListValue<TId> $identifiers
      *
-     * @return TStates
+     * @return array<array<string, mixed>>
      */
-    public function findDocumentStatesByIds(array|ListValue $identifiers);
+    public function needDocumentStatesByIds(array|ListValue $identifiers): array;
 
     /**
      * @param array<string|TId>|ListValue<TId> $identifiers
      *
      * @return TStates
      */
-    public function needDocumentStatesByIds(array|ListValue $identifiers);
+    public function findStatesByIds(array|ListValue $identifiers);
 
     /**
-     * @return Traversable<array{state: array<string, mixed>}>
+     * @param array<string|TId>|ListValue<TId> $identifiers
+     *
+     * @return TStates
      */
-    public function findPartialDocuments(
-        PartialSelect $partialSelect,
-        ?Filter $filter = null,
-        ?int $skip = null,
-        ?int $limit = null
-    ): Traversable;
-
-    public function countDocuments(?Filter $filter = null): int;
+    public function needStatesByIds(array|ListValue $identifiers);
 
     /**
-     * @return array<mixed>
+     * @return TStates
      */
-    public function findDocumentIds(?Filter $filter = null): array;
+    public function findStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null);
 
     /**
      * @param string|TId $identifier
      *
      * @return TState|null
      */
-    public function findDocumentState($identifier);
-
-    /**
-     * @return TStates
-     */
-    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null);
+    public function findState($identifier);
 
     /**
      * @return ListValue<TId>

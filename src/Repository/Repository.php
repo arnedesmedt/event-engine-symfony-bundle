@@ -59,19 +59,14 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
     /**
      * @inheritDoc
      */
-    public function aggregateFromDocument(?array $document)
+    public function aggregateFromDocumentState(?array $documentState)
     {
-        if ($document === null) {
+        if ($documentState === null) {
             return null;
         }
 
-        self::checkDocumentHasState($document);
-
-        /** @var array<string, mixed> $state */
-        $state = $document['state'];
-
         /** @var TAgg $aggregate */
-        $aggregate = $this->aggregateClass::reconstituteFromStateArray($state);
+        $aggregate = $this->aggregateClass::reconstituteFromStateArray($documentState);
 
         return $aggregate;
     }
@@ -81,8 +76,8 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
      */
     public function findAggregate($identifier)
     {
-        return $this->aggregateFromDocument(
-            $this->findDocument($identifier)
+        return $this->aggregateFromDocumentState(
+            $this->findDocumentState($identifier)
         );
     }
 
@@ -93,11 +88,11 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
         $identifier,
         ?Throwable $exception = null
     ) {
-        $document = $this->needDocument($identifier, $exception);
+        /** @var TAgg $aggregate */
+        $aggregate = $this->aggregateFromDocumentState(
+            $this->needDocumentState($identifier, $exception)
+        );
 
-        /** @var TAgg $aggregateRoot */
-        $aggregateRoot = $this->aggregateFromDocument($document);
-
-        return $aggregateRoot;
+        return $aggregate;
     }
 }

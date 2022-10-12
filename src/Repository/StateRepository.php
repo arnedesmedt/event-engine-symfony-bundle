@@ -148,6 +148,13 @@ interface StateRepository
     public function findState($identifier);
 
     /**
+     * @param string|TId $identifier
+     *
+     * @return TState
+     */
+    public function needState($identifier);
+
+    /**
      * @return ListValue<TId>
      */
     public function findDocumentIdValueObjects(?Filter $filter = null): ListValue;

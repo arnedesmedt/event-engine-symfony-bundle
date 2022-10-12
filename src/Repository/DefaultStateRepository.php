@@ -420,6 +420,16 @@ abstract class DefaultStateRepository implements StateRepository
         return $this->stateFromDocument($documentState);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function needState($identifier)
+    {
+        return $this->stateFromDocument(
+            $this->needDocumentState($identifier)
+        );
+    }
+
     public function findDocumentIdValueObjects(?Filter $filter = null): ListValue
     {
         $documentIds = $this->findDocumentIds($filter);

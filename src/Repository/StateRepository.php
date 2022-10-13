@@ -112,14 +112,14 @@ interface StateRepository
      *
      * @return array<array{state: array<string, mixed>}>
      */
-    public function needDocumentsByIds(array|ListValue $identifiers): array;
+    public function needDocumentsByIds(array|ListValue $identifiers, ?Throwable $exception = null): array;
 
     /**
      * @param array<string|TId>|ListValue<TId> $identifiers
      *
      * @return array<array<string, mixed>>
      */
-    public function needDocumentStatesByIds(array|ListValue $identifiers): array;
+    public function needDocumentStatesByIds(array|ListValue $identifiers, ?Throwable $exception = null): array;
 
     /**
      * @param array<string|TId>|ListValue<TId> $identifiers
@@ -133,7 +133,7 @@ interface StateRepository
      *
      * @return TStates
      */
-    public function needStatesByIds(array|ListValue $identifiers);
+    public function needStatesByIds(array|ListValue $identifiers, ?Throwable $exception = null);
 
     /**
      * @return TStates
@@ -152,7 +152,10 @@ interface StateRepository
      *
      * @return TState
      */
-    public function needState($identifier);
+    public function needState(
+        $identifier,
+        ?Throwable $exception = null
+    );
 
     /**
      * @return ListValue<TId>

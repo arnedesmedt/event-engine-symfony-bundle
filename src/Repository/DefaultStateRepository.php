@@ -325,12 +325,12 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function needDocumentsByIds(array|ListValue $identifiers): array
+    public function needDocumentsByIds(array|ListValue $identifiers, ?Throwable $exception = null): array
     {
         $documents = $this->findDocumentsByIds($identifiers);
 
         if (count($documents) !== count($identifiers)) {
-            throw new NotFoundHttpException(
+            throw $exception ?? new NotFoundHttpException(
                 sprintf(
                     'One of the identifiers is not found: \'%s\'.',
                     json_encode($this->identifiersToScalars($identifiers), JSON_THROW_ON_ERROR)
@@ -356,12 +356,12 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function needDocumentStatesByIds(array|ListValue $identifiers): array
+    public function needDocumentStatesByIds(array|ListValue $identifiers, ?Throwable $exception = null): array
     {
         $documentStates = $this->findDocumentStatesByIds($identifiers);
 
         if (count($documentStates) !== count($identifiers)) {
-            throw new NotFoundHttpException(
+            throw $exception ?? new NotFoundHttpException(
                 sprintf(
                     'One of the identifiers is not found: \'%s\'.',
                     json_encode($this->identifiersToScalars($identifiers), JSON_THROW_ON_ERROR)
@@ -385,10 +385,10 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function needStatesByIds(array|ListValue $identifiers)
+    public function needStatesByIds(array|ListValue $identifiers, ?Throwable $exception = null)
     {
         return $this->statesFromDocuments(
-            $this->needDocumentStatesByIds($identifiers)
+            $this->needDocumentStatesByIds($identifiers, $exception)
         );
     }
 
@@ -423,10 +423,12 @@ abstract class DefaultStateRepository implements StateRepository
     /**
      * @inheritDoc
      */
-    public function needState($identifier)
-    {
+    public function needState(
+        $identifier,
+        ?Throwable $exception = null
+    ) {
         return $this->stateFromDocument(
-            $this->needDocumentState($identifier)
+            $this->needDocumentState($identifier, $exception)
         );
     }
 

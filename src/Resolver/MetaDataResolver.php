@@ -10,6 +10,4 @@ interface MetaDataResolver
      * @param array<string, mixed> $metaData
      */
     public function setMetaData(array $metaData): static;
-
-    public function __invoke(mixed $message): mixed;
 }

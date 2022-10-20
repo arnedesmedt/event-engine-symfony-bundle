@@ -10,6 +10,7 @@ use ReflectionClass;
 trait DefaultAggregateCommand
 {
     use JsonSchemaAwareRecordLogic;
+    use OAuthRoleAuthorization;
 
     /**
      * The default aggregate method is the shortname of the class.

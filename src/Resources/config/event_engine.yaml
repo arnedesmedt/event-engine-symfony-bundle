@@ -280,6 +280,10 @@ services:
             - '@lock.aggregate.factory'
             - '@logger'
 
+    ADS\Bundle\EventEngineBundle\Lock\NoLockAggregateCommand:
+        arguments:
+            - '@EventEngine\EventEngine'
+
     ADS\Bundle\EventEngineBundle\Validator\SpecificationValidator:
         arguments:
             $container: '@service_container'

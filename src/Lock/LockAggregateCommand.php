@@ -12,7 +12,7 @@ use Symfony\Component\Lock\LockFactory;
 
 use function sprintf;
 
-final class LockAggregateCommand
+final class LockAggregateCommand implements LockAggregateCommandStrategy
 {
     public function __construct(
         private EventEngine $eventEngine,

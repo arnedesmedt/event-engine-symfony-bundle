@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Messenger\Handler;
 
-use ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand;
+use ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommandStrategy;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Flavour;
@@ -13,7 +13,7 @@ class AsyncCommandHandler
 {
     public function __construct(
         private Flavour $flavour,
-        private LockAggregateCommand $lockAggregateCommand
+        private LockAggregateCommandStrategy $lockAggregateCommand
     ) {
     }
 

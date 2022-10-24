@@ -7,7 +7,7 @@ namespace ADS\Bundle\EventEngineBundle\Lock;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\MessageBag;
 
-final class NoLockAggregateCommand
+final class NoLockAggregateCommand implements LockAggregateCommandStrategy
 {
     public function __construct(
         private EventEngine $eventEngine,

@@ -274,6 +274,12 @@ services:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
 
+    ADS\Bundle\EventEngineBundle\Messenger\Middleware\ChangeTransports:
+        public: true
+
+    ADS\Bundle\EventEngineBundle\Messenger\Middleware\DontSendToFailureTransportMiddleware:
+        public: true
+
     ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand:
         arguments:
             - '@EventEngine\EventEngine'
@@ -290,3 +296,4 @@ services:
 
     ADS\Bundle\EventEngineBundle\Validator\ListenerWithValidatedMessage:
         abstract: true
+

@@ -246,7 +246,6 @@ services:
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncCommandHandler:
         arguments:
-            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
         tags:
             - { name: messenger.message_handler, bus: command.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper, from_transport: event_engine.command }

@@ -7,13 +7,11 @@ namespace ADS\Bundle\EventEngineBundle\Messenger\Handler;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\MessageWrapper;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\MessageBag;
-use EventEngine\Runtime\Flavour;
 
 abstract class Handler
 {
     public function __construct(
         protected EventEngine $eventEngine,
-        protected Flavour $flavour,
     ) {
     }
 

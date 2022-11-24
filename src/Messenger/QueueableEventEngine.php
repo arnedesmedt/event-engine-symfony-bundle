@@ -18,6 +18,10 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Throwable;
 
 use function array_merge;
+use function array_unique;
+use function class_implements;
+use function count;
+use function in_array;
 use function reset;
 
 final class QueueableEventEngine implements MessageProducer
@@ -51,25 +55,46 @@ final class QueueableEventEngine implements MessageProducer
      */
     public function dispatch(string $messageClass, array $payload = [], array $metadata = []): mixed
     {
-        $messageBag = $this->eventEngine
-            ->messageFactory()
-            ->createMessageFromArray(
-                $messageClass,
-                [
-                    'payload' => $payload,
-                    'metadata' => $metadata,
-                ]
-            );
+        $messageClasses = [$messageClass];
+        $interfaces = class_implements($messageClass);
 
-        return $this->produce($messageBag);
+        if ($interfaces && in_array(Queueable::class, $interfaces)) {
+            $messageClasses = array_unique(
+                array_merge(
+                    $messageClasses,
+                    $messageClass::__forkMessage($payload) ?? []
+                )
+            );
+        }
+
+        $result = [];
+        foreach ($messageClasses as $messageClass) {
+            $messageBag = $this->eventEngine
+                ->messageFactory()
+                ->createMessageFromArray(
+                    $messageClass,
+                    [
+                        'payload' => $payload,
+                        'metadata' => $metadata,
+                    ]
+                );
+
+            $result[] = $this->produce($messageBag);
+        }
+
+        if (count($result) === 1) {
+            return $result[0];
+        }
+
+        return $result;
     }
 
-    public function produce(Message $message): mixed
+    public function produce(Message $messageBag): mixed
     {
-        $transferableMessage = $this->flavour->prepareNetworkTransmission($message);
+        $transferableMessage = $this->flavour->prepareNetworkTransmission($messageBag);
 
         if ($transferableMessage->getMetaOrDefault('async', false)) {
-            $transferableMessage = match ($message->messageType()) {
+            $transferableMessage = match ($messageBag->messageType()) {
                 Message::TYPE_COMMAND => CommandMessageWrapper::fromMessage($transferableMessage),
                 Message::TYPE_EVENT => EventMessageWrapper::fromMessage($transferableMessage),
                 default => QueryMessageWrapper::fromMessage($transferableMessage),
@@ -78,7 +103,7 @@ final class QueueableEventEngine implements MessageProducer
 
         try {
             /** @var Envelope $envelop */
-            $envelop = match ($message->messageType()) {
+            $envelop = match ($messageBag->messageType()) {
                 Message::TYPE_COMMAND => $this->commandBus->dispatch($transferableMessage),
                 Message::TYPE_EVENT => $this->eventBus->dispatch($transferableMessage),
                 default => $this->queryBus->dispatch($transferableMessage),

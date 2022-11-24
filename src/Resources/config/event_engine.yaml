@@ -273,11 +273,13 @@ services:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
 
-    ADS\Bundle\EventEngineBundle\Messenger\Middleware\ChangeTransports:
-        public: true
-
     ADS\Bundle\EventEngineBundle\Messenger\Middleware\DontSendToFailureTransportMiddleware:
         public: true
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry'
+            - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry'
+            - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry'
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
 
     ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand:
         arguments:

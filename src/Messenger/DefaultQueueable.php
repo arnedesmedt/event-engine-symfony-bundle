@@ -37,7 +37,7 @@ trait DefaultQueueable
     }
 
     /** @inheritDoc */
-    public static function __changeTransports($message): ?array
+    public static function __forkMessage(array $payload): ?array
     {
         return null;
     }

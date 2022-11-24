@@ -21,7 +21,7 @@ class ChangeTransports implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $newTransports = $message::__changeTransports();
+        $newTransports = $message::__changeTransports($message);
         $transportNameStamp = $envelope->last(TransportNamesStamp::class);
 
         if (

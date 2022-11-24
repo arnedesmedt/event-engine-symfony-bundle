@@ -7,7 +7,6 @@ namespace ADS\Bundle\EventEngineBundle\DependencyInjection;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
-use ADS\Bundle\EventEngineBundle\Messenger\Middleware\ChangeTransports;
 use ADS\Bundle\EventEngineBundle\Messenger\Middleware\DontSendToFailureTransportMiddleware;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry;
@@ -107,19 +106,16 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                 'buses' => [
                     'command.bus' => [
                         'middleware' => [
-                            ChangeTransports::class,
                             DontSendToFailureTransportMiddleware::class,
                         ],
                     ],
                     'event.bus' => [
                         'middleware' => [
-                            ChangeTransports::class,
                             DontSendToFailureTransportMiddleware::class,
                         ],
                     ],
                     'query.bus' => [
                         'middleware' => [
-                            ChangeTransports::class,
                             DontSendToFailureTransportMiddleware::class,
                         ],
                     ],

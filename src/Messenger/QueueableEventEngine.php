@@ -9,6 +9,7 @@ use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\Message;
+use EventEngine\Messaging\MessageBag;
 use EventEngine\Messaging\MessageProducer;
 use EventEngine\Runtime\Flavour;
 use Symfony\Component\Messenger\Envelope;
@@ -17,11 +18,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Throwable;
 
+use function array_map;
 use function array_merge;
 use function array_unique;
-use function class_implements;
 use function count;
-use function in_array;
 use function reset;
 
 final class QueueableEventEngine implements MessageProducer
@@ -55,32 +55,52 @@ final class QueueableEventEngine implements MessageProducer
      */
     public function dispatch(string $messageClass, array $payload = [], array $metadata = []): mixed
     {
-        $messageClasses = [$messageClass];
-        $interfaces = class_implements($messageClass);
+        return $this->produce($this->messageBag($messageClass, $payload, $metadata));
+    }
 
-        if ($interfaces && in_array(Queueable::class, $interfaces)) {
-            $messageClasses = array_unique(
+    /**
+     * @param array<string, mixed> $payload
+     * @param array<string, mixed> $metadata
+     */
+    private function messageBag(string $messageClass, array $payload, array $metadata): Message
+    {
+        return $this->eventEngine
+            ->messageFactory()
+            ->createMessageFromArray(
+                $messageClass,
+                [
+                    'payload' => $payload,
+                    'metadata' => $metadata,
+                ]
+            );
+    }
+
+    public function produce(Message $messageBag): mixed
+    {
+        $messageBags = [$messageBag];
+        $message = $messageBag->get(MessageBag::MESSAGE);
+
+        if ($message instanceof Queueable) {
+            $messageClasses =
+            $messageBags = array_unique(
                 array_merge(
-                    $messageClasses,
-                    $messageClass::__forkMessage($payload) ?? []
+                    $messageBags,
+                    array_map(
+                        fn (string $messageClass) => $this->messageBag(
+                            $messageClass,
+                            $messageBag->payload(),
+                            $messageBag->metadata()
+                        ),
+                        $message::__forkMessage($message)
+                    )
                 )
             );
         }
 
-        $result = [];
-        foreach ($messageClasses as $messageClass) {
-            $messageBag = $this->eventEngine
-                ->messageFactory()
-                ->createMessageFromArray(
-                    $messageClass,
-                    [
-                        'payload' => $payload,
-                        'metadata' => $metadata,
-                    ]
-                );
-
-            $result[] = $this->produce($messageBag);
-        }
+        $result = array_map(
+            fn (Message $messageBag) => $this->produceOneMessage($messageBag),
+            $messageBags
+        );
 
         if (count($result) === 1) {
             return $result[0];
@@ -89,7 +109,7 @@ final class QueueableEventEngine implements MessageProducer
         return $result;
     }
 
-    public function produce(Message $messageBag): mixed
+    public function produceOneMessage(Message $messageBag): mixed
     {
         $transferableMessage = $this->flavour->prepareNetworkTransmission($messageBag);
 

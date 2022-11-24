@@ -37,8 +37,8 @@ trait DefaultQueueable
     }
 
     /** @inheritDoc */
-    public static function __forkMessage(array $payload): ?array
+    public static function __forkMessage($message): array
     {
-        return null;
+        return [];
     }
 }

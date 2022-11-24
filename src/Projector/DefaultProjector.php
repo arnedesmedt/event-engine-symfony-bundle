@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\Messaging\Message;
+use EventEngine\Messaging\MessageBag;
 use EventEngine\Projecting\AggregateProjector;
 use RuntimeException;
 
@@ -78,7 +79,7 @@ abstract class DefaultProjector implements Projector
 
         if ($event instanceof Message) {
             $eventClass = $event->messageName();
-            $event = $event->get('message');
+            $event = $event->get(MessageBag::MESSAGE);
         }
 
         if (! in_array($eventClass, static::events(), true)) {

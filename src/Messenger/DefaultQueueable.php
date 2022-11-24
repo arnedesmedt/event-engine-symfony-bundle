@@ -26,7 +26,7 @@ trait DefaultQueueable
         return 5 * 60 * 1000;
     }
 
-    public static function __dispatchAsync(mixed $data): bool
+    public static function __dispatchAsync(): bool
     {
         return true;
     }
@@ -34,5 +34,11 @@ trait DefaultQueueable
     public static function __sendToLinkedFailureTransport(): bool
     {
         return true;
+    }
+
+    /** @inheritDoc */
+    public static function __changeTransports(): ?array
+    {
+        return null;
     }
 }

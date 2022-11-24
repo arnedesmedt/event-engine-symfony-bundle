@@ -249,19 +249,19 @@ services:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
         tags:
-            - { name: messenger.message_handler, bus: command.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper }
+            - { name: messenger.message_handler, bus: command.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper, from_transport: event_engine.command }
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncEventHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         tags:
-            - { name: messenger.message_handler, bus: event.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper }
+            - { name: messenger.message_handler, bus: event.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper, from_transport: event_engine.event }
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncQueryHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         tags:
-            - { name: messenger.message_handler, bus: query.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper }
+            - { name: messenger.message_handler, bus: query.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper, from_transport: event_engine.query }
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry:

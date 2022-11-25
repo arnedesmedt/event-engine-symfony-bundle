@@ -7,6 +7,8 @@ namespace ADS\Bundle\EventEngineBundle\Messenger;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
+use ArrayObject;
+use EventEngine\Data\ImmutableRecord;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
@@ -20,7 +22,6 @@ use Throwable;
 
 use function array_map;
 use function array_merge;
-use function array_unique;
 use function count;
 use function reset;
 
@@ -78,21 +79,19 @@ final class QueueableEventEngine implements MessageProducer
     public function produce(Message $messageBag): mixed
     {
         $messageBags = [$messageBag];
+        /** @var ImmutableRecord&Queueable $message */
         $message = $messageBag->get(MessageBag::MESSAGE);
 
         if ($message instanceof Queueable) {
-            $messageClasses =
-            $messageBags = array_unique(
-                array_merge(
-                    $messageBags,
-                    array_map(
-                        fn (string $messageClass) => $this->messageBag(
-                            $messageClass,
-                            $messageBag->payload(),
-                            $messageBag->metadata()
-                        ),
-                        $message::__forkMessage($message)
-                    )
+            $messageBags = array_merge(
+                $messageBags,
+                array_map(
+                    fn (string $messageClass) => $this->messageBag(
+                        $messageClass,
+                        $message->toArray(),
+                        $messageBag->metadata()
+                    ),
+                    $message::__forkMessage($message)
                 )
             );
         }
@@ -106,7 +105,7 @@ final class QueueableEventEngine implements MessageProducer
             return $result[0];
         }
 
-        return $result;
+        return new ArrayObject($result);
     }
 
     public function produceOneMessage(Message $messageBag): mixed

@@ -14,7 +14,6 @@ use function substr_count;
 trait DefaultControllerCommand
 {
     use JsonSchemaAwareRecordLogic;
-    use OAuthRoleAuthorization;
 
     public static function __controller(): string
     {

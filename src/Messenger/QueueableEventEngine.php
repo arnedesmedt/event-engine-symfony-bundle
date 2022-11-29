@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Throwable;
 
+use function array_filter;
 use function array_map;
 use function array_merge;
 use function count;
@@ -96,10 +97,16 @@ final class QueueableEventEngine implements MessageProducer
             );
         }
 
-        $result = array_map(
-            fn (Message $messageBag) => $this->produceOneMessage($messageBag),
-            $messageBags
+        $result = array_filter(
+            array_map(
+                fn (Message $messageBag) => $this->produceOneMessage($messageBag),
+                $messageBags
+            )
         );
+
+        if (empty($result)) {
+            return null;
+        }
 
         if (count($result) === 1) {
             return $result[0];

@@ -293,6 +293,8 @@ services:
             - '@EventEngine\EventEngine'
 
     ADS\Bundle\EventEngineBundle\Validator\SpecificationValidator:
+        tags:
+            - validator.constraint_validator
         arguments:
             $container: '@service_container'
 

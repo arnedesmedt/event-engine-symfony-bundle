@@ -106,7 +106,7 @@ final class QueueableEventEngine implements MessageProducer
         );
 
         if (empty($result)) {
-            return null;
+            return new ArrayObject();
         }
 
         if (count($result) === 1) {

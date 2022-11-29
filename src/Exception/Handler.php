@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Throwable;
 
 use function json_decode;
 use function json_encode;
@@ -58,11 +59,17 @@ final class Handler implements EventSubscriberInterface
                 $message = $exception->getMessage();
 
                 if (preg_match('/field "(.+)" \[(.+)\] ([.\S\s]+)$/m', $message, $matches)) {
-                    /** @var string $encodedJson */
-                    $encodedJson = json_encode(
-                        json_decode($matches[3], true, 512, JSON_THROW_ON_ERROR),
-                        JSON_THROW_ON_ERROR
-                    );
+                    try {
+                        /** @var string $encodedJson */
+                        $encodedJson = json_encode(
+                            json_decode($matches[3], true, 512, JSON_THROW_ON_ERROR),
+                            JSON_THROW_ON_ERROR
+                        );
+                    } catch (Throwable) {
+                        /** @var string $encodedJson */
+                        $encodedJson = $matches[3];
+                    }
+
                     $message = sprintf(
                         'Payload validation error: field \'%s\' [%s] %s',
                         StringUtil::decamelize($matches[1]),

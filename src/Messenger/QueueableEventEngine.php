@@ -101,7 +101,8 @@ final class QueueableEventEngine implements MessageProducer
             array_map(
                 fn (Message $messageBag) => $this->produceOneMessage($messageBag),
                 $messageBags
-            )
+            ),
+            static fn ($result) => ! ($result === null || $result instanceof Envelope)
         );
 
         if (empty($result)) {

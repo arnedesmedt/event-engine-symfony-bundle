@@ -188,7 +188,7 @@ final class Configurator
         $types = array_unique(
             [
                 ...array_map(
-                    static fn ($aggregateClass) => EventEngineUtil::fromAggregateClassToStateClass($aggregateClass),
+                    static fn ($aggregateClass) => $aggregateClass::stateClass(),
                     $this->aggregateClasses
                 ),
                 ...array_map(

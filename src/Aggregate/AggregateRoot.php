@@ -13,6 +13,11 @@ use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 interface AggregateRoot
 {
     /**
+     * @return class-string
+     */
+    public static function stateClass(): string;
+
+    /**
      * @return static
      */
     public static function reconstituteFromHistory(Event ...$domainEvents): static;

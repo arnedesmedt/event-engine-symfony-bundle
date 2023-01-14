@@ -70,6 +70,7 @@ services:
     EventEngine\Persistence\MultiModelStore: '@EventEngine\Persistence\ComposedMultiModelStore'
     EventEngine\Persistence\TransactionalConnection: '@ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection'
     EventEngine\Runtime\Flavour: '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+    EventEngine\Runtime\Prototyping\Port: '@ADS\Bundle\EventEngineBundle\Port\MessagePort'
     EventEngine\Runtime\Functional\Port: '@ADS\Bundle\EventEngineBundle\Port\MessagePort'
     EventEngine\Runtime\Oop\Port: '@ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort'
     EventEngine\Schema\Schema: '@EventEngine\JsonSchema\OpisJsonSchema'
@@ -129,6 +130,9 @@ services:
             - '@Prooph\EventStore\EventStore'
             - '%event_engine.event_store.transactional%'
     EventEngine\Prooph\V7\EventStore\ProophEventStoreMessageFactory: ~
+    EventEngine\Runtime\PrototypingFlavour:
+        arguments:
+            - '@EventEngine\Runtime\Prototyping\Port'
     EventEngine\Runtime\FunctionalFlavour:
         arguments:
             - '@EventEngine\Runtime\Functional\Port'

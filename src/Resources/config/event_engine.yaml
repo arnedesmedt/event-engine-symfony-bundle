@@ -29,7 +29,7 @@ services:
             - '@EventEngine\DocumentStore\DocumentStore'
             - '%env(string:APP_ENV)%'
             - '%kernel.project_dir%'
-            - '%event_engine.seed_path%',
+            - '%event_engine.seed_path%'
         tags:
             - console.command
 

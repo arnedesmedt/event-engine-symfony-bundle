@@ -20,7 +20,7 @@ services:
             - '%env(string:APP_ENV)%'
         tags:
             - console.command
-            -
+
     event_engine.command.database_seed:
         class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineDatabaseSeedCommand
         arguments:

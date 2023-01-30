@@ -16,41 +16,31 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-use function preg_match;
+use function str_contains;
 
-#[AsCommand('event-engine:data:reset')]
-class EventEngineDataResetCommand extends Command
+#[AsCommand('event-engine:database:clear', 'clear all the streams, projections and document stores.')]
+class EventEngineDatabaseClearCommand extends Command
 {
     /**
      * @param array<class-string> $aggregates
      */
     public function __construct(
-        private EventStore $eventStore,
-        private DocumentStore $documentStore,
-        private array $aggregates
+        private readonly EventStore $eventStore,
+        private readonly DocumentStore $documentStore,
+        private readonly array $aggregates,
+        private readonly string $environment,
     ) {
         parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this->setDescription('Reset all the streams, projections and document stores');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (
-            $this->isProductionEnvironment($_SERVER['APP_ENV'])
-            && (
-                ! $io->confirm('Resetting the data in production is not a good idea. Are you sure?', false)
-                || ! $io->confirm('Are you really sure?', false)
-            )
-        ) {
-            $io->comment('Reset is not executed.');
+        if (str_contains($this->environment, 'prod')) {
+            $io->comment('You can\'t reset the database in production.');
 
-            return 0;
+            return Command::SUCCESS;
         }
 
         /** @var Application $application */
@@ -90,11 +80,6 @@ class EventEngineDataResetCommand extends Command
 
         $io->comment('Reset executed.');
 
-        return 0;
-    }
-
-    private function isProductionEnvironment(string $env): bool
-    {
-        return ! (bool) preg_match('/(dev(.*)|local|test)/i', $env);
+        return Command::SUCCESS;
     }
 }

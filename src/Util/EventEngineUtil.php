@@ -141,4 +141,14 @@ final class EventEngineUtil
             self::fromAggregateClassToAggregateName($aggregateClass)
         );
     }
+
+    /**
+     * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateClass
+     */
+    public static function fromAggregateClassToDocumentStoreName(string $aggregateClass): string
+    {
+        return self::fromAggregateNameToDocumentStoreName(
+            self::fromAggregateClassToAggregateName($aggregateClass)
+        );
+    }
 }

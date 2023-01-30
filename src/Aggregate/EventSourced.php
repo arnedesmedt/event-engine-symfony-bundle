@@ -154,4 +154,9 @@ trait EventSourced
             )
         );
     }
+
+    public static function createForSeed(): static
+    {
+        return new self();
+    }
 }

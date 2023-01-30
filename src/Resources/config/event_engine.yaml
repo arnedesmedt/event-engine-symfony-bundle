@@ -11,12 +11,25 @@ services:
 
 
     # Commands
-    event_engine.command.data_reset:
-        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineDataResetCommand
+    event_engine.command.database_clear:
+        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineDatabaseClearCommand
         arguments:
             - '@Prooph\EventStore\EventStore'
             - '@EventEngine\DocumentStore\DocumentStore'
             - '%event_engine.aggregates%'
+            - '%env(string:APP_ENV)%'
+        tags:
+            - console.command
+            -
+    event_engine.command.database_seed:
+        class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineDatabaseSeedCommand
+        arguments:
+            - '@EventEngine\Runtime\Flavour'
+            - '@EventEngine\Persistence\MultiModelStore'
+            - '@EventEngine\DocumentStore\DocumentStore'
+            - '%env(string:APP_ENV)%'
+            - '%kernel.project_dir%'
+            - '%event_engine.seed_path%',
         tags:
             - console.command
 

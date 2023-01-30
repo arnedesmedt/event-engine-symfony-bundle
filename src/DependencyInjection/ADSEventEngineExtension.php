@@ -21,7 +21,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
 {
     /**
      * phpcs:ignore Generic.Files.LineLength.TooLong
-     * @param array{"event_store": array{"transactional": bool}, "messenger": array<string, array<string, string>>, "document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "pdo_dsn": string} $mergedConfig
+     * @param array{"event_store": array{"transactional": bool}, "messenger": array<string, array<string, string>>, "document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "pdo_dsn": string, "seed_path": string} $mergedConfig
      */
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
@@ -60,6 +60,11 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
         $container->setParameter(
             'event_engine.pdo_dsn',
             $mergedConfig['pdo_dsn']
+        );
+
+        $container->setParameter(
+            'event_engine.seed_path',
+            $mergedConfig['seed_path']
         );
 
         $container->setParameter(

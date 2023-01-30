@@ -47,4 +47,6 @@ interface AggregateRoot
     public function state();
 
     public static function aggregateId(): string;
+
+    public static function createForSeed(): static;
 }

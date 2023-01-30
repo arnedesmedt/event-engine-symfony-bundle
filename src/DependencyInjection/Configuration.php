@@ -22,6 +22,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('pdo_dsn')->defaultValue('%env(string:PDO_DSN)%')->end()
                 ->scalarNode('entity_namespace')->defaultValue('App\Domain\Entity')->end()
+                ->scalarNode('seed_path')->defaultValue('database/seeds')->end()
                 ->arrayNode('document_store')
                     ->addDefaultsIfNotSet()
                     ->children()

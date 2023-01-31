@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\SymfonyCommand;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
+use ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\Aggregate\FlavouredAggregateRoot;
 use EventEngine\Aggregate\GenericAggregateRepository;
@@ -15,7 +16,6 @@ use EventEngine\Messaging\MessageBag;
 use EventEngine\Persistence\MultiModelStore;
 use EventEngine\Runtime\Oop\AggregateAndEventBag;
 use EventEngine\Runtime\Oop\FlavourHint;
-use EventEngine\Runtime\OopFlavour;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,7 +35,7 @@ use function trim;
 class EventEngineDatabaseSeedCommand extends Command
 {
     public function __construct(
-        private readonly OopFlavour $flavour,
+        private readonly OopMetaDataFlavour $flavour,
         private readonly MultiModelStore $eventStore,
         private readonly DocumentStore $documentStore,
         private readonly string $environment,

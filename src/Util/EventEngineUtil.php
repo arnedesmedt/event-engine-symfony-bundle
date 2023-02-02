@@ -98,7 +98,7 @@ final class EventEngineUtil
 
     public static function fromAggregateNameToAggregateClass(string $aggregateName, string $entityNamespace): string
     {
-        return sprintf('%s\\%2$s\\%2$s', $entityNamespace, StringUtil::camelize($aggregateName, '_', true));
+        return sprintf('%s\\%2$s\\%2$s', $entityNamespace, StringUtil::camelizePascalCase($aggregateName, '_'));
     }
 
     /**

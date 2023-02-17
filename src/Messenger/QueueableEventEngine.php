@@ -105,10 +105,6 @@ final class QueueableEventEngine implements MessageProducer
             static fn ($result) => ! ($result === null || $result instanceof Envelope)
         );
 
-        if (empty($result)) {
-            return new ArrayObject();
-        }
-
         if (count($result) === 1) {
             return $result[0];
         }

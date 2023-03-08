@@ -17,13 +17,11 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
 {
     public function __construct(
         private OopFlavour $oopFlavour,
-        private FunctionalMetaDataFlavour $functionalMetaDataFlavour
+        private FunctionalMetaDataFlavour $functionalMetaDataFlavour,
     ) {
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function callCommandPreProcessor($preProcessor, Message $command): Message|CommandDispatchResult
     {
         FunctionalMetaDataFlavour::addMessageUuid($preProcessor, $command);
@@ -48,9 +46,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
         return $this->oopFlavour->getAggregateIdFromCommand($aggregateIdPayloadKey, $command);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function callContextProvider($contextProvider, Message $command): mixed
     {
         return $this->oopFlavour->callContextProvider($contextProvider, $command);
@@ -67,7 +63,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
         string $aggregateType,
         callable $aggregateFunction,
         Message $command,
-        ...$contextServices
+        ...$contextServices,
     ): Generator {
         foreach ($contextServices as $contextService) {
             FunctionalMetaDataFlavour::addMessageUuid($contextService, $command);
@@ -77,7 +73,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
             $aggregateType,
             $aggregateFunction,
             $command,
-            ...$contextServices
+            ...$contextServices,
         );
     }
 
@@ -93,7 +89,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
         callable $aggregateFunction,
         $aggregateState,
         Message $command,
-        ...$contextServices
+        ...$contextServices,
     ): Generator {
         foreach ($contextServices as $contextService) {
             FunctionalMetaDataFlavour::addMessageUuid($contextService, $command);
@@ -104,7 +100,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
             $aggregateFunction,
             $aggregateState,
             $command,
-            ...$contextServices
+            ...$contextServices,
         );
     }
 
@@ -113,9 +109,7 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
         return $this->oopFlavour->callApplyFirstEvent($applyFunction, $event);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function callApplySubsequentEvent(callable $applyFunction, $aggregateState, Message $event): mixed
     {
         return $this->oopFlavour->callApplySubsequentEvent($applyFunction, $aggregateState, $event);
@@ -126,17 +120,13 @@ final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
         return $this->oopFlavour->prepareNetworkTransmission($message);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function convertMessageReceivedFromNetwork(Message $message, $aggregateEvent = false): Message
     {
         return $this->oopFlavour->convertMessageReceivedFromNetwork($message, $aggregateEvent);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function callProjector($projector, string $projectionVersion, string $projectionName, Message $event): void
     {
         $this->oopFlavour->callProjector($projector, $projectionVersion, $projectionName, $event);

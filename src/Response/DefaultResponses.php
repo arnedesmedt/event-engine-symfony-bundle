@@ -17,9 +17,7 @@ use function reset;
 
 trait DefaultResponses
 {
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public static function __responseClassesPerStatusCode(): array
     {
         $reflectionClass = new ReflectionClass(static::class);
@@ -31,7 +29,7 @@ trait DefaultResponses
                 $methodName = $reflectionMethod->getShortName();
 
                 return preg_match('/^__extraResponseClasses/', $methodName);
-            }
+            },
         );
 
         $responses = [];
@@ -70,7 +68,7 @@ trait DefaultResponses
         return $responses[$statusCode];
     }
 
-    public static function __defaultStatusCode(): ?int
+    public static function __defaultStatusCode(): int|null
     {
         if (method_exists(static::class, '__httpMethod')) {
             $httpMethod = static::__httpMethod();

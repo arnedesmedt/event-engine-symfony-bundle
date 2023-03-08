@@ -24,17 +24,13 @@ trait DefaultAggregateCommand
         return false;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public static function __eventsToRecord(): array
     {
         return [];
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public static function __replaceServices(array $services): array
     {
         return $services;

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
-/**
- * @method static with(array $recordData)
- */
+/** @method static with(array $recordData) */
 trait DeletableAggregate
 {
     private bool $deleted = false;
@@ -16,9 +14,7 @@ trait DeletableAggregate
         return $this->deleted === true;
     }
 
-    /**
-     * @return static
-     */
+    /** @return static */
     public function delete(): static
     {
         $this->deleted = true;

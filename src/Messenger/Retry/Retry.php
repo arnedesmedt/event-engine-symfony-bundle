@@ -19,7 +19,7 @@ abstract class Retry implements RetryStrategyInterface
     {
     }
 
-    public function isRetryable(Envelope $message, ?Throwable $throwable = null): bool
+    public function isRetryable(Envelope $message, Throwable|null $throwable = null): bool
     {
         /** @var MessageWrapper $messageWrapper */
         $messageWrapper = $message->getMessage();
@@ -40,7 +40,7 @@ abstract class Retry implements RetryStrategyInterface
         return $retries < $eventEngineMessage::__maxRetries();
     }
 
-    public function getWaitingTime(Envelope $message, ?Throwable $throwable = null): int
+    public function getWaitingTime(Envelope $message, Throwable|null $throwable = null): int
     {
         /** @var MessageWrapper $messageWrapper */
         $messageWrapper = $message->getMessage();

@@ -24,11 +24,9 @@ interface StateRepository
      *
      * @return array{state: array<string, mixed>}|null
      */
-    public function findDocument($identifier): ?array;
+    public function findDocument($identifier): array|null;
 
-    /**
-     * @param string|TId $identifier
-     */
+    /** @param string|TId $identifier */
     public function findPartialDocument(PartialSelect $select, $identifier): mixed;
 
     /**
@@ -36,34 +34,30 @@ interface StateRepository
      *
      * @return array<string, mixed>|null
      */
-    public function findDocumentState($identifier): ?array;
+    public function findDocumentState($identifier): array|null;
 
-    /**
-     * @return array<array{state: array<string, mixed>}>
-     */
-    public function findDocuments(?Filter $filter = null, ?int $skip = null, ?int $limit = null): array;
+    /** @return array<array{state: array<string, mixed>}> */
+    public function findDocuments(Filter|null $filter = null, int|null $skip = null, int|null $limit = null): array;
 
-    /**
-     * @return array<mixed>
-     */
+    /** @return array<mixed> */
     public function findPartialDocuments(
         PartialSelect $partialSelect,
-        ?Filter $filter = null,
-        ?int $skip = null,
-        ?int $limit = null
+        Filter|null $filter = null,
+        int|null $skip = null,
+        int|null $limit = null,
     ): array;
 
-    /**
-     * @return array<array<string, mixed>>
-     */
-    public function findDocumentStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null): array;
+    /** @return array<array<string, mixed>> */
+    public function findDocumentStates(
+        Filter|null $filter = null,
+        int|null $skip = null,
+        int|null $limit = null,
+    ): array;
 
-    /**
-     * @return array<mixed>
-     */
-    public function findDocumentIds(?Filter $filter = null): array;
+    /** @return array<mixed> */
+    public function findDocumentIds(Filter|null $filter = null): array;
 
-    public function countDocuments(?Filter $filter = null): int;
+    public function countDocuments(Filter|null $filter = null): int;
 
     /**
      * @param string|TId $identifier
@@ -72,7 +66,7 @@ interface StateRepository
      */
     public function needDocument(
         $identifier,
-        ?Throwable $exception = null
+        Throwable|null $exception = null,
     ): array;
 
     /**
@@ -82,15 +76,13 @@ interface StateRepository
      */
     public function needDocumentState(
         $identifier,
-        ?Throwable $exception = null
+        Throwable|null $exception = null,
     ): array;
 
-    /**
-     * @param string|TId $identifier
-     */
+    /** @param string|TId $identifier */
     public function dontNeedDocument(
         $identifier,
-        ?Throwable $exception = null
+        Throwable|null $exception = null,
     ): void;
 
     /**
@@ -112,14 +104,14 @@ interface StateRepository
      *
      * @return array<array{state: array<string, mixed>}>
      */
-    public function needDocumentsByIds(array|ListValue $identifiers, ?Throwable $exception = null): array;
+    public function needDocumentsByIds(array|ListValue $identifiers, Throwable|null $exception = null): array;
 
     /**
      * @param array<string|TId>|ListValue<TId> $identifiers
      *
      * @return array<array<string, mixed>>
      */
-    public function needDocumentStatesByIds(array|ListValue $identifiers, ?Throwable $exception = null): array;
+    public function needDocumentStatesByIds(array|ListValue $identifiers, Throwable|null $exception = null): array;
 
     /**
      * @param array<string|TId>|ListValue<TId> $identifiers
@@ -133,12 +125,10 @@ interface StateRepository
      *
      * @return TStates
      */
-    public function needStatesByIds(array|ListValue $identifiers, ?Throwable $exception = null);
+    public function needStatesByIds(array|ListValue $identifiers, Throwable|null $exception = null);
 
-    /**
-     * @return TStates
-     */
-    public function findStates(?Filter $filter = null, ?int $skip = null, ?int $limit = null);
+    /** @return TStates */
+    public function findStates(Filter|null $filter = null, int|null $skip = null, int|null $limit = null);
 
     /**
      * @param string|TId $identifier
@@ -154,31 +144,23 @@ interface StateRepository
      */
     public function needState(
         $identifier,
-        ?Throwable $exception = null
+        Throwable|null $exception = null,
     );
 
-    /**
-     * @return ListValue<TId>
-     */
-    public function findDocumentIdValueObjects(?Filter $filter = null): ListValue;
+    /** @return ListValue<TId> */
+    public function findDocumentIdValueObjects(Filter|null $filter = null): ListValue;
 
-    public function hasDocuments(?Filter $filter = null): bool;
+    public function hasDocuments(Filter|null $filter = null): bool;
 
-    public function hasNoDocuments(?Filter $filter = null): bool;
+    public function hasNoDocuments(Filter|null $filter = null): bool;
 
-    /**
-     * @param string|TId $identifier
-     */
+    /** @param string|TId $identifier */
     public function hasDocument($identifier): bool;
 
-    /**
-     * @param string|TId $identifier
-     */
+    /** @param string|TId $identifier */
     public function hasNoDocument($identifier): bool;
 
-    /**
-     * @param array<string|TId>|ListValue<TId> $identifiers
-     */
+    /** @param array<string|TId>|ListValue<TId> $identifiers */
     public function hasAllDocuments(array|ListValue $identifiers): bool;
 
     /**
@@ -187,13 +169,9 @@ interface StateRepository
      */
     public function upsertState($identifier, $state): void;
 
-    /**
-     * @param string|TId $identifier
-     */
+    /** @param string|TId $identifier */
     public function deleteDoc($identifier): void;
 
-    /**
-     * @return class-string<TState>
-     */
+    /** @return class-string<TState> */
     public function stateClass(): string;
 }

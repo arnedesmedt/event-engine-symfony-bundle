@@ -33,7 +33,7 @@ final class QueueableEventEngine implements MessageProducer
         private MessageBusInterface $commandBus,
         private MessageBusInterface $eventBus,
         private MessageBusInterface $queryBus,
-        private EventEngine $eventEngine
+        private EventEngine $eventEngine,
     ) {
     }
 
@@ -73,7 +73,7 @@ final class QueueableEventEngine implements MessageProducer
                 [
                     'payload' => $payload,
                     'metadata' => $metadata,
-                ]
+                ],
             );
     }
 
@@ -90,17 +90,17 @@ final class QueueableEventEngine implements MessageProducer
                     fn (string $messageClass) => $this->messageBag(
                         $messageClass,
                         $message->toArray(),
-                        $messageBag->metadata()
+                        $messageBag->metadata(),
                     ),
-                    $message::__forkMessage($message)
-                )
+                    $message::__forkMessage($message),
+                ),
             );
         }
 
         $result = array_filter(
             array_map(
                 fn (Message $messageBag) => $this->produceOneMessage($messageBag),
-                $messageBags
+                $messageBags,
             ),
             static fn ($result) => ! ($result === null || $result instanceof Envelope)
         );

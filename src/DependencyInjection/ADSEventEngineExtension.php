@@ -27,74 +27,74 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
     {
         $loader = new YamlFileLoader(
             $container,
-            new FileLocator(__DIR__ . '/../Resources/config')
+            new FileLocator(__DIR__ . '/../Resources/config'),
         );
 
         $loader->load('event_engine.yaml');
 
         $container->setParameter(
             'event_engine.document_store.prefix',
-            $mergedConfig['document_store']['prefix']
+            $mergedConfig['document_store']['prefix'],
         );
 
         $container->setParameter(
             'event_engine.document_store.id.schema',
-            $mergedConfig['document_store']['id']['schema']
+            $mergedConfig['document_store']['id']['schema'],
         );
 
         $container->setParameter(
             'event_engine.document_store.transactional',
-            $mergedConfig['document_store']['transactional']
+            $mergedConfig['document_store']['transactional'],
         );
 
         $container->setParameter(
             'event_engine.event_store.transactional',
-            $mergedConfig['event_store']['transactional']
+            $mergedConfig['event_store']['transactional'],
         );
 
         $container->setParameter(
             'event_engine.entity_namespace',
-            $mergedConfig['entity_namespace']
+            $mergedConfig['entity_namespace'],
         );
 
         $container->setParameter(
             'event_engine.pdo_dsn',
-            $mergedConfig['pdo_dsn']
+            $mergedConfig['pdo_dsn'],
         );
 
         $container->setParameter(
             'event_engine.seed_path',
-            $mergedConfig['seed_path']
+            $mergedConfig['seed_path'],
         );
 
         $container->setParameter(
             'event_engine.messenger.command.transport',
-            $mergedConfig['messenger']['command']['transport']
+            $mergedConfig['messenger']['command']['transport'],
         );
 
         $container->setParameter(
             'event_engine.messenger.command.retry',
-            $mergedConfig['messenger']['command']['retry']
+            $mergedConfig['messenger']['command']['retry'],
         );
 
         $container->setParameter(
             'event_engine.messenger.event.transport',
-            $mergedConfig['messenger']['event']['transport']
+            $mergedConfig['messenger']['event']['transport'],
         );
 
         $container->setParameter(
             'event_engine.messenger.event.retry',
-            $mergedConfig['messenger']['event']['retry']
+            $mergedConfig['messenger']['event']['retry'],
         );
 
         $container->setParameter(
             'event_engine.messenger.query.transport',
-            $mergedConfig['messenger']['query']['transport']
+            $mergedConfig['messenger']['query']['transport'],
         );
 
         $container->setParameter(
             'event_engine.messenger.query.retry',
-            $mergedConfig['messenger']['query']['retry']
+            $mergedConfig['messenger']['query']['retry'],
         );
     }
 
@@ -174,7 +174,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
 
         $container->prependExtensionConfig(
             'framework',
-            $config
+            $config,
         );
     }
 }

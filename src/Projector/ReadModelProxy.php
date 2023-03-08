@@ -24,7 +24,7 @@ class ReadModelProxy extends AbstractReadModel
     {
         if (! $event instanceof GenericProophEvent) {
             throw new InvalidArgumentException(
-                __METHOD__ . ' expects a ' . GenericProophEvent::class . '. Got ' . VariableType::determine($event)
+                __METHOD__ . ' expects a ' . GenericProophEvent::class . '. Got ' . VariableType::determine($event),
             );
         }
 

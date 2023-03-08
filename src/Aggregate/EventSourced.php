@@ -14,9 +14,7 @@ use RuntimeException;
 use function method_exists;
 use function sprintf;
 
-/**
- * @template TState of JsonSchemaAwareRecord
- */
+/** @template TState of JsonSchemaAwareRecord */
 trait EventSourced
 {
     /** @var Event[] */
@@ -25,9 +23,7 @@ trait EventSourced
     /** @var TState */
     private $state;
 
-    /**
-     * @return TState
-     */
+    /** @return TState */
     public function state()
     {
         return $this->state;
@@ -44,17 +40,13 @@ trait EventSourced
         return $self;
     }
 
-    /**
-     * @return class-string<TState>
-     */
+    /** @return class-string<TState> */
     public static function stateClass(): string
     {
         return EventEngineUtil::fromAggregateClassToStateClass(static::class);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public static function reconstituteFromStateArray(array $state): static
     {
         $stateClass = static::stateClass();
@@ -70,9 +62,7 @@ trait EventSourced
         $this->recordedEvents[] = $event;
     }
 
-    /**
-     * @return Event[]
-     */
+    /** @return Event[] */
     public function popRecordedEvents(): array
     {
         $events = $this->recordedEvents;
@@ -91,8 +81,8 @@ trait EventSourced
                     'Unable to apply event \'%s\'. Missing method \'%s\' in class \'%s\'.',
                     $event::class,
                     $whenMethod,
-                    static::class
-                )
+                    static::class,
+                ),
             );
         }
 
@@ -104,9 +94,7 @@ trait EventSourced
         return $event->__applyMethod();
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function toArray(): array
     {
         return $this->state->toArray();
@@ -150,8 +138,8 @@ trait EventSourced
         throw new RuntimeException(
             sprintf(
                 'You have to override the aggregateId method for aggregate root \'%s\'.',
-                static::class
-            )
+                static::class,
+            ),
         );
     }
 

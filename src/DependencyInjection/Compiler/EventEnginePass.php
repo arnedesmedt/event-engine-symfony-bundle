@@ -201,7 +201,7 @@ final class EventEnginePass implements CompilerPassInterface
                         EventEngineUtil::fromAggregateNameToDocumentStoreName($aggregateShortName),
                         EventEngineUtil::fromAggregateNameToStateClass($aggregateShortName, $entityNamespace),
                         EventEngineUtil::fromAggregateNameToStatesClass($aggregateShortName, $entityNamespace),
-                    ]
+                    ],
                 ))
                     ->setPublic(true);
 
@@ -219,8 +219,8 @@ final class EventEnginePass implements CompilerPassInterface
                 $repositoryDefinition = $container->getDefinition(
                     sprintf(
                         'event_engine.repository.%s',
-                        strtolower(StringUtil::decamelize($matches[1][0]))
-                    )
+                        strtolower(StringUtil::decamelize($matches[1][0])),
+                    ),
                 );
             } catch (ServiceNotFoundException) {
                 continue;
@@ -246,7 +246,7 @@ final class EventEnginePass implements CompilerPassInterface
                 $identifier = str_replace(
                     '_projector',
                     '',
-                    sprintf('event_engine.repository.%s', StringUtil::decamelize($projectorName))
+                    sprintf('event_engine.repository.%s', StringUtil::decamelize($projectorName)),
                 );
 
                 $result[$identifier] = (new Definition(
@@ -256,12 +256,12 @@ final class EventEnginePass implements CompilerPassInterface
                         $projector::generateOwnCollectionName(),
                         $projector::stateClassName(),
                         $projector::statesClassName(),
-                    ]
+                    ],
                 ))->setPublic(true);
 
                 return $result;
             },
-            []
+            [],
         );
 
         $container->addDefinitions($projectorRepositoryDefinitions);
@@ -277,7 +277,7 @@ final class EventEnginePass implements CompilerPassInterface
 
             $services = array_merge(
                 $services,
-                $extraServices
+                $extraServices,
             );
         }
 
@@ -286,8 +286,8 @@ final class EventEnginePass implements CompilerPassInterface
                 throw new RuntimeException(
                     sprintf(
                         'Service \'%s\' can\'t be made public because it\'s not found.',
-                        $service
-                    )
+                        $service,
+                    ),
                 );
             }
 
@@ -295,13 +295,11 @@ final class EventEnginePass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @return ReflectionClass<object>|null
-     */
+    /** @return ReflectionClass<object>|null */
     private function reflectionClassFromResource(
         ContainerBuilder $container,
-        ResourceInterface $resource
-    ): ?ReflectionClass {
+        ResourceInterface $resource,
+    ): ReflectionClass|null {
         if (! $resource instanceof ReflectionClassResource) {
             return null;
         }

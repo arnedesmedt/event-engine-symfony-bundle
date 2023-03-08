@@ -14,26 +14,22 @@
     "require": {
         "php": "^8.1",
         "ext-pdo": "*",
-        "ext-json": "*",
+        "arnedesmedt/json-immutable-objects": "~0.1",
         "event-engine/php-engine": "~0.1",
-        "event-engine/php-json-schema": "~2.0",
         "event-engine/php-postgres-document-store": "~0.1",
         "event-engine/prooph-v7-event-store": "~0.1",
         "prooph/pdo-event-store": "~1.0",
         "opis/json-schema": "~1.0",
-        "arnedesmedt/value-objects": "~0.1",
-        "arnedesmedt/json-immutable-objects": "~0.1",
         "symfony/cache": "~6.1",
         "symfony/http-kernel": "~6.1",
-        "arnedesmedt/php-util": "~0.1",
         "symfony/validator": "~6.1",
         "symfony/messenger": "~6.1",
-        "symfony/lock": "^6.1"
+        "symfony/lock": "~6.1"
     },
     "require-dev": {
         "phpstan/phpstan": "~1.0",
         "squizlabs/php_codesniffer": "~3.0",
-        "doctrine/coding-standard": "~9.0",
+        "doctrine/coding-standard": "~11.0",
         "phpro/grumphp": "~1.0",
         "rector/rector": "~0.1"
     },
@@ -48,6 +44,7 @@
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpro/grumphp": true
-        }
+        },
+        "sort-packages": true
     }
 }

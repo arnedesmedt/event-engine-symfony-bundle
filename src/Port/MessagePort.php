@@ -60,9 +60,7 @@ final class MessagePort implements Port
         return $messageType::fromArray((array) $data);
     }
 
-    /**
-     * @return array<mixed>
-     */
+    /** @return array<mixed> */
     public function serializePayload(mixed $customMessage): array
     {
         if (is_array($customMessage)) {
@@ -77,8 +75,8 @@ final class MessagePort implements Port
             sprintf(
                 'Invalid message passed to \'%s\'. This should be an immutable record but got \'%s\' instead.',
                 __METHOD__,
-                get_debug_type($customMessage)
-            )
+                get_debug_type($customMessage),
+            ),
         );
     }
 
@@ -99,7 +97,7 @@ final class MessagePort implements Port
         return new MessageBag(
             $customCommand::class,
             MessageBag::TYPE_COMMAND,
-            $customCommand
+            $customCommand,
         );
     }
 
@@ -120,7 +118,7 @@ final class MessagePort implements Port
         return new MessageBag(
             $customEvent::class,
             MessageBag::TYPE_EVENT,
-            $customEvent
+            $customEvent,
         );
     }
 
@@ -138,8 +136,8 @@ final class MessagePort implements Port
         throw new RuntimeException(
             sprintf(
                 'Unknown command. Cannot get the aggregate id from command \'%s\'.',
-                $command::class
-            )
+                $command::class,
+            ),
         );
     }
 

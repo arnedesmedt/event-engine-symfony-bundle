@@ -9,13 +9,9 @@ use EventEngine\Schema\TypeSchema;
 
 interface Query extends HasResponses
 {
-    /**
-     * @return class-string|string
-     */
+    /** @return class-string|string */
     public static function __resolver(): string;
 
-    /**
-     * @return array<string, class-string<TypeSchema>>
-     */
+    /** @return array<string, class-string<TypeSchema>> */
     public static function __extraResponseClasses(): array;
 }

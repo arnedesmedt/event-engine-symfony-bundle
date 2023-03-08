@@ -14,7 +14,7 @@ class CommandHandler extends Handler
     public function __construct(
         EventEngine $eventEngine,
         Flavour $flavour,
-        private LockAggregateCommandStrategy $lockAggregateCommand
+        private LockAggregateCommandStrategy $lockAggregateCommand,
     ) {
         parent::__construct($eventEngine, $flavour);
     }

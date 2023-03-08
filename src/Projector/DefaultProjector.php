@@ -92,8 +92,8 @@ abstract class DefaultProjector implements Projector
                     'The event \'%s\' needs to implement the \'%s\' interface, ' .
                     'if you want to use it in projections.',
                     $eventClass,
-                    Event::class
-                )
+                    Event::class,
+                ),
             );
         }
 

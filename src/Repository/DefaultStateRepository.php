@@ -39,12 +39,6 @@ use const JSON_THROW_ON_ERROR;
  */
 abstract class DefaultStateRepository implements StateRepository
 {
-    /** @var class-string<TState> */
-    protected string $stateClass;
-
-    /** @var class-string<TStates> */
-    protected string $statesClass;
-
     /**
      * @param class-string<TState> $stateClass
      * @param class-string<TStates> $statesClass
@@ -52,15 +46,15 @@ abstract class DefaultStateRepository implements StateRepository
     public function __construct(
         protected DocumentStore $documentStore,
         protected string $documentStoreName,
-        string $stateClass,
-        string $statesClass,
+        protected string $stateClass,
+        protected string $statesClass,
     ) {
         $reflectionClassState = new ReflectionClass($stateClass);
         if (! $reflectionClassState->implementsInterface(ImmutableRecord::class)) {
             throw new RuntimeException(sprintf(
                 'The state class "%s" doesn\'t implement the "%s" interface',
                 $stateClass,
-                ImmutableRecord::class
+                ImmutableRecord::class,
             ));
         }
 
@@ -69,31 +63,24 @@ abstract class DefaultStateRepository implements StateRepository
             throw new RuntimeException(sprintf(
                 'The states class "%s" doesn\'t implement the "%s" interface',
                 $statesClass,
-                ListValue::class
+                ListValue::class,
             ));
         }
-
-        $this->stateClass = $stateClass;
-        $this->statesClass = $statesClass;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function findDocument($identifier): ?array
+    /** @inheritDoc */
+    public function findDocument($identifier): array|null
     {
         /** @var array{state: array<string, mixed>}|null $document */
         $document = $this->documentStore->getDoc(
             $this->documentStoreName,
-            (string) $identifier
+            (string) $identifier,
         );
 
         return $document;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findPartialDocument(PartialSelect $select, $identifier): mixed
     {
         return $this->documentStore->getPartialDoc(
@@ -103,10 +90,8 @@ abstract class DefaultStateRepository implements StateRepository
         );
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function findDocumentState($identifier): ?array
+    /** @inheritDoc */
+    public function findDocumentState($identifier): array|null
     {
         /** @var array<string, mixed>|null $documentState */
         $documentState = $this->findPartialDocument(
@@ -117,14 +102,12 @@ abstract class DefaultStateRepository implements StateRepository
         return $documentState;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findDocuments(
-        ?Filter $filter = null,
-        ?int $skip = null,
-        ?int $limit = null,
-        ?OrderBy $orderBy = null
+        Filter|null $filter = null,
+        int|null $skip = null,
+        int|null $limit = null,
+        OrderBy|null $orderBy = null,
     ): array {
         if ($filter === null) {
             $filter = new AnyFilter();
@@ -135,21 +118,19 @@ abstract class DefaultStateRepository implements StateRepository
             $filter,
             $skip,
             $limit,
-            $orderBy
+            $orderBy,
         );
 
         return iterator_to_array($iterator);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findPartialDocuments(
         PartialSelect $partialSelect,
-        ?Filter $filter = null,
-        ?int $skip = null,
-        ?int $limit = null,
-        ?OrderBy $orderBy = null
+        Filter|null $filter = null,
+        int|null $skip = null,
+        int|null $limit = null,
+        OrderBy|null $orderBy = null,
     ): array {
         if ($filter === null) {
             $filter = new AnyFilter();
@@ -161,20 +142,18 @@ abstract class DefaultStateRepository implements StateRepository
             $filter,
             $skip,
             $limit,
-            $orderBy
+            $orderBy,
         );
 
         return iterator_to_array($iterator);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findDocumentStates(
-        ?Filter $filter = null,
-        ?int $skip = null,
-        ?int $limit = null,
-        ?OrderBy $orderBy = null
+        Filter|null $filter = null,
+        int|null $skip = null,
+        int|null $limit = null,
+        OrderBy|null $orderBy = null,
     ): array {
         /** @var array<array<string, mixed>> $documentStates */
         $documentStates = $this->findPartialDocuments(
@@ -188,10 +167,8 @@ abstract class DefaultStateRepository implements StateRepository
         return $documentStates;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function findDocumentIds(?Filter $filter = null): array
+    /** @inheritDoc */
+    public function findDocumentIds(Filter|null $filter = null): array
     {
         if ($filter === null) {
             $filter = new AnyFilter();
@@ -199,11 +176,11 @@ abstract class DefaultStateRepository implements StateRepository
 
         return $this->documentStore->filterDocIds(
             $this->documentStoreName,
-            $filter
+            $filter,
         );
     }
 
-    public function countDocuments(?Filter $filter = null): int
+    public function countDocuments(Filter|null $filter = null): int
     {
         if ($filter === null) {
             $filter = new AnyFilter();
@@ -211,39 +188,33 @@ abstract class DefaultStateRepository implements StateRepository
 
         return $this->documentStore->countDocs(
             $this->documentStoreName,
-            $filter
+            $filter,
         );
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function upsertState($identifier, $state): void
     {
         $this->documentStore->upsertDoc(
             $this->documentStoreName,
             (string) $identifier,
-            ['state' => $state->toArray()]
+            ['state' => $state->toArray()],
         );
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function deleteDoc($identifier): void
     {
         $this->documentStore->deleteDoc(
             $this->documentStoreName,
-            (string) $identifier
+            (string) $identifier,
         );
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function needDocument(
         $identifier,
-        ?Throwable $exception = null
+        Throwable|null $exception = null,
     ): array {
         $document = $this->findDocument($identifier);
 
@@ -252,8 +223,8 @@ abstract class DefaultStateRepository implements StateRepository
                 sprintf(
                     'Resource with id \'%s\' not found in document store \'%s\'',
                     (string) $identifier,
-                    $this->documentStoreName
-                )
+                    $this->documentStoreName,
+                ),
             );
 
             throw $exception;
@@ -262,12 +233,10 @@ abstract class DefaultStateRepository implements StateRepository
         return $document;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function needDocumentState(
         $identifier,
-        ?Throwable $exception = null
+        Throwable|null $exception = null,
     ): array {
         $state = $this->findDocumentState($identifier);
 
@@ -276,8 +245,8 @@ abstract class DefaultStateRepository implements StateRepository
                 sprintf(
                     'Resource with id \'%s\' not found in document store \'%s\'',
                     (string) $identifier,
-                    $this->documentStoreName
-                )
+                    $this->documentStoreName,
+                ),
             );
 
             throw $exception;
@@ -286,12 +255,10 @@ abstract class DefaultStateRepository implements StateRepository
         return $state;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function dontNeedDocument(
         $identifier,
-        ?Throwable $exception = null
+        Throwable|null $exception = null,
     ): void {
         try {
             $this->needDocument($identifier);
@@ -303,16 +270,14 @@ abstract class DefaultStateRepository implements StateRepository
             sprintf(
                 'Resource with id \'%s\' already exists in document store \'%s\'',
                 (string) $identifier,
-                $this->documentStoreName
-            )
+                $this->documentStoreName,
+            ),
         );
 
         throw $exception;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findDocumentsByIds(array|ListValue $identifiers): array
     {
         $filter = $this->identifiersToFilter($identifiers);
@@ -322,10 +287,8 @@ abstract class DefaultStateRepository implements StateRepository
             : $this->findDocuments($filter);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function needDocumentsByIds(array|ListValue $identifiers, ?Throwable $exception = null): array
+    /** @inheritDoc */
+    public function needDocumentsByIds(array|ListValue $identifiers, Throwable|null $exception = null): array
     {
         $documents = $this->findDocumentsByIds($identifiers);
 
@@ -333,17 +296,15 @@ abstract class DefaultStateRepository implements StateRepository
             throw $exception ?? new NotFoundHttpException(
                 sprintf(
                     'One of the identifiers is not found: \'%s\'.',
-                    json_encode($this->identifiersToScalars($identifiers), JSON_THROW_ON_ERROR)
-                )
+                    json_encode($this->identifiersToScalars($identifiers), JSON_THROW_ON_ERROR),
+                ),
             );
         }
 
         return $documents;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findDocumentStatesByIds(array|ListValue $identifiers): array
     {
         $filter = $this->identifiersToFilter($identifiers);
@@ -353,10 +314,8 @@ abstract class DefaultStateRepository implements StateRepository
             : $this->findDocumentStates($filter);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function needDocumentStatesByIds(array|ListValue $identifiers, ?Throwable $exception = null): array
+    /** @inheritDoc */
+    public function needDocumentStatesByIds(array|ListValue $identifiers, Throwable|null $exception = null): array
     {
         $documentStates = $this->findDocumentStatesByIds($identifiers);
 
@@ -364,51 +323,43 @@ abstract class DefaultStateRepository implements StateRepository
             throw $exception ?? new NotFoundHttpException(
                 sprintf(
                     'One of the identifiers is not found: \'%s\'.',
-                    json_encode($this->identifiersToScalars($identifiers), JSON_THROW_ON_ERROR)
-                )
+                    json_encode($this->identifiersToScalars($identifiers), JSON_THROW_ON_ERROR),
+                ),
             );
         }
 
         return $documentStates;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findStatesByIds(array|ListValue $identifiers)
     {
         return $this->statesFromDocuments(
-            $this->findDocumentStatesByIds($identifiers)
+            $this->findDocumentStatesByIds($identifiers),
         );
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function needStatesByIds(array|ListValue $identifiers, ?Throwable $exception = null)
+    /** @inheritDoc */
+    public function needStatesByIds(array|ListValue $identifiers, Throwable|null $exception = null)
     {
         return $this->statesFromDocuments(
-            $this->needDocumentStatesByIds($identifiers, $exception)
+            $this->needDocumentStatesByIds($identifiers, $exception),
         );
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findStates(
-        ?Filter $filter = null,
-        ?int $skip = null,
-        ?int $limit = null,
-        ?OrderBy $orderBy = null
+        Filter|null $filter = null,
+        int|null $skip = null,
+        int|null $limit = null,
+        OrderBy|null $orderBy = null,
     ) {
         return $this->statesFromDocuments(
-            $this->findDocumentStates($filter, $skip, $limit, $orderBy)
+            $this->findDocumentStates($filter, $skip, $limit, $orderBy),
         );
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findState($identifier)
     {
         $documentState = $this->findDocumentState($identifier);
@@ -420,45 +371,41 @@ abstract class DefaultStateRepository implements StateRepository
         return $this->stateFromDocument($documentState);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function needState(
         $identifier,
-        ?Throwable $exception = null
+        Throwable|null $exception = null,
     ) {
         return $this->stateFromDocument(
-            $this->needDocumentState($identifier, $exception)
+            $this->needDocumentState($identifier, $exception),
         );
     }
 
-    public function findDocumentIdValueObjects(?Filter $filter = null): ListValue
+    public function findDocumentIdValueObjects(Filter|null $filter = null): ListValue
     {
         $documentIds = $this->findDocumentIds($filter);
         $identifiersClass = $this->identifiersClass();
 
         if ($identifiersClass === null) {
             throw new RuntimeException(
-                sprintf('Could not found identifiers class for repository \'%s\'.', static::class)
+                sprintf('Could not found identifiers class for repository \'%s\'.', static::class),
             );
         }
 
         return $identifiersClass::fromArray($documentIds);
     }
 
-    public function hasDocuments(?Filter $filter = null): bool
+    public function hasDocuments(Filter|null $filter = null): bool
     {
         return $this->countDocuments($filter) > 0;
     }
 
-    public function hasNoDocuments(?Filter $filter = null): bool
+    public function hasNoDocuments(Filter|null $filter = null): bool
     {
         return $this->countDocuments($filter) === 0;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function hasDocument($identifier): bool
     {
         $document = $this->findDocument($identifier);
@@ -466,9 +413,7 @@ abstract class DefaultStateRepository implements StateRepository
         return $document !== null;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function hasNoDocument($identifier): bool
     {
         return ! $this->hasDocument($identifier);
@@ -504,26 +449,20 @@ abstract class DefaultStateRepository implements StateRepository
         return $this->stateClass::fromArray($documentState);
     }
 
-    /**
-     * @return class-string<TState>
-     */
+    /** @return class-string<TState> */
     public function stateClass(): string
     {
         return $this->stateClass;
     }
 
-    /**
-     * @return class-string<ListValue<TId>>|null
-     */
-    protected function identifiersClass(): ?string
+    /** @return class-string<ListValue<TId>>|null */
+    protected function identifiersClass(): string|null
     {
         return null;
     }
 
-    /**
-     * @param array<string|TId>|ListValue<TId> $identifiers
-     */
-    private function identifiersToFilter(array|ListValue $identifiers): ?Filter
+    /** @param array<string|TId>|ListValue<TId> $identifiers */
+    private function identifiersToFilter(array|ListValue $identifiers): Filter|null
     {
         /** @var array<string> $scalarIdentifiers */
         $scalarIdentifiers = $this->identifiersToScalars($identifiers);
@@ -534,7 +473,7 @@ abstract class DefaultStateRepository implements StateRepository
 
         $filters = array_map(
             static fn ($scalarIdentifier) => new DocIdFilter($scalarIdentifier),
-            $scalarIdentifiers
+            $scalarIdentifiers,
         );
 
         return count($filters) === 1 ? reset($filters) : new OrFilter(...$filters);
@@ -555,7 +494,7 @@ abstract class DefaultStateRepository implements StateRepository
             static fn ($identifier) => $identifier instanceof ValueObject
                 ? $identifier->toValue()
                 : $identifier,
-            $identifiers
+            $identifiers,
         );
     }
 }

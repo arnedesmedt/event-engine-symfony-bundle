@@ -32,9 +32,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         $service->setEventEngineMessageUuid($message->uuid());
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function callCommandPreProcessor($preProcessor, Message $command): Message|CommandDispatchResult
     {
         self::addMessageUuid($preProcessor, $command);
@@ -59,9 +57,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         return $this->functionalFlavour->getAggregateIdFromCommand($aggregateIdPayloadKey, $command);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function callContextProvider($contextProvider, Message $command): mixed
     {
         return $this->functionalFlavour->callContextProvider($contextProvider, $command);
@@ -78,7 +74,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         string $aggregateType,
         callable $aggregateFunction,
         Message $command,
-        ...$contextServices
+        ...$contextServices,
     ): Generator {
         foreach ($contextServices as $contextService) {
             self::addMessageUuid($contextService, $command);
@@ -88,7 +84,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
             $aggregateType,
             $aggregateFunction,
             $command,
-            ...$contextServices
+            ...$contextServices,
         );
     }
 
@@ -104,7 +100,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         callable $aggregateFunction,
         $aggregateState,
         Message $command,
-        ...$contextServices
+        ...$contextServices,
     ): Generator {
         foreach ($contextServices as $contextService) {
             self::addMessageUuid($contextService, $command);
@@ -115,7 +111,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
             $aggregateFunction,
             $aggregateState,
             $command,
-            ...$contextServices
+            ...$contextServices,
         );
     }
 
@@ -124,9 +120,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         return $this->functionalFlavour->callApplyFirstEvent($applyFunction, $event);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function callApplySubsequentEvent(callable $applyFunction, $aggregateState, Message $event): mixed
     {
         return $this->functionalFlavour->callApplySubsequentEvent($applyFunction, $aggregateState, $event);
@@ -137,17 +131,13 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         return $this->functionalFlavour->prepareNetworkTransmission($message);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function convertMessageReceivedFromNetwork(Message $message, $aggregateEvent = false): Message
     {
         return $this->functionalFlavour->convertMessageReceivedFromNetwork($message, $aggregateEvent);
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function callProjector($projector, string $projectionVersion, string $projectionName, Message $event): void
     {
         $this->functionalFlavour->callProjector($projector, $projectionVersion, $projectionName, $event);
@@ -218,7 +208,7 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     {
         if (! $query instanceof MessageBag) {
             throw new RuntimeException(
-                'Message passed to ' . __METHOD__ . ' should be of type ' . MessageBag::class
+                'Message passed to ' . __METHOD__ . ' should be of type ' . MessageBag::class,
             );
         }
 

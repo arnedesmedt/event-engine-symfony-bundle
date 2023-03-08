@@ -17,7 +17,7 @@ final class LockAggregateCommand implements LockAggregateCommandStrategy
     public function __construct(
         private EventEngine $eventEngine,
         private LockFactory $aggregateLockFactory,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 

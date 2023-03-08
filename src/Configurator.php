@@ -99,7 +99,7 @@ final class Configurator
         private array $projectorClasses,
         private array $preProcessorClasses,
         private array $descriptionServices,
-        private ?MessageProducer $eventQueue
+        private MessageProducer|null $eventQueue,
     ) {
         $this->environment = $this->mapEnvironment($environment);
     }
@@ -128,7 +128,7 @@ final class Configurator
         )
             ->bootstrap(
                 $this->environment,
-                $this->debug
+                $this->debug,
             );
     }
 
@@ -189,14 +189,14 @@ final class Configurator
             [
                 ...array_map(
                     static fn ($aggregateClass) => $aggregateClass::stateClass(),
-                    $this->aggregateClasses
+                    $this->aggregateClasses,
                 ),
                 ...array_map(
                     static fn ($projectorClass) => $projectorClass::stateClassName(),
-                    $this->projectorClasses
+                    $this->projectorClasses,
                 ),
                 ...$this->typeClasses,
-            ]
+            ],
         );
 
         foreach ($types as $type) {
@@ -247,15 +247,15 @@ final class Configurator
         $aggregateRootClasses = array_unique(
             array_map(
                 fn ($eventClass) => $this->aggregateRootClassFromEventClass($eventClass),
-                $projectorClass::events()
-            )
+                $projectorClass::events(),
+            ),
         );
 
         return array_map(
             static fn ($aggregateRootClass) => Stream::ofLocalProjection(
-                EventEngineUtil::fromAggregateClassToStreamName($aggregateRootClass)
+                EventEngineUtil::fromAggregateClassToStreamName($aggregateRootClass),
             ),
-            $aggregateRootClasses
+            $aggregateRootClasses,
         );
     }
 
@@ -334,7 +334,7 @@ final class Configurator
     private function newAggregateRoot(
         string $aggregateRootClass,
         string $commandClass,
-        array &$usedAggregateRoots
+        array &$usedAggregateRoots,
     ): bool {
         if ($commandClass::__newAggregate()) {
             $usedAggregateRoots[] = $aggregateRootClass;
@@ -356,7 +356,7 @@ final class Configurator
         CommandProcessorDescription $commandProcessor,
         string $aggregateRootClass,
         string $commandClass,
-        bool $newAggregateRoot
+        bool $newAggregateRoot,
     ): self {
         $aggregateRootMethod = $newAggregateRoot ? 'withNew' : 'withExisting';
 
@@ -368,12 +368,10 @@ final class Configurator
         return $this;
     }
 
-    /**
-     * @param class-string<AggregateCommand> $commandClass
-     */
+    /** @param class-string<AggregateCommand> $commandClass */
     private function handleEvents(
         CommandProcessorDescription $commandProcessor,
-        string $commandClass
+        string $commandClass,
     ): self {
         $events = $commandClass::__eventsToRecord();
 
@@ -386,12 +384,10 @@ final class Configurator
         return $this;
     }
 
-    /**
-     * @param class-string<AggregateCommand> $commandClass
-     */
+    /** @param class-string<AggregateCommand> $commandClass */
     private function handleServices(
         CommandProcessorDescription $commandProcessor,
-        string $commandClass
+        string $commandClass,
     ): self {
         $services = $this->commandServiceMapping()[$commandClass] ?? [];
 
@@ -402,13 +398,11 @@ final class Configurator
         return $this;
     }
 
-    /**
-     * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateRootClass
-     */
+    /** @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateRootClass */
     private function handleStorage(
         CommandProcessorDescription $commandProcessor,
         string $aggregateRootClass,
-        bool $newAggregateRoot
+        bool $newAggregateRoot,
     ): self {
         if (! $newAggregateRoot) {
             return $this;
@@ -423,9 +417,7 @@ final class Configurator
         return $this;
     }
 
-    /**
-     * @return array<string>
-     */
+    /** @return array<string> */
     private function handle(string $aggregateRootClass, string $commandClass, bool $newAggregateRoot): array
     {
         if (! $newAggregateRoot) {
@@ -442,14 +434,12 @@ final class Configurator
             sprintf(
                 'Aggregate method \'%s\' for aggregate root \'%s\' is not callable.',
                 $commandClass::__aggregateMethod(),
-                $aggregateRootClass
-            )
+                $aggregateRootClass,
+            ),
         );
     }
 
-    /**
-     * @return array<class-string<AggregateCommand>, class-string<AggregateRoot<JsonSchemaAwareRecord>>>
-     */
+    /** @return array<class-string<AggregateCommand>, class-string<AggregateRoot<JsonSchemaAwareRecord>>> */
     private function commandAggregateMapping(): array
     {
         if (! empty($this->commandAggregateMapping)) {
@@ -493,9 +483,7 @@ final class Configurator
         return $this->commandAggregateMapping;
     }
 
-    /**
-     * @return array<class-string<AggregateCommand>, array<class-string<Event>>>
-     */
+    /** @return array<class-string<AggregateCommand>, array<class-string<Event>>> */
     private function commandEventMapping(): array
     {
         if (! empty($this->commandEventMapping)) {
@@ -516,9 +504,7 @@ final class Configurator
         return $this->commandEventMapping;
     }
 
-    /**
-     * @return array<class-string<AggregateCommand>, array<class-string|string>>
-     */
+    /** @return array<class-string<AggregateCommand>, array<class-string|string>> */
     private function commandServiceMapping(): array
     {
         if (! empty($this->commandServiceMapping)) {
@@ -558,7 +544,7 @@ final class Configurator
 
                         return $type ? $type->getName() : null;
                     },
-                    $parameters
+                    $parameters,
                 );
 
                 if (in_array(null, $mapping)) {
@@ -578,9 +564,7 @@ final class Configurator
         return $this->commandServiceMapping;
     }
 
-    /**
-     * @return array<class-string<Command>, class-string<PreProcessor>>
-     */
+    /** @return array<class-string<Command>, class-string<PreProcessor>> */
     private function commandPreProcessorMapping(): array
     {
         if (! empty($this->commandPreProcessorMapping)) {
@@ -609,8 +593,8 @@ final class Configurator
                 throw new RuntimeException(
                     sprintf(
                         '__invoke method of preProcessor \'%s\' has no parameters.',
-                        $preProcessorClass
-                    )
+                        $preProcessorClass,
+                    ),
                 );
             }
 
@@ -627,8 +611,8 @@ final class Configurator
                             sprintf(
                                 'The first parameter of the __invoke method of preProcessor \'%s\' ' .
                                 'has no type or is not a command.',
-                                $preProcessorClass
-                            )
+                                $preProcessorClass,
+                            ),
                         );
                     }
 
@@ -636,6 +620,7 @@ final class Configurator
                 }
             }
 
+            /** @var class-string<Command> $commandClass */
             foreach ($commandClasses as $commandClass) {
                 $this->commandPreProcessorMapping[$commandClass] = $preProcessorClass;
             }
@@ -644,9 +629,7 @@ final class Configurator
         return $this->commandPreProcessorMapping;
     }
 
-    /**
-     * @return array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string>
-     */
+    /** @return array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */
     private function aggregateIdentifierMapping(): array
     {
         if (! empty($this->aggregateIdentifierMapping)) {
@@ -660,9 +643,7 @@ final class Configurator
         return $this->aggregateIdentifierMapping;
     }
 
-    /**
-     * @param class-string $message
-     */
+    /** @param class-string $message */
     private static function schemaFromMessage(string $message): PayloadSchema|TypeSchema
     {
         $reflectionClass = new ReflectionClass($message);
@@ -678,8 +659,8 @@ final class Configurator
         throw new RuntimeException(
             sprintf(
                 'No schema found for message \'%s\'. Implement the JsonSchemaAwareRecord interface.',
-                $message
-            )
+                $message,
+            ),
         );
     }
 

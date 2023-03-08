@@ -41,17 +41,15 @@ final class EventEngineUtil
                     'for aggregate root \'%s\' don\'t match.',
                     $stateClassByReturnType,
                     $stateClass,
-                    $aggregateRootClass
-                )
+                    $aggregateRootClass,
+                ),
             );
         }
 
         return $aggregateRootClass;
     }
 
-    /**
-     * @param class-string $stateClass
-     */
+    /** @param class-string $stateClass */
     public static function fromStateToAggregateRootName(string $stateClass): string
     {
         $namespace = substr($stateClass, 0, -(strlen('State') + 1));
@@ -60,9 +58,7 @@ final class EventEngineUtil
         return substr($namespace, $pos + 1);
     }
 
-    /**
-     * @param class-string $stateClass
-     */
+    /** @param class-string $stateClass */
     public static function fromStateToRepositoryId(string $stateClass): string
     {
         $aggregateRootName = self::fromStateToAggregateRootName($stateClass);
@@ -70,9 +66,7 @@ final class EventEngineUtil
         return sprintf('event_engine.repository.%s', strtolower($aggregateRootName));
     }
 
-    /**
-     * @param class-string $aggregateClass
-     */
+    /** @param class-string $aggregateClass */
     public static function fromAggregateClassToStateClass(string $aggregateClass): string
     {
         $aggregateName = self::fromAggregateClassToAggregateName($aggregateClass);
@@ -81,15 +75,15 @@ final class EventEngineUtil
             '~(.*)' . preg_quote($aggregateName, '~') . '~',
             '$1State',
             $aggregateClass,
-            1
+            1,
         );
 
         if ($replaced === null) {
             throw new RuntimeException(
                 sprintf(
                     'Couldn\'t convert the aggregate class \'%s\' into a state class',
-                    $aggregateClass
-                )
+                    $aggregateClass,
+                ),
             );
         }
 
@@ -101,9 +95,7 @@ final class EventEngineUtil
         return sprintf('%s\\%2$s\\%2$s', $entityNamespace, StringUtil::camelizePascalCase($aggregateName, '_'));
     }
 
-    /**
-     * @param class-string $aggregateClass
-     */
+    /** @param class-string $aggregateClass */
     public static function fromAggregateClassToAggregateName(string $aggregateClass): string
     {
         return (new ReflectionClass($aggregateClass))->getShortName();
@@ -132,23 +124,19 @@ final class EventEngineUtil
         return self::fromAggregateNameToStateClass($aggregateName, $entityNamespace) . 's';
     }
 
-    /**
-     * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateClass
-     */
+    /** @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateClass */
     public static function fromAggregateClassToStreamName(string $aggregateClass): string
     {
         return self::fromAggregateNameToStreamName(
-            self::fromAggregateClassToAggregateName($aggregateClass)
+            self::fromAggregateClassToAggregateName($aggregateClass),
         );
     }
 
-    /**
-     * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateClass
-     */
+    /** @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateClass */
     public static function fromAggregateClassToDocumentStoreName(string $aggregateClass): string
     {
         return self::fromAggregateNameToDocumentStoreName(
-            self::fromAggregateClassToAggregateName($aggregateClass)
+            self::fromAggregateClassToAggregateName($aggregateClass),
         );
     }
 }

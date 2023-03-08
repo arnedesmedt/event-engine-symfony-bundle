@@ -32,7 +32,7 @@ final class Validator implements ValidatorInterface
     public function validate(
         mixed $value,
         array|Constraint|null $constraints = null,
-        array|GroupSequence|string|null $groups = null
+        array|GroupSequence|string|null $groups = null,
     ): ConstraintViolationListInterface {
         if ($value instanceof MessageBag) {
             $value = $value->get(MessageBag::MESSAGE);
@@ -44,7 +44,7 @@ final class Validator implements ValidatorInterface
     public function validateProperty(
         object $object,
         string $propertyName,
-        array|GroupSequence|string|null $groups = null
+        array|GroupSequence|string|null $groups = null,
     ): ConstraintViolationListInterface {
         return $this->validator->validateProperty($object, $propertyName, $groups);
     }
@@ -53,7 +53,7 @@ final class Validator implements ValidatorInterface
         object|string $objectOrClass,
         string $propertyName,
         mixed $value,
-        array|GroupSequence|string|null $groups = null
+        array|GroupSequence|string|null $groups = null,
     ): ConstraintViolationListInterface {
         return $this->validator->validatePropertyValue($objectOrClass, $propertyName, $value, $groups);
     }

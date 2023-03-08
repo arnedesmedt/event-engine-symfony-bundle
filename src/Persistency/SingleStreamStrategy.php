@@ -21,14 +21,12 @@ final class SingleStreamStrategy implements PostgresPersistenceStrategy
 {
     use PostgresHelper;
 
-    public function __construct(private ?MessageConverter $messageConverter = null)
+    public function __construct(private MessageConverter|null $messageConverter = null)
     {
         $this->messageConverter = $messageConverter ?? new DefaultMessageConverter();
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function createSchema(string $tableName): array
     {
         $tableName = $this->quoteIdent($tableName);
@@ -65,13 +63,11 @@ EOT;
                 $statement,
                 $index1,
                 $index2,
-            ]
+            ],
         );
     }
 
-    /**
-     * @return array<string>
-     */
+    /** @return array<string> */
     public function columnNames(): array
     {
         return [
@@ -118,9 +114,7 @@ EOT;
         return $table;
     }
 
-    /**
-     * @return array<string>
-     */
+    /** @return array<string> */
     private function getSchemaCreationSchema(string $tableName): array
     {
         $schemaName = $this->extractSchema($tableName);
@@ -132,7 +126,7 @@ EOT;
         return [
             sprintf(
                 'CREATE SCHEMA IF NOT EXISTS %s',
-                $schemaName
+                $schemaName,
             ),
         ];
     }

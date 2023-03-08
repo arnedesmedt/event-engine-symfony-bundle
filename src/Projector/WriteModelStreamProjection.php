@@ -19,14 +19,12 @@ class WriteModelStreamProjection
     /** @readonly */
     private ReadModelProjector $projection;
 
-    /**
-     * @param array<string, mixed>|null $projectionOptions
-     */
+    /** @param array<string, mixed>|null $projectionOptions */
     public function __construct(
         ProjectionManager $projectionManager,
         EventEngine $eventEngine,
-        ?array $projectionOptions = null,
-        private bool $testMode = false
+        array|null $projectionOptions = null,
+        private bool $testMode = false,
     ) {
         if ($projectionOptions === null) {
             $projectionOptions = [ReadModelProjector::OPTION_PERSIST_BLOCK_SIZE => 1];
@@ -54,7 +52,7 @@ class WriteModelStreamProjection
         $this->projection = $projectionManager->createReadModelProjection(
             self::NAME,
             new ReadModelProxy($eventEngine),
-            $projectionOptions
+            $projectionOptions,
         );
 
         $this->projection->fromStreams(...$sourceStreams);

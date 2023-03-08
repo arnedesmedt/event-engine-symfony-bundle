@@ -15,12 +15,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand('event-engine:document-stores:create')]
 class EventEngineDocumentStoresCreateCommand extends Command
 {
-    /**
-     * @param array<class-string> $aggregates
-     */
+    /** @param array<class-string> $aggregates */
     public function __construct(
         private DocumentStore $documentStore,
-        private array $aggregates
+        private array $aggregates,
     ) {
         parent::__construct();
     }

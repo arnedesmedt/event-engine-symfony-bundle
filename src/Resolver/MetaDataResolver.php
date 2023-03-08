@@ -6,8 +6,8 @@ namespace ADS\Bundle\EventEngineBundle\Resolver;
 
 interface MetaDataResolver
 {
-    /**
-     * @param array<string, mixed> $metaData
-     */
+    /** @param array<string, mixed> $metaData */
     public function setMetaData(array $metaData): static;
+
+    public function __invoke(mixed $message): mixed;
 }

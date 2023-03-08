@@ -8,9 +8,7 @@ use Symfony\Component\Validator\Constraint;
 
 class SpecificationValidation extends Constraint
 {
-    /**
-     * @return string|array<string>
-     */
+    /** @return string|array<string> */
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

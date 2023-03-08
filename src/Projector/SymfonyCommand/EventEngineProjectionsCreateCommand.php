@@ -35,7 +35,7 @@ final class EventEngineProjectionsCreateCommand extends Command
   locked_until CHAR(26),
   PRIMARY KEY (no),
   UNIQUE (name)
-);'
+);',
         );
 
         return Command::SUCCESS;

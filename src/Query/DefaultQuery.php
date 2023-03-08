@@ -36,23 +36,19 @@ trait DefaultQuery
         return $resolverClass;
     }
 
-    /**
-     * @return array<string, class-string<TypeSchema>>
-     */
+    /** @return array<string, class-string<TypeSchema>> */
     public static function __extraResponseClasses(): array
     {
         return [];
     }
 
-    /**
-     * @return array<string>
-     */
+    /** @return array<string> */
     public static function __extraAuthorizationQuery(): array
     {
         return [
             sprintf(
                 'ROLE_OAUTH2_%s:READ',
-                strtoupper(StringUtil::entityNameFromClassName(static::class))
+                strtoupper(StringUtil::entityNameFromClassName(static::class)),
             ),
         ];
     }

@@ -13,7 +13,7 @@ class AsyncCommandHandler
 {
     public function __construct(
         private Flavour $flavour,
-        private LockAggregateCommandStrategy $lockAggregateCommand
+        private LockAggregateCommandStrategy $lockAggregateCommand,
     ) {
     }
 

@@ -15,10 +15,8 @@ trait TypedJsonSchemaAwareRecordLogic
 {
     use JsonSchemaAwareRecordLogic;
 
-    /**
-     * @return class-string|null
-     */
-    public static function getTypeClassNameForState(): ?string
+    /** @return class-string|null */
+    public static function getTypeClassNameForState(): string|null
     {
         $stateClass = static::class;
 

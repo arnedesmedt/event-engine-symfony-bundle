@@ -19,13 +19,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand('event-engine:event-streams:create')]
 class EventEngineEventStreamsCreateCommand extends Command
 {
-    /**
-     * @param array<class-string> $aggregates
-     */
+    /** @param array<class-string> $aggregates */
     public function __construct(
         private PDO $connection,
         private EventStore $eventStore,
-        private array $aggregates
+        private array $aggregates,
     ) {
         parent::__construct();
     }
@@ -46,11 +44,11 @@ class EventEngineEventStreamsCreateCommand extends Command
                 category VARCHAR(150),
                 PRIMARY KEY (no),
                 UNIQUE (stream_name)
-            );'
+            );',
         );
 
         $this->connection->exec(
-            'CREATE INDEX IF NOT EXISTS category_index on event_streams (category);'
+            'CREATE INDEX IF NOT EXISTS category_index on event_streams (category);',
         );
 
         foreach ($this->aggregates as $aggregate) {

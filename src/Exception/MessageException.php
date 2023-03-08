@@ -10,17 +10,15 @@ use function sprintf;
 
 final class MessageException extends Exception
 {
-    /**
-     * @param class-string $message
-     */
+    /** @param class-string $message */
     public static function noHandlerFound(string $message, string $type): self
     {
         return new static(
             sprintf(
                 'Could not find a %s for message \'%s\'.',
                 $type,
-                $message
-            )
+                $message,
+            ),
         );
     }
 
@@ -30,8 +28,8 @@ final class MessageException extends Exception
             sprintf(
                 'The message \'%s\' has a nested folder structure for the directory \'%s\'.',
                 $class,
-                $folder
-            )
+                $folder,
+            ),
         );
     }
 }

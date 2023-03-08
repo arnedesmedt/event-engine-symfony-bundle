@@ -9,9 +9,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 trait ValidationMessageLogic
 {
-    /**
-     * @return array<class-string>
-     */
+    /** @return array<class-string> */
     public function specificationServices(): array
     {
         return [];

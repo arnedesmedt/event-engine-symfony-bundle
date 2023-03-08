@@ -21,9 +21,7 @@ use function str_contains;
 #[AsCommand('event-engine:database:clear', 'clear all the streams, projections and document stores.')]
 class EventEngineDatabaseClearCommand extends Command
 {
-    /**
-     * @param array<class-string> $aggregates
-     */
+    /** @param array<class-string> $aggregates */
     public function __construct(
         private readonly EventStore $eventStore,
         private readonly DocumentStore $documentStore,

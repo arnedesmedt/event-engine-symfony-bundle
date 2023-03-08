@@ -10,8 +10,6 @@ interface ValidationMessage
 {
     public static function loadValidatorMetadata(ClassMetadata $metadata): void;
 
-    /**
-     * @return array<class-string>
-     */
+    /** @return array<class-string> */
     public function specificationServices(): array;
 }

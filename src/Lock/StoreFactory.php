@@ -20,7 +20,7 @@ class StoreFactory
     {
         if (! preg_match(self::DSN_REGEX, $dsn, $matches)) {
             throw new RuntimeException(
-                sprintf('DSN \'%s\' is not valid.', $dsn)
+                sprintf('DSN \'%s\' is not valid.', $dsn),
             );
         }
 
@@ -29,7 +29,7 @@ class StoreFactory
             [
                 'db_username' => $matches['user'],
                 'db_password' => $matches['password'],
-            ]
+            ],
         );
     }
 }

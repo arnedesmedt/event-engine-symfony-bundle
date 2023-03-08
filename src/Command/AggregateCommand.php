@@ -14,9 +14,7 @@ interface AggregateCommand extends Command
 
     public static function __newAggregate(): bool;
 
-    /**
-     * @return array<class-string<Event>>
-     */
+    /** @return array<class-string<Event>> */
     public static function __eventsToRecord(): array;
 
     /**

@@ -48,9 +48,7 @@ class SpecificationValidator extends ConstraintValidator
         $value->specifications(...$neededServices);
     }
 
-    /**
-     * @return array<class-string>
-     */
+    /** @return array<class-string> */
     protected function generalServices(): array
     {
         return [];
@@ -65,13 +63,11 @@ class SpecificationValidator extends ConstraintValidator
     {
         return array_map(
             fn (string $class) => $this->convertClassToService($value, $class),
-            $neededServiceClasses
+            $neededServiceClasses,
         );
     }
 
-    /**
-     * @param class-string $class
-     */
+    /** @param class-string $class */
     protected function convertClassToService(ValidationMessage $value, string $class): mixed
     {
         return $this->container->get($class);

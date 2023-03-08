@@ -38,7 +38,7 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
         DocumentStore $documentStore,
         string $documentStoreName,
         string $stateClass,
-        string $statesClass
+        string $statesClass,
     ) {
         parent::__construct($documentStore, $documentStoreName, $stateClass, $statesClass);
 
@@ -49,17 +49,15 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
             throw new LogicException(sprintf(
                 'The aggregate class "%s" doesn\'t implement the "%s" interface',
                 $aggregateClass,
-                AggregateRoot::class
+                AggregateRoot::class,
             ));
         }
 
         $this->aggregateClass = $aggregateClass;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function aggregateFromDocumentState(?array $documentState)
+    /** @inheritDoc */
+    public function aggregateFromDocumentState(array|null $documentState)
     {
         if ($documentState === null) {
             return null;
@@ -71,26 +69,22 @@ abstract class Repository extends DefaultStateRepository implements AggregateRep
         return $aggregate;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function findAggregate($identifier)
     {
         return $this->aggregateFromDocumentState(
-            $this->findDocumentState($identifier)
+            $this->findDocumentState($identifier),
         );
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function needAggregate(
         $identifier,
-        ?Throwable $exception = null
+        Throwable|null $exception = null,
     ) {
         /** @var TAgg $aggregate */
         $aggregate = $this->aggregateFromDocumentState(
-            $this->needDocumentState($identifier, $exception)
+            $this->needDocumentState($identifier, $exception),
         );
 
         return $aggregate;

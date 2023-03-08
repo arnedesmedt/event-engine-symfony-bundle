@@ -26,9 +26,7 @@ use const JSON_THROW_ON_ERROR;
 
 final class Handler implements EventSubscriberInterface
 {
-    /**
-     * @return array<string, string>
-     */
+    /** @return array<string, string> */
     public static function getSubscribedEvents(): array
     {
         return [KernelEvents::EXCEPTION => 'onKernelException'];
@@ -43,16 +41,16 @@ final class Handler implements EventSubscriberInterface
                 $event->setThrowable(
                     new ConflictHttpException(
                         'Resource already exists.',
-                        $exception
-                    )
+                        $exception,
+                    ),
                 );
                 break;
             case $exception instanceof AggregateNotFound:
                 $event->setThrowable(
                     new NotFoundHttpException(
                         $exception->getMessage(),
-                        $exception
-                    )
+                        $exception,
+                    ),
                 );
                 break;
             case $exception instanceof JsonValidationError:
@@ -63,7 +61,7 @@ final class Handler implements EventSubscriberInterface
                         /** @var string $encodedJson */
                         $encodedJson = json_encode(
                             json_decode($matches[3], true, 512, JSON_THROW_ON_ERROR),
-                            JSON_THROW_ON_ERROR
+                            JSON_THROW_ON_ERROR,
                         );
                     } catch (Throwable) {
                         /** @var string $encodedJson */
@@ -74,15 +72,15 @@ final class Handler implements EventSubscriberInterface
                         'Payload validation error: field \'%s\' [%s] %s',
                         StringUtil::decamelize($matches[1]),
                         $matches[2],
-                        str_replace('"', '\'', $encodedJson)
+                        str_replace('"', '\'', $encodedJson),
                     );
                 }
 
                 $event->setThrowable(
                     new BadRequestHttpException(
                         $message,
-                        $exception
-                    )
+                        $exception,
+                    ),
                 );
                 break;
         }

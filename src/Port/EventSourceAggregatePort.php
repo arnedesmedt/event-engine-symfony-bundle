@@ -28,7 +28,7 @@ final class EventSourceAggregatePort implements Port
         string $aggregateType,
         callable $aggregateFactory,
         $customCommand,
-        ...$contextServices
+        ...$contextServices,
     ): mixed {
         return $aggregateFactory($customCommand, ...$contextServices);
     }
@@ -43,7 +43,7 @@ final class EventSourceAggregatePort implements Port
     public function callAggregateWithCommand(
         $aggregate,
         $customCommand,
-        ...$contextServices
+        ...$contextServices,
     ): void {
         $method = lcfirst($customCommand->__aggregateMethod());
 
@@ -52,8 +52,8 @@ final class EventSourceAggregatePort implements Port
                 sprintf(
                     'Aggregate \'%s\' has no method \'%s\'.',
                     $aggregate::class,
-                    $method
-                )
+                    $method,
+                ),
             );
         }
 
@@ -74,8 +74,8 @@ final class EventSourceAggregatePort implements Port
                 sprintf(
                     'Cannot apply event. Given aggregate is not an instance of \'%s\'. Got \'%s\'.',
                     AggregateRoot::class,
-                    get_debug_type($aggregate)
-                )
+                    get_debug_type($aggregate),
+                ),
             );
         }
 
@@ -94,17 +94,15 @@ final class EventSourceAggregatePort implements Port
                 sprintf(
                     'Cannot apply event. Given aggregate is not an instance of \'%s\'. Got \'%s\'',
                     AggregateRoot::class,
-                    get_debug_type($aggregate)
-                )
+                    get_debug_type($aggregate),
+                ),
             );
         }
 
         $aggregate->apply($customEvent);
     }
 
-    /**
-     * @return array<mixed>
-     */
+    /** @return array<mixed> */
     public function serializeAggregate(mixed $aggregate): array
     {
         if (! $aggregate instanceof AggregateRoot) {
@@ -112,17 +110,15 @@ final class EventSourceAggregatePort implements Port
                 sprintf(
                     'Cannot serialize aggregate. Given aggregate is not an instance of \'%s\'. Got \'%s\'',
                     AggregateRoot::class,
-                    get_debug_type($aggregate)
-                )
+                    get_debug_type($aggregate),
+                ),
             );
         }
 
         return $aggregate->toArray();
     }
 
-    /**
-     * @param iterable<Event> $events
-     */
+    /** @param iterable<Event> $events */
     public function reconstituteAggregate(string $aggregateType, iterable $events): mixed
     {
         /** @var AggregateRoot<JsonSchemaAwareRecord> $aggregateClass */
@@ -131,9 +127,7 @@ final class EventSourceAggregatePort implements Port
         return $aggregateClass::reconstituteFromHistory(...$events);
     }
 
-    /**
-     * @param array<mixed> $state
-     */
+    /** @param array<mixed> $state */
     public function reconstituteAggregateFromStateArray(string $aggregateType, array $state, int $version): mixed
     {
         /** @var AggregateRoot<JsonSchemaAwareRecord> $aggregateClass */

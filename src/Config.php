@@ -18,18 +18,16 @@ final class Config implements CacheClearerInterface
     public const AGGREGATE_IDENTIFIERS = 'aggregateIdentifiers';
 
     /** @var array<string, array<string, string>>|null */
-    private ?array $config = null;
+    private array|null $config = null;
 
     public function __construct(
         private EventEngine $eventEngine,
         private AbstractAdapter $cache,
-        private string $environment
+        private string $environment,
     ) {
     }
 
-    /**
-     * @return array<string, array<mixed>>
-     */
+    /** @return array<string, array<mixed>> */
     public function config(): array
     {
         if ($this->isDevEnv()) {
@@ -45,12 +43,10 @@ final class Config implements CacheClearerInterface
         return $result;
     }
 
-    /**
-     * @return array<string, string>|string
-     */
+    /** @return array<string, string>|string */
     public function aggregateIdentifiers(
-        ?string $aggregateRootClass = null,
-        ?string $defaultAggregateIdentifier = null
+        string|null $aggregateRootClass = null,
+        string|null $defaultAggregateIdentifier = null,
     ): array|string|null {
         /** @var array<string, string> $aggregateIdentifiers */
         $aggregateIdentifiers = $this->cache->get(
@@ -61,9 +57,9 @@ final class Config implements CacheClearerInterface
 
                 return array_map(
                     static fn (array $aggregateDescription) => $aggregateDescription['aggregateIdentifier'],
-                    $config['aggregateDescriptions']
+                    $config['aggregateDescriptions'],
                 );
-            }
+            },
         );
 
         if ($aggregateRootClass === null) {
@@ -78,9 +74,7 @@ final class Config implements CacheClearerInterface
         $this->cache->clear();
     }
 
-    /**
-     * @return array<string, array<string, string>>
-     */
+    /** @return array<string, array<string, string>> */
     private function getConfig(): array
     {
         if (is_array($this->config)) {

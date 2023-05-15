@@ -2,3 +2,8 @@ parameters:
     level: max
     paths:
         - src
+services:
+	-
+		class: ADS\JsonImmutableObjects\PhpStan\PropertiesExtension
+		tags:
+			- phpstan.properties.readWriteExtension

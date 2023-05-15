@@ -14,6 +14,7 @@ use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
 use ADS\Bundle\EventEngineBundle\Query\Query;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
+use ADS\Bundle\EventEngineBundle\Util\PreProcessorCommandLink;
 use EventEngine\Commanding\CommandProcessorDescription;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;
@@ -31,6 +32,7 @@ use EventEngine\Schema\ResponseTypeSchema;
 use EventEngine\Schema\TypeSchema;
 use LogicException;
 use Psr\Container\ContainerInterface;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
@@ -46,10 +48,10 @@ use function array_unique;
 use function class_implements;
 use function in_array;
 use function is_callable;
-use function is_int;
 use function is_string;
 use function reset;
 use function sprintf;
+use function usort;
 
 final class Configurator
 {
@@ -67,7 +69,7 @@ final class Configurator
     private array $commandEventMapping = [];
     /** @var array<class-string<AggregateCommand>, array<class-string|string>> */
     private array $commandServiceMapping = [];
-    /** @var array<class-string<Command>, array<class-string<PreProcessor>>> */
+    /** @var array<class-string<Command>, array<class-string<object>>> */
     private array $commandPreProcessorMapping = [];
     /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */
     private array $aggregateIdentifierMapping = [];
@@ -569,73 +571,128 @@ final class Configurator
         return $this->commandServiceMapping;
     }
 
-    /** @return array<class-string<Command>, array<class-string<PreProcessor>>> */
+    /** @return array<class-string<Command>, array<class-string<object>>> */
     private function commandPreProcessorMapping(): array
     {
         if (! empty($this->commandPreProcessorMapping)) {
             return $this->commandPreProcessorMapping;
         }
 
-        foreach ($this->preProcessorClasses as $preProcessorClassOrInt => $preProcessorClassOrCommands) {
-            /** @var class-string<PreProcessor> $preProcessorClass */
-            $preProcessorClass = is_int($preProcessorClassOrInt)
-                ? $preProcessorClassOrCommands
-                : $preProcessorClassOrInt;
-
-            /** @var array<class-string<Command>> $commandClasses */
-            $commandClasses = is_int($preProcessorClassOrInt)
-                ? []
-                : $preProcessorClassOrCommands;
-
+        $preProcessorCommandLinks = [];
+        foreach ($this->preProcessorClasses as $preProcessorClass) {
             $preProcessorReflection = new ReflectionClass($preProcessorClass);
 
-            $invokeMethod = $preProcessorReflection->getMethod('__invoke');
-            $invokeParameters = $invokeMethod->getParameters();
+            /** @var array<PreProcessorCommandLink> $preProcessorCommandLinks */
+            $preProcessorCommandLinks = [
+                ...$preProcessorCommandLinks,
+                ...(
+                    $this->preProcessorCommandLinksByAttributes($preProcessorReflection)
+                    ?? $this->preProcessorCommandLinksByParameter($preProcessorReflection)
+                ),
+            ];
+        }
 
-            $firstParameter = reset($invokeParameters);
-
-            if (! $firstParameter) {
-                throw new RuntimeException(
-                    sprintf(
-                        '__invoke method of preProcessor \'%s\' has no parameters.',
-                        $preProcessorClass,
-                    ),
-                );
-            }
-
-            if (empty($commandClasses)) {
-                /** @var ReflectionNamedType|ReflectionUnionType|null $commandType */
-                $commandType = $firstParameter->getType();
-                $commandTypes = $commandType instanceof ReflectionUnionType
-                    ? $commandType->getTypes()
-                    : [$commandType];
-
-                foreach ($commandTypes as $commandType) {
-                    if ($commandType === null || ! in_array($commandType->getName(), $this->commandClasses)) {
-                        throw new RuntimeException(
-                            sprintf(
-                                'The first parameter of the __invoke method of preProcessor \'%s\' ' .
-                                'has no type or is not a command.',
-                                $preProcessorClass,
-                            ),
-                        );
-                    }
-
-                    $commandClasses[] = $commandType->getName();
-                }
-            }
-
-            /** @var class-string<Command> $commandClass */
-            foreach ($commandClasses as $commandClass) {
-                if (! isset($this->commandPreProcessorMapping[$commandClass])) {
-                    $this->commandPreProcessorMapping[$commandClass] = [];
+        usort(
+            $preProcessorCommandLinks,
+            static function (PreProcessorCommandLink $a, PreProcessorCommandLink $b) {
+                if ($a->commandClass() !== $b->commandClass()) {
+                    return 0;
                 }
 
-                $this->commandPreProcessorMapping[$commandClass][] = $preProcessorClass;
+                return $a->priority() <=> $b->priority();
+            },
+        );
+
+        foreach ($preProcessorCommandLinks as $preProcessorCommandLink) {
+            $commandClass = $preProcessorCommandLink->commandClass();
+            if (! isset($this->commandPreProcessorMapping[$commandClass])) {
+                $this->commandPreProcessorMapping[$commandClass] = [];
             }
+
+            $this->commandPreProcessorMapping[$commandClass][] = $preProcessorCommandLink->preProcessorClass();
         }
 
         return $this->commandPreProcessorMapping;
+    }
+
+    /**
+     * @param ReflectionClass<object> $preProcessorReflection
+     *
+     * @return array<PreProcessorCommandLink>|null
+     */
+    private function preProcessorCommandLinksByAttributes(ReflectionClass $preProcessorReflection): array|null
+    {
+        $preProcessorAttributes = $preProcessorReflection->getAttributes(Attribute\PreProcessor::class);
+
+        if (empty($preProcessorAttributes)) {
+            return null;
+        }
+
+        /** @var ReflectionAttribute<Attribute\PreProcessor> $preProcessorAttribute */
+        $preProcessorAttribute = reset($preProcessorAttributes);
+        /** @var Attribute\PreProcessor $preProcessor */
+        $preProcessor = $preProcessorAttribute->newInstance();
+
+        return array_map(
+            static fn (string $commandClass) => PreProcessorCommandLink::fromRecordData(
+                [
+                    'commandClass' => $commandClass,
+                    'preProcessorClass' => $preProcessorReflection->getName(),
+                    'priority' => $preProcessor->priority(),
+                ],
+            ),
+            $preProcessor->commandClasses(),
+        );
+    }
+
+    /**
+     * @param ReflectionClass<object> $preProcessorReflection
+     *
+     * @return array<PreProcessorCommandLink>
+     */
+    private function preProcessorCommandLinksByParameter(ReflectionClass $preProcessorReflection): array
+    {
+        $invokeMethod = $preProcessorReflection->getMethod('__invoke');
+        $invokeParameters = $invokeMethod->getParameters();
+
+        $firstParameter = reset($invokeParameters);
+
+        if (! $firstParameter) {
+            throw new RuntimeException(
+                sprintf(
+                    '__invoke method of preProcessor \'%s\' has no parameters.',
+                    $preProcessorReflection->getName(),
+                ),
+            );
+        }
+
+        /** @var ReflectionNamedType|ReflectionUnionType|null $commandType */
+        $commandType = $firstParameter->getType();
+        $commandTypes = $commandType instanceof ReflectionUnionType
+            ? $commandType->getTypes()
+            : [$commandType];
+
+        return array_map(
+            function (ReflectionNamedType|null $commandType) use ($preProcessorReflection) {
+                if ($commandType === null || ! in_array($commandType->getName(), $this->commandClasses)) {
+                    throw new RuntimeException(
+                        sprintf(
+                            'The first parameter of the __invoke method of preProcessor \'%s\' ' .
+                            'has no type or is not a command.',
+                            $preProcessorReflection->getName(),
+                        ),
+                    );
+                }
+
+                return PreProcessorCommandLink::fromRecordData(
+                    [
+                        'commandClass' => $commandType->getName(),
+                        'preProcessorClass' => $preProcessorReflection->getName(),
+                    ],
+                );
+            },
+            $commandTypes,
+        );
     }
 
     /** @return array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */

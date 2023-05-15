@@ -103,8 +103,12 @@ final class EventEnginePass implements CompilerPassInterface
                 ->implementsInterface(AggregateRoot::class)
                 ? $reflectionClass
                 : null,
-            'pre_processors' => static fn (ReflectionClass $reflectionClass) => $reflectionClass
-                ->implementsInterface(PreProcessor::class) && ! $reflectionClass->isAbstract()
+            'pre_processors' => static fn (ReflectionClass $reflectionClass) => (
+                $reflectionClass->implementsInterface(PreProcessor::class)
+                || ! empty($reflectionClass->getAttributes(
+                    \ADS\Bundle\EventEngineBundle\Attribute\PreProcessor::class,
+                ))
+            ) && ! $reflectionClass->isAbstract()
                 ? $reflectionClass
                 : null,
             'listeners' => static fn (ReflectionClass $reflectionClass) => $reflectionClass

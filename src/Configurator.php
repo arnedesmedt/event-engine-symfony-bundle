@@ -615,12 +615,8 @@ final class Configurator
         return $this->commandPreProcessorMapping;
     }
 
-    /**
-     * @param ReflectionClass<object> $preProcessorReflection
-     *
-     * @return array<PreProcessorCommandLink>|null
-     */
-    private function preProcessorCommandLinksByAttributes(ReflectionClass $preProcessorReflection): array|null
+    /** @param ReflectionClass<object> $preProcessorReflection */
+    private function preProcessorAttribute(ReflectionClass $preProcessorReflection): Attribute\PreProcessor|null
     {
         $preProcessorAttributes = $preProcessorReflection->getAttributes(Attribute\PreProcessor::class);
 
@@ -630,8 +626,22 @@ final class Configurator
 
         /** @var ReflectionAttribute<Attribute\PreProcessor> $preProcessorAttribute */
         $preProcessorAttribute = reset($preProcessorAttributes);
-        /** @var Attribute\PreProcessor $preProcessor */
-        $preProcessor = $preProcessorAttribute->newInstance();
+
+        return $preProcessorAttribute->newInstance();
+    }
+
+    /**
+     * @param ReflectionClass<object> $preProcessorReflection
+     *
+     * @return array<PreProcessorCommandLink>|null
+     */
+    private function preProcessorCommandLinksByAttributes(ReflectionClass $preProcessorReflection): array|null
+    {
+        $preProcessor = $this->preProcessorAttribute($preProcessorReflection);
+
+        if ($preProcessor === null || empty($preProcessor->commandClasses())) {
+            return null;
+        }
 
         return array_map(
             static fn (string $commandClass) => PreProcessorCommandLink::fromRecordData(
@@ -652,6 +662,7 @@ final class Configurator
      */
     private function preProcessorCommandLinksByParameter(ReflectionClass $preProcessorReflection): array
     {
+        $priority = $this->preProcessorAttribute($preProcessorReflection)?->priority() ?? 0;
         $invokeMethod = $preProcessorReflection->getMethod('__invoke');
         $invokeParameters = $invokeMethod->getParameters();
 
@@ -673,7 +684,7 @@ final class Configurator
             : [$commandType];
 
         return array_map(
-            function (ReflectionNamedType|null $commandType) use ($preProcessorReflection) {
+            function (ReflectionNamedType|null $commandType) use ($preProcessorReflection, $priority) {
                 if ($commandType === null || ! in_array($commandType->getName(), $this->commandClasses)) {
                     throw new RuntimeException(
                         sprintf(
@@ -688,6 +699,7 @@ final class Configurator
                     [
                         'commandClass' => $commandType->getName(),
                         'preProcessorClass' => $preProcessorReflection->getName(),
+                        'priority' => $priority,
                     ],
                 );
             },

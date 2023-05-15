@@ -12,7 +12,7 @@ class PreProcessor
 {
     /** @param array<class-string<Command>> $commandClasses */
     public function __construct(
-        private readonly array $commandClasses,
+        private readonly array $commandClasses = [],
         private int $priority = 0,
     ) {
     }

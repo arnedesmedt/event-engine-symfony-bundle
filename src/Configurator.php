@@ -67,7 +67,7 @@ final class Configurator
     private array $commandEventMapping = [];
     /** @var array<class-string<AggregateCommand>, array<class-string|string>> */
     private array $commandServiceMapping = [];
-    /** @var array<class-string<Command>, class-string<PreProcessor>> */
+    /** @var array<class-string<Command>, array<class-string<PreProcessor>>> */
     private array $commandPreProcessorMapping = [];
     /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */
     private array $aggregateIdentifierMapping = [];
@@ -301,8 +301,11 @@ final class Configurator
             $commandProcessor = $eventEngine->process($commandClass);
 
             if (array_key_exists($commandClass, $preProcessorMapping)) {
-                $preProcessorClass = $preProcessorMapping[$commandClass];
-                $commandProcessor->preProcess($preProcessorClass);
+                $preProcessorClasses = $preProcessorMapping[$commandClass];
+                foreach ($preProcessorClasses as $preProcessorClass) {
+                    $commandProcessor->preProcess($preProcessorClass);
+                }
+
                 unset($preProcessorMapping[$commandClass]);
             }
 
@@ -315,12 +318,14 @@ final class Configurator
                 ->handleStorage($commandProcessor, $aggregateRootClass, $newAggregateRoot);
         }
 
-        foreach ($preProcessorMapping as $commandClass => $preProcessorClass) {
-            $eventEngine
-                ->process($commandClass)
-                ->preProcess($preProcessorClass)
-                ->withNew('test')
-                ->handle([FlavourHint::class, 'useAggregate']);
+        foreach ($preProcessorMapping as $commandClass => $preProcessorClasses) {
+            foreach ($preProcessorClasses as $preProcessorClass) {
+                $eventEngine
+                    ->process($commandClass)
+                    ->preProcess($preProcessorClass)
+                    ->withNew('test')
+                    ->handle([FlavourHint::class, 'useAggregate']);
+            }
         }
 
         return $this;
@@ -564,7 +569,7 @@ final class Configurator
         return $this->commandServiceMapping;
     }
 
-    /** @return array<class-string<Command>, class-string<PreProcessor>> */
+    /** @return array<class-string<Command>, array<class-string<PreProcessor>>> */
     private function commandPreProcessorMapping(): array
     {
         if (! empty($this->commandPreProcessorMapping)) {
@@ -622,7 +627,11 @@ final class Configurator
 
             /** @var class-string<Command> $commandClass */
             foreach ($commandClasses as $commandClass) {
-                $this->commandPreProcessorMapping[$commandClass] = $preProcessorClass;
+                if (! isset($this->commandPreProcessorMapping[$commandClass])) {
+                    $this->commandPreProcessorMapping[$commandClass] = [];
+                }
+
+                $this->commandPreProcessorMapping[$commandClass][] = $preProcessorClass;
             }
         }
 

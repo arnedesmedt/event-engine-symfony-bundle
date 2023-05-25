@@ -129,6 +129,17 @@ services:
             - '@event.bus'
             - '@query.bus'
             - '@EventEngine\EventEngine'
+    ADS\Bundle\EventEngineBundle\Messenger\QueueableMessageProducer:
+        public: true
+        arguments:
+            - '@command.bus'
+            - '@event.bus'
+            - '@query.bus'
+    ADS\Bundle\EventEngineBundle\Messenger\FlavouredMessageProducer:
+        public: true
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@ADS\Bundle\EventEngineBundle\Messenger\QueueableMessageProducer'
     EventEngine\JsonSchema\OpisJsonSchema: ~
     EventEngine\Logger\SimpleMessageEngine:
         arguments:
@@ -298,6 +309,9 @@ services:
             - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry'
             - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry'
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+
+    ADS\Bundle\EventEngineBundle\Messenger\Middleware\PickTransportMiddleware:
+        public: true
 
     ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand:
         arguments:

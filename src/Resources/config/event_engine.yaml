@@ -250,29 +250,35 @@ services:
             - '@lock.postgres.store'
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\MessageHandler:
-        public: true
+        autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\CommandHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         arguments:
             $lockAggregateCommand: '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
+        autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\EventHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
+        autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\QueryHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
+        autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncCommandHandler:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
+        autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncEventHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
+        autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncQueryHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
+        autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry:
         parent: ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry

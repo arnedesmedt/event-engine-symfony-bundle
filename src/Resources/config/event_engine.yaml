@@ -274,7 +274,7 @@ services:
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncQueryHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler' }
+        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry:

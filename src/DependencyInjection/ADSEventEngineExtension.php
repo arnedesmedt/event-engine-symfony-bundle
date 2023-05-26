@@ -198,6 +198,10 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                                 ?? CommandRetry::class,
                         ],
                         'failure_transport' => 'command.failed',
+                        'options' => [
+                            'pgsql_get_notify' => true,
+                            'pgsql_get_notify_timeout' => 500,
+                        ],
                     ],
                     'command.failed' => [
                         'dsn' => 'doctrine://default?table_name=messenger_commands&queue_name=failed',
@@ -210,6 +214,10 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                                 ?? EventRetry::class,
                         ],
                         'failure_transport' => 'event.failed',
+                        'options' => [
+                            'pgsql_get_notify' => true,
+                            'pgsql_get_notify_timeout' => 500,
+                        ],
                     ],
                     'event.failed' => [
                         'dsn' => 'doctrine://default?table_name=messenger_events&queue_name=failed',
@@ -222,6 +230,10 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                                 ?? QueryRetry::class,
                         ],
                         'failure_transport' => 'query.failed',
+                        'options' => [
+                            'pgsql_get_notify' => true,
+                            'pgsql_get_notify_timeout' => 500,
+                        ],
                     ],
                     'query.failed' => [
                         'dsn' => 'doctrine://default?table_name=messenger_queries&queue_name=failed',

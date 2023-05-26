@@ -68,7 +68,7 @@ class MessageHandler
 
         $eventEngineMessage = $this->eventEngine->messageFactory()->createMessageFromArray(
             $message::class,
-            $message->toArray(),
+            ['payload' => $message->toArray()],
         );
 
         return $this->handlesMessageBag($eventEngineMessage, $lockAggregateStrategy);

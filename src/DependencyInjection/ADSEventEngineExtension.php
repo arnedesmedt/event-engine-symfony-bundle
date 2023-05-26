@@ -199,8 +199,8 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                         ],
                         'failure_transport' => 'command.failed',
                         'options' => [
-                            'pgsql_get_notify' => true,
-                            'pgsql_get_notify_timeout' => 500,
+                            'use_notify' => true,
+                            'check_delayed_interval' => 0,
                         ],
                     ],
                     'command.failed' => [
@@ -215,8 +215,8 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                         ],
                         'failure_transport' => 'event.failed',
                         'options' => [
-                            'pgsql_get_notify' => true,
-                            'pgsql_get_notify_timeout' => 500,
+                            'use_notify' => true,
+                            'check_delayed_interval' => 0,
                         ],
                     ],
                     'event.failed' => [
@@ -231,8 +231,8 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                         ],
                         'failure_transport' => 'query.failed',
                         'options' => [
-                            'pgsql_get_notify' => true,
-                            'pgsql_get_notify_timeout' => 500,
+                            'use_notify' => true,
+                            'check_delayed_interval' => 0,
                         ],
                     ],
                     'query.failed' => [

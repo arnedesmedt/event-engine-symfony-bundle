@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Messenger;
 
+use ADS\Bundle\EventEngineBundle\Message\Message;
 use EventEngine\EventEngine;
-use EventEngine\Messaging\Message;
+use EventEngine\Messaging\Message as EventEngineMessage;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Messaging\MessageDispatcher;
 use EventEngine\Messaging\MessageProducer;
@@ -41,7 +42,7 @@ final class QueueableMessageProducer implements MessageProducer, MessageDispatch
      */
     public function dispatch($messageOrName, array $payload = [], array $metadata = []): mixed
     {
-        if ($messageOrName instanceof Message) {
+        if ($messageOrName instanceof EventEngineMessage) {
             return $this->produce($messageOrName);
         }
 
@@ -52,7 +53,7 @@ final class QueueableMessageProducer implements MessageProducer, MessageDispatch
      * @param array<string, mixed> $payload
      * @param array<string, mixed> $metadata
      */
-    private function messageBag(string $messageClass, array $payload, array $metadata): Message
+    private function messageBag(string $messageClass, array $payload, array $metadata): EventEngineMessage
     {
         return $this->eventEngine
             ->messageFactory()
@@ -65,7 +66,7 @@ final class QueueableMessageProducer implements MessageProducer, MessageDispatch
             );
     }
 
-    public function produce(Message $message): mixed
+    public function produce(EventEngineMessage $message): mixed
     {
         /** @var Message $innerMessage */
         $innerMessage = $message->get(MessageBag::MESSAGE);
@@ -81,8 +82,8 @@ final class QueueableMessageProducer implements MessageProducer, MessageDispatch
         try {
             /** @var Envelope $envelop */
             $envelop = match ($message->messageType()) {
-                Message::TYPE_COMMAND => $this->commandBus->dispatch($innerMessage),
-                Message::TYPE_EVENT => $this->eventBus->dispatch($innerMessage),
+                EventEngineMessage::TYPE_COMMAND => $this->commandBus->dispatch($innerMessage),
+                EventEngineMessage::TYPE_EVENT => $this->eventBus->dispatch($innerMessage),
                 default => $this->queryBus->dispatch($innerMessage),
             };
         } catch (HandlerFailedException $exception) {

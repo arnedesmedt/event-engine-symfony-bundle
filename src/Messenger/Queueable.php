@@ -6,6 +6,8 @@ namespace ADS\Bundle\EventEngineBundle\Messenger;
 
 interface Queueable
 {
+    public static function __queue(): bool;
+
     public static function __maxRetries(): int;
 
     public static function __delayInMilliseconds(): int;

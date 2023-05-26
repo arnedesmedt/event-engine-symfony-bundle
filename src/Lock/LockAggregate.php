@@ -6,13 +6,14 @@ namespace ADS\Bundle\EventEngineBundle\Lock;
 
 use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use EventEngine\EventEngine;
+use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
 
 use function sprintf;
 
-final class LockAggregateCommand implements LockAggregateCommandStrategy
+final class LockAggregate implements LockAggregateStrategy
 {
     public function __construct(
         private EventEngine $eventEngine,
@@ -21,16 +22,16 @@ final class LockAggregateCommand implements LockAggregateCommandStrategy
     ) {
     }
 
-    public function __invoke(MessageBag $messageBag): mixed
+    public function __invoke(Message $message): mixed
     {
-        $message = $messageBag->get(MessageBag::MESSAGE);
+        $customMessage = $message->get(MessageBag::MESSAGE);
         $lock = null;
         $lockId = '';
 
-        if ($message instanceof AggregateCommand) {
-            $aggregateId = $message->__aggregateId();
+        if ($customMessage instanceof AggregateCommand) {
+            $aggregateId = $customMessage->__aggregateId();
             $commandRouting = $this->eventEngine->compileCacheableConfig()['compiledCommandRouting'];
-            $aggregateType = $commandRouting[$message::class]['aggregateType'];
+            $aggregateType = $commandRouting[$customMessage::class]['aggregateType'];
 
             $lockId = sprintf('aggregate:%s-id:%s', $aggregateType, $aggregateId);
             $lock = $this->aggregateLockFactory->createLock($lockId);
@@ -41,7 +42,7 @@ final class LockAggregateCommand implements LockAggregateCommandStrategy
         }
 
         try {
-            $result = $this->eventEngine->dispatch($messageBag);
+            $result = $this->eventEngine->dispatch($message);
         } finally {
             if ($lock !== null) {
                 $lock->release();

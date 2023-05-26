@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Messenger\Handler;
 
-use ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommandStrategy;
+use ADS\Bundle\EventEngineBundle\Lock\LockAggregateStrategy;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Flavour;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler(bus: 'command.bus', fromTransport: 'event_engine.command')]
 class AsyncCommandHandler
 {
     public function __construct(
         private Flavour $flavour,
-        private LockAggregateCommandStrategy $lockAggregateCommand,
+        private LockAggregateStrategy $lockAggregateCommand,
     ) {
     }
 

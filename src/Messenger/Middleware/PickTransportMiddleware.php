@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Command\Command;
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Message\Message;
 use ADS\Bundle\EventEngineBundle\Messenger\Queueable;
+use EventEngine\Messaging\Message as EventEngineMessage;
 use EventEngine\Messaging\MessageBag;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -18,20 +19,20 @@ class PickTransportMiddleware implements MiddlewareInterface
 {
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        /** @var MessageBag|Message $messageBag */
-        $messageBag = $envelope->getMessage();
-        $message = $messageBag instanceof Message
-            ? $messageBag
-            : $messageBag->get(MessageBag::MESSAGE);
+        /** @var EventEngineMessage|Message $eventEngineMessage */
+        $eventEngineMessage = $envelope->getMessage();
+        $message = $eventEngineMessage instanceof Message
+            ? $eventEngineMessage
+            : $eventEngineMessage->get(MessageBag::MESSAGE);
 
         if (
-            $messageBag instanceof MessageBag
-            && $messageBag->getMetaOrDefault('async', false)
+            $eventEngineMessage instanceof MessageBag
+            && $eventEngineMessage->getMetaOrDefault('async', false)
         ) {
-            $envelope = $envelope->with(new TransportNamesStamp([$messageBag->messageType()]));
+            $envelope = $envelope->with(new TransportNamesStamp([$eventEngineMessage->messageType()]));
         }
 
-        if ($message instanceof Queueable) {
+        if ($message instanceof Queueable && $message::__queue()) {
             $transport = match (true) {
                 $message instanceof Command => 'command',
                 $message instanceof Event => 'event',

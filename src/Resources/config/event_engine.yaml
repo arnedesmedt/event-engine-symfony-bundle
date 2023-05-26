@@ -253,40 +253,28 @@ services:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         arguments:
             $lockAggregateCommand: '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
-        tags:
-            - { name: messenger.message_handler, bus: command.bus, handles: EventEngine\Messaging\MessageBag }
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\EventHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
-        tags:
-            - { name: messenger.message_handler, bus: event.bus, handles: EventEngine\Messaging\MessageBag }
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\QueryHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
-        tags:
-            - { name: messenger.message_handler, bus: query.bus, handles: EventEngine\Messaging\MessageBag }
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncCommandHandler:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
-        tags:
-            - { name: messenger.message_handler, bus: command.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper, from_transport: event_engine.command }
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncEventHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
-        tags:
-            - { name: messenger.message_handler, bus: event.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper, from_transport: event_engine.event }
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncQueryHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
-        tags:
-            - { name: messenger.message_handler, bus: query.bus, handles: ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper, from_transport: event_engine.query }
+        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler' }
         autoconfigure: false
 
     ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry:

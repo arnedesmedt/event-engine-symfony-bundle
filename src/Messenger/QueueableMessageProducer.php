@@ -20,6 +20,8 @@ use function reset;
 
 final class QueueableMessageProducer implements MessageProducer, MessageDispatcher
 {
+    public const ASYNC_METADATA = ['async' => true];
+
     public function __construct(
         private readonly MessageBusInterface $commandBus,
         private readonly MessageBusInterface $eventBus,

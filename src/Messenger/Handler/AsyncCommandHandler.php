@@ -8,8 +8,10 @@ use ADS\Bundle\EventEngineBundle\Lock\LockAggregateStrategy;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Flavour;
+use JetBrains\PhpStorm\Deprecated;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[Deprecated]
 #[AsMessageHandler(bus: 'command.bus', fromTransport: 'event_engine.command')]
 class AsyncCommandHandler
 {

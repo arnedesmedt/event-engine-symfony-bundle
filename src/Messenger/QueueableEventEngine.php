@@ -7,25 +7,21 @@ namespace ADS\Bundle\EventEngineBundle\Messenger;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
-use ArrayObject;
-use EventEngine\Data\ImmutableRecord;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\Message;
-use EventEngine\Messaging\MessageBag;
 use EventEngine\Messaging\MessageProducer;
 use EventEngine\Runtime\Flavour;
+use JetBrains\PhpStorm\Deprecated;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Throwable;
 
-use function array_filter;
-use function array_map;
 use function array_merge;
-use function count;
 use function reset;
 
+#[Deprecated]
 final class QueueableEventEngine implements MessageProducer
 {
     public function __construct(
@@ -78,41 +74,6 @@ final class QueueableEventEngine implements MessageProducer
     }
 
     public function produce(Message $messageBag): mixed
-    {
-        $messageBags = [$messageBag];
-        /** @var ImmutableRecord&Queueable $message */
-        $message = $messageBag->get(MessageBag::MESSAGE);
-
-        if ($message instanceof Queueable) {
-            $messageBags = array_merge(
-                $messageBags,
-                array_map(
-                    fn (string $messageClass) => $this->messageBag(
-                        $messageClass,
-                        $message->toArray(),
-                        $messageBag->metadata(),
-                    ),
-                    $message::__forkMessage($message),
-                ),
-            );
-        }
-
-        $result = array_filter(
-            array_map(
-                fn (Message $messageBag) => $this->produceOneMessage($messageBag),
-                $messageBags,
-            ),
-            static fn ($result) => ! ($result === null || $result instanceof Envelope)
-        );
-
-        if (count($result) === 1) {
-            return $result[0];
-        }
-
-        return new ArrayObject($result);
-    }
-
-    public function produceOneMessage(Message $messageBag): mixed
     {
         $transferableMessage = $this->flavour->prepareNetworkTransmission($messageBag);
 

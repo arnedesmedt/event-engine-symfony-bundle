@@ -8,7 +8,9 @@ use ADS\Bundle\EventEngineBundle\Messenger\Message\MessageWrapper;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Flavour;
+use JetBrains\PhpStorm\Deprecated;
 
+#[Deprecated]
 abstract class Handler
 {
     public function __construct(

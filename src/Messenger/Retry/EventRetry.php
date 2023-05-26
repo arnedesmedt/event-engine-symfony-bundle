@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Messenger\Retry;
 
-use EventEngine\Messaging\MessageBag;
+use ADS\Bundle\EventEngineBundle\Event\Event;
+use ADS\Bundle\EventEngineBundle\Message\Message;
 
 class EventRetry extends Retry
 {
-    protected function messageBagAllowed(MessageBag $messageBag): bool
+    protected function messageAllowed(Message $message): bool
     {
-        return $messageBag->messageType() === MessageBag::TYPE_EVENT;
+        return $message instanceof Event;
     }
 }

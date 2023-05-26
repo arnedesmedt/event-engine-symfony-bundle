@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Messenger\Retry;
 
-use EventEngine\Messaging\MessageBag;
+use ADS\Bundle\EventEngineBundle\Command\Command;
+use ADS\Bundle\EventEngineBundle\Message\Message;
 
 class CommandRetry extends Retry
 {
-    protected function messageBagAllowed(MessageBag $messageBag): bool
+    protected function messageAllowed(Message $message): bool
     {
-        return $messageBag->messageType() === MessageBag::TYPE_COMMAND;
+        return $message instanceof Command;
     }
 }

@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Messenger\Retry;
 
-use EventEngine\Messaging\MessageBag;
+use ADS\Bundle\EventEngineBundle\Message\Message;
+use ADS\Bundle\EventEngineBundle\Query\Query;
 
 class QueryRetry extends Retry
 {
-    protected function messageBagAllowed(MessageBag $messageBag): bool
+    protected function messageAllowed(Message $message): bool
     {
-        return $messageBag->messageType() === MessageBag::TYPE_QUERY;
+        return $message instanceof Query;
     }
 }

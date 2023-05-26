@@ -8,8 +8,10 @@ use ADS\Bundle\EventEngineBundle\Lock\LockAggregateStrategy;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Flavour;
+use JetBrains\PhpStorm\Deprecated;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[Deprecated]
 #[AsMessageHandler(bus: 'command.bus')]
 class CommandHandler extends Handler
 {

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Messenger\Middleware;
 
-use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
+use ADS\Bundle\EventEngineBundle\Event\Event;
+use ADS\Bundle\EventEngineBundle\Message\Message;
 use ADS\Bundle\EventEngineBundle\Messenger\Message\MessageWrapper;
-use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Queueable;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry;
-use EventEngine\Messaging\MessageBag;
-use EventEngine\Runtime\Flavour;
+use ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope;
+use ADS\Bundle\EventEngineBundle\Query\Query;
+use EventEngine\Messaging\Message as EventEngineMessage;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -28,7 +29,7 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
         private readonly CommandRetry $commandRetry,
         private readonly EventRetry $eventRetry,
         private readonly QueryRetry $queryRetry,
-        private readonly Flavour $flavour,
+        private readonly MessageFromEnvelope $messageFromEnvelope,
     ) {
     }
 
@@ -37,11 +38,16 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
         try {
             return $stack->next()->handle($envelope, $stack);
         } catch (HandlerFailedException $e) {
-            /** @var MessageWrapper|MessageBag $message */
+            /** @var MessageWrapper|EventEngineMessage|Message $message */
             $message = $envelope->getMessage();
 
-            if ($message instanceof MessageBag) {
-                // send sync
+            // Send sync for normal message
+            if ($message instanceof Message && (! $message instanceof Queueable || ! $message::__queue())) {
+                throw $e;
+            }
+
+            // Send sync for event engine message that contains the async metadata flag.
+            if ($message instanceof EventEngineMessage && ! $message->getMetaOrDefault('async', false)) {
                 throw $e;
             }
 
@@ -49,10 +55,9 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
                 throw $e;
             }
 
-            $message = $message->message();
-            $command = $this->flavour->convertMessageReceivedFromNetwork($message)->get(MessageBag::MESSAGE);
+            $message = ($this->messageFromEnvelope)($envelope);
 
-            if ($command instanceof Queueable && $command::__sendToLinkedFailureTransport()) {
+            if ($message instanceof Queueable && $message::__sendToLinkedFailureTransport()) {
                 throw $e;
             }
 
@@ -91,12 +96,12 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
             return false;
         }
 
-        /** @var MessageWrapper $message */
-        $message = $envelope->getMessage();
+        /** @var Message $message */
+        $message = ($this->messageFromEnvelope)($envelope);
 
         $retryStrategy = match (true) {
-            $message instanceof QueryMessageWrapper => $this->queryRetry,
-            $message instanceof EventMessageWrapper => $this->eventRetry,
+            $message instanceof Query => $this->queryRetry,
+            $message instanceof Event => $this->eventRetry,
             default => $this->commandRetry
         };
 

@@ -285,6 +285,10 @@ services:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         autoconfigure: true
 
+    ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope:
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+
     ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry:
         parent: ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry
     ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry:
@@ -293,7 +297,7 @@ services:
         parent: ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry
     ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry:
         arguments:
-            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope'
 
     ADS\Bundle\EventEngineBundle\Messenger\Middleware\DontSendToFailureTransportMiddleware:
         public: true
@@ -301,7 +305,7 @@ services:
             - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry'
             - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry'
             - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry'
-            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope'
 
     ADS\Bundle\EventEngineBundle\Messenger\Middleware\PickTransportMiddleware:
         public: true

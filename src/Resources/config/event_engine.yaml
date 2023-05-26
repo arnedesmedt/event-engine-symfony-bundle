@@ -135,11 +135,8 @@ services:
             - '@command.bus'
             - '@event.bus'
             - '@query.bus'
-    ADS\Bundle\EventEngineBundle\Messenger\FlavouredMessageProducer:
-        public: true
-        arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
-            - '@ADS\Bundle\EventEngineBundle\Messenger\QueueableMessageProducer'
+            - '@EventEngine\EventEngine'
     EventEngine\JsonSchema\OpisJsonSchema: ~
     EventEngine\Logger\SimpleMessageEngine:
         arguments:

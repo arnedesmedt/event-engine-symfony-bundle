@@ -132,9 +132,9 @@ services:
     ADS\Bundle\EventEngineBundle\Messenger\QueueableMessageProducer:
         public: true
         arguments:
-            - '@command.bus'
-            - '@event.bus'
-            - '@query.bus'
+            - '@command'
+            - '@event'
+            - '@query'
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@EventEngine\EventEngine'
     EventEngine\JsonSchema\OpisJsonSchema: ~

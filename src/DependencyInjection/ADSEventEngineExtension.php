@@ -31,7 +31,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
             new FileLocator(__DIR__ . '/../Resources/config'),
         );
 
-        $loader->load('event_engine.yaml');
+        $loader->load('event_engine_symfony.yaml');
 
         $container->setParameter(
             'event_engine.document_store.prefix',

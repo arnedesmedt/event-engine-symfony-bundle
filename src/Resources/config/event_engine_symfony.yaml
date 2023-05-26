@@ -251,11 +251,16 @@ services:
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\MessageHandler:
         autoconfigure: true
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@EventEngine\EventEngine'
+            - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregate'
+            - '@ADS\Bundle\EventEngineBundle\Lock\NoLockAggregate'
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\CommandHandler:
         parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
         arguments:
-            $lockAggregateCommand: '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
+            $lockAggregateCommand: '@ADS\Bundle\EventEngineBundle\Lock\LockAggregate'
         autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\EventHandler:
@@ -269,7 +274,7 @@ services:
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncCommandHandler:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
-            - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand'
+            - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregate'
         autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncEventHandler:
@@ -301,13 +306,13 @@ services:
     ADS\Bundle\EventEngineBundle\Messenger\Middleware\PickTransportMiddleware:
         public: true
 
-    ADS\Bundle\EventEngineBundle\Lock\LockAggregateCommand:
+    ADS\Bundle\EventEngineBundle\Lock\LockAggregate:
         arguments:
             - '@EventEngine\EventEngine'
             - '@lock.aggregate.factory'
             - '@logger'
 
-    ADS\Bundle\EventEngineBundle\Lock\NoLockAggregateCommand:
+    ADS\Bundle\EventEngineBundle\Lock\NoLockAggregate:
         arguments:
             - '@EventEngine\EventEngine'
 

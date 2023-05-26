@@ -31,11 +31,6 @@ trait DefaultQueueable
         return 5 * 60 * 1000;
     }
 
-    public static function __dispatchAsync(): bool
-    {
-        return true;
-    }
-
     public static function __sendToLinkedFailureTransport(): bool
     {
         return true;

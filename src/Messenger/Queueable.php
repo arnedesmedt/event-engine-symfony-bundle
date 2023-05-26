@@ -17,13 +17,4 @@ interface Queueable
     public static function __dispatchAsync(): bool;
 
     public static function __sendToLinkedFailureTransport(): bool;
-
-    /**
-     * @param mixed $message
-     *
-     * @return array<class-string>
-     *
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-     */
-    public static function __forkMessage($message): array;
 }

@@ -35,10 +35,4 @@ trait DefaultQueueable
     {
         return true;
     }
-
-    /** @inheritDoc */
-    public static function __forkMessage($message): array
-    {
-        return [];
-    }
 }

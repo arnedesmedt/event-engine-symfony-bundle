@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Throwable;
 
+use function array_diff_key;
 use function reset;
 
 final class QueueableMessageProducer implements MessageProducer, MessageDispatcher
@@ -68,23 +69,29 @@ final class QueueableMessageProducer implements MessageProducer, MessageDispatch
 
     public function produce(EventEngineMessage $message): mixed
     {
-        /** @var Message $innerMessage */
-        $innerMessage = $message->get(MessageBag::MESSAGE);
+        /** @var Message $messageToPutOnTheQueue */
+        $messageToPutOnTheQueue = $message->get(MessageBag::MESSAGE);
+        $metadata = $message->metadata();
 
-        if (! $innerMessage instanceof Queueable && $message->getMetaOrDefault('async', false)) {
+        $sendAsync = ($messageToPutOnTheQueue instanceof Queueable && $messageToPutOnTheQueue::__queue())
+            || $message->getMetaOrDefault('async', false);
+
+        $emptyMetadata = empty(array_diff_key($metadata, self::ASYNC_METADATA));
+        $sendInnerMessage = $sendAsync && $emptyMetadata;
+
+        if (! $sendInnerMessage && $sendAsync) {
             // Put the message bag on the queue instead of the message itself.
-            // Since the message is not queueable, the transport won't be changed by PickTransportMiddleware.
-            // Therefore we need to send the complete messageBag
-            // so it contains the metadata with the async property set to true, and now the transport will be changed.
-            $innerMessage = $this->flavour->prepareNetworkTransmission($message);
+            // For readability, we want to put as much as we can the inner message on the queue
+            // but if metadata is added we need to put the message bag on the queue.
+            $messageToPutOnTheQueue = $this->flavour->prepareNetworkTransmission($message);
         }
 
         try {
             /** @var Envelope $envelop */
             $envelop = match ($message->messageType()) {
-                EventEngineMessage::TYPE_COMMAND => $this->commandBus->dispatch($innerMessage),
-                EventEngineMessage::TYPE_EVENT => $this->eventBus->dispatch($innerMessage),
-                default => $this->queryBus->dispatch($innerMessage),
+                EventEngineMessage::TYPE_COMMAND => $this->commandBus->dispatch($messageToPutOnTheQueue),
+                EventEngineMessage::TYPE_EVENT => $this->eventBus->dispatch($messageToPutOnTheQueue),
+                default => $this->queryBus->dispatch($messageToPutOnTheQueue),
             };
         } catch (HandlerFailedException $exception) {
             while ($exception instanceof HandlerFailedException) {

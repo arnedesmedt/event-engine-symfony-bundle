@@ -42,7 +42,7 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
             $message = $envelope->getMessage();
 
             // Send sync for normal message
-            if ($message instanceof Message && (! $message instanceof Queueable || ! $message::__queue())) {
+            if ($message instanceof Message && ! $message instanceof Queueable) {
                 throw $e;
             }
 

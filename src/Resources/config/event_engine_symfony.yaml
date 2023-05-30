@@ -309,8 +309,6 @@ services:
 
     ADS\Bundle\EventEngineBundle\Messenger\Middleware\PickTransportMiddleware:
         public: true
-        arguments:
-            $environment: '%kernel.environment%'
 
     ADS\Bundle\EventEngineBundle\Lock\LockAggregate:
         arguments:

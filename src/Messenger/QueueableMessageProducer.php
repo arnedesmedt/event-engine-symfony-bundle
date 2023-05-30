@@ -73,8 +73,8 @@ final class QueueableMessageProducer implements MessageProducer, MessageDispatch
         $messageToPutOnTheQueue = $message->get(MessageBag::MESSAGE);
         $metadata = $message->metadata();
 
-        $sendAsync = ($messageToPutOnTheQueue instanceof Queueable && $messageToPutOnTheQueue::__queue())
-            || $message->getMetaOrDefault('async', false);
+        $sendAsync = $messageToPutOnTheQueue instanceof Queueable
+            && $message->getMetaOrDefault('async', false);
 
         $emptyMetadata = empty(array_diff_key($metadata, self::ASYNC_METADATA));
 

@@ -6,11 +6,6 @@ namespace ADS\Bundle\EventEngineBundle\Messenger;
 
 trait DefaultQueueable
 {
-    public static function __queue(): bool
-    {
-        return true;
-    }
-
     public static function __maxRetries(): int
     {
         return 5;

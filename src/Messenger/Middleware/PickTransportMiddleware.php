@@ -17,8 +17,16 @@ use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
 class PickTransportMiddleware implements MiddlewareInterface
 {
+    public function __construct(private readonly string $environment)
+    {
+    }
+
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
+        if ($this->environment === 'test') {
+            return $stack->next()->handle($envelope, $stack);
+        }
+
         /** @var EventEngineMessage|Message $eventEngineMessage */
         $eventEngineMessage = $envelope->getMessage();
         $message = $eventEngineMessage instanceof Message

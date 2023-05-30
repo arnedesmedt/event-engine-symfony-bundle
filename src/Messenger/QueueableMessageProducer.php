@@ -77,12 +77,13 @@ final class QueueableMessageProducer implements MessageProducer, MessageDispatch
             || $message->getMetaOrDefault('async', false);
 
         $emptyMetadata = empty(array_diff_key($metadata, self::ASYNC_METADATA));
-        $sendInnerMessage = $sendAsync && $emptyMetadata;
 
-        if (! $sendInnerMessage && $sendAsync) {
-            // Put the message bag on the queue instead of the message itself.
-            // For readability, we want to put as much as we can the inner message on the queue
-            // but if metadata is added we need to put the message bag on the queue.
+        if (! $emptyMetadata) {
+            // We loose the metadata if it's not send as a message bag.
+            $messageToPutOnTheQueue = $message;
+        }
+
+        if ($sendAsync && $messageToPutOnTheQueue instanceof EventEngineMessage) {
             $messageToPutOnTheQueue = $this->flavour->prepareNetworkTransmission($message);
         }
 

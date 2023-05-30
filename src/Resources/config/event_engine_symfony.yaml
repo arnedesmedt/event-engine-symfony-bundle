@@ -309,6 +309,8 @@ services:
 
     ADS\Bundle\EventEngineBundle\Messenger\Middleware\PickTransportMiddleware:
         public: true
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
 
     ADS\Bundle\EventEngineBundle\Lock\LockAggregate:
         arguments:

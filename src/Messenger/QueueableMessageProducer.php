@@ -75,7 +75,7 @@ final class QueueableMessageProducer implements MessageProducer, MessageDispatch
 
         $sendAsync = $message->getMetaOrDefault('async', null)
             ?? $messageToPutOnTheQueue instanceof Queueable;
-        $emptyMetadata = empty(array_diff_key($metadata, self::ASYNC_METADATA));
+        $emptyMetadata = empty(array_diff_key($metadata, self::ASYNC_METADATA)) && ($metadata['async'] ?? false);
 
         if (! $emptyMetadata) {
             // We loose the metadata if it's not send as a message bag.

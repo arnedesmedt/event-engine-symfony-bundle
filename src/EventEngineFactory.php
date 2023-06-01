@@ -127,7 +127,11 @@ final class EventEngineFactory
                 $this->container,
                 null,
                 $this->eventQueue,
-            );
+            )
+                ->bootstrap(
+                    $this->environment,
+                    $this->debug,
+                );
         }
 
         $eventEngine = new EventEngine($this->schema);

@@ -11,7 +11,9 @@ services:
 
     # Cache
     event_engine.cache.config:
-        parent: cache.system
+        class: 'Symfony\Component\Cache\Adapter\ChainAdapter'
+        arguments:
+            - [ 'cache.adapter.array', 'cache.adapter.apcu', 'cache.adapter.filesystem' ]
         public: false
         tags:
             - { name: cache.pool }

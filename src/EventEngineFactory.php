@@ -29,8 +29,10 @@ use EventEngine\Runtime\Flavour;
 use EventEngine\Runtime\Oop\FlavourHint;
 use EventEngine\Schema\PayloadSchema;
 use EventEngine\Schema\ResponseTypeSchema;
+use EventEngine\Schema\Schema;
 use EventEngine\Schema\TypeSchema;
 use LogicException;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -53,7 +55,7 @@ use function reset;
 use function sprintf;
 use function usort;
 
-final class Configurator
+final class EventEngineFactory
 {
     private const ENVIRONMENT_MAP = [
         'staging' => EventEngine::ENV_DEV,
@@ -86,6 +88,7 @@ final class Configurator
      * @param array<class-string<EventEngineDescription>> $descriptionServices
      */
     public function __construct(
+        private Schema $schema,
         private Flavour $flavour,
         private MultiModelStore $multiModelStore,
         private SimpleMessageEngine $simpleMessageEngine,
@@ -101,13 +104,34 @@ final class Configurator
         private array $projectorClasses,
         private array $preProcessorClasses,
         private array $descriptionServices,
+        private CacheItemPoolInterface $cache,
         private MessageProducer|null $eventQueue,
     ) {
         $this->environment = $this->mapEnvironment($environment);
     }
 
-    public function __invoke(EventEngine $eventEngine): void
+    public function __invoke(): EventEngine
     {
+        $cacheConfig = $this->cache->getItem('event_engine_config');
+
+        if ($cacheConfig->isHit()) {
+            /** @var array<mixed> $config */
+            $config = $cacheConfig->get();
+
+            return EventEngine::fromCachedConfig(
+                $config,
+                $this->schema,
+                $this->flavour,
+                $this->multiModelStore,
+                $this->simpleMessageEngine,
+                $this->container,
+                null,
+                $this->eventQueue,
+            );
+        }
+
+        $eventEngine = new EventEngine($this->schema);
+
         $this
             ->registerCommands($eventEngine)
             ->registerQueries($eventEngine)
@@ -132,6 +156,14 @@ final class Configurator
                 $this->environment,
                 $this->debug,
             );
+
+        $this->cache->save(
+            $this->cache
+                ->getItem('event_engine_config')
+                ->set($eventEngine->compileCacheableConfig()),
+        );
+
+        return $eventEngine;
     }
 
     private function registerCommands(EventEngine $eventEngine): self

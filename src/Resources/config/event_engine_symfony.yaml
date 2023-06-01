@@ -9,6 +9,78 @@ services:
         arguments:
             $dsn: '%event_engine.pdo_dsn%'
 
+    # Cache
+    event_engine.cache.config:
+        parent: cache.system
+        public: false
+        tags:
+            - { name: cache.pool }
+
+    # Schema
+    EventEngine\Schema\Schema: '@EventEngine\JsonSchema\OpisJsonSchema'
+    EventEngine\JsonSchema\OpisJsonSchema: ~
+
+    # Event Engine
+    ADS\Bundle\EventEngineBundle\EventEngineFactory:
+        arguments:
+            - '@EventEngine\Schema\Schema'
+            - '@EventEngine\Runtime\Flavour'
+            - '@EventEngine\Persistence\MultiModelStore'
+            - '@EventEngine\Logger\LogEngine'
+            - '@service_container'
+            - '%kernel.environment%'
+            - '%kernel.debug%'
+            - '%event_engine.commands%'
+            - '%event_engine.queries%'
+            - '%event_engine.events%'
+            - '%event_engine.aggregates%'
+            - '%event_engine.types%'
+            - '%event_engine.listeners%'
+            - '%event_engine.projectors%'
+            - '%event_engine.pre_processors%'
+            - '%event_engine.descriptions%'
+            - '@event_engine.cache.config'
+            - '@?event_engine.event_queue'
+
+    EventEngine\EventEngine:
+        factory: '@ADS\Bundle\EventEngineBundle\EventEngineFactory'
+
+    ADS\Bundle\EventEngineBundle\Messenger\QueueableEventEngine:
+        public: true
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@command.bus'
+            - '@event.bus'
+            - '@query.bus'
+            - '@EventEngine\EventEngine'
+
+    ADS\Bundle\EventEngineBundle\Messenger\QueueableMessageProducer:
+        public: true
+        arguments:
+            - '@command'
+            - '@event'
+            - '@query'
+            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@EventEngine\EventEngine'
+
+    # Flavours
+    EventEngine\Runtime\PrototypingFlavour:
+        arguments:
+            - '@EventEngine\Runtime\Prototyping\Port'
+    EventEngine\Runtime\FunctionalFlavour:
+        arguments:
+            - '@EventEngine\Runtime\Functional\Port'
+    ADS\Bundle\EventEngineBundle\Flavour\FunctionalMetaDataFlavour:
+        arguments:
+            - '@EventEngine\Runtime\FunctionalFlavour'
+    EventEngine\Runtime\OopFlavour:
+        arguments:
+            - '@EventEngine\Runtime\Oop\Port'
+            - '@EventEngine\Runtime\FunctionalFlavour'
+    ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour:
+        arguments:
+            - '@EventEngine\Runtime\OopFlavour'
+            - '@ADS\Bundle\EventEngineBundle\Flavour\FunctionalMetaDataFlavour'
 
     # Commands
     event_engine.command.database_clear:
@@ -86,7 +158,7 @@ services:
     EventEngine\Runtime\Prototyping\Port: '@ADS\Bundle\EventEngineBundle\Port\MessagePort'
     EventEngine\Runtime\Functional\Port: '@ADS\Bundle\EventEngineBundle\Port\MessagePort'
     EventEngine\Runtime\Oop\Port: '@ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort'
-    EventEngine\Schema\Schema: '@EventEngine\JsonSchema\OpisJsonSchema'
+
 
 
     # Implementations
@@ -117,27 +189,8 @@ services:
             - '%event_engine.document_store.prefix%'
             - '%event_engine.document_store.id.schema%'
             - '%event_engine.document_store.transactional%'
-    EventEngine\EventEngine:
-        arguments:
-            - '@EventEngine\Schema\Schema'
-        configurator: '@ADS\Bundle\EventEngineBundle\Configurator'
-    ADS\Bundle\EventEngineBundle\Messenger\QueueableEventEngine:
-        public: true
-        arguments:
-            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
-            - '@command.bus'
-            - '@event.bus'
-            - '@query.bus'
-            - '@EventEngine\EventEngine'
-    ADS\Bundle\EventEngineBundle\Messenger\QueueableMessageProducer:
-        public: true
-        arguments:
-            - '@command'
-            - '@event'
-            - '@query'
-            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
-            - '@EventEngine\EventEngine'
-    EventEngine\JsonSchema\OpisJsonSchema: ~
+
+
     EventEngine\Logger\SimpleMessageEngine:
         arguments:
             - '@logger'
@@ -151,23 +204,7 @@ services:
             - '@Prooph\EventStore\EventStore'
             - '%event_engine.event_store.transactional%'
     EventEngine\Prooph\V7\EventStore\ProophEventStoreMessageFactory: ~
-    EventEngine\Runtime\PrototypingFlavour:
-        arguments:
-            - '@EventEngine\Runtime\Prototyping\Port'
-    EventEngine\Runtime\FunctionalFlavour:
-        arguments:
-            - '@EventEngine\Runtime\Functional\Port'
-    ADS\Bundle\EventEngineBundle\Flavour\FunctionalMetaDataFlavour:
-        arguments:
-            - '@EventEngine\Runtime\FunctionalFlavour'
-    EventEngine\Runtime\OopFlavour:
-        arguments:
-            - '@EventEngine\Runtime\Oop\Port'
-            - '@EventEngine\Runtime\FunctionalFlavour'
-    ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour:
-        arguments:
-            - '@EventEngine\Runtime\OopFlavour'
-            - '@ADS\Bundle\EventEngineBundle\Flavour\FunctionalMetaDataFlavour'
+
 
     ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot: ~
     ADS\Bundle\EventEngineBundle\Aggregate\DeletableAggregate: ~
@@ -180,24 +217,7 @@ services:
             - '%kernel.environment%'
         tags:
             - { name: kernel.cache_clearer }
-    ADS\Bundle\EventEngineBundle\Configurator:
-        arguments:
-            - '@EventEngine\Runtime\Flavour'
-            - '@EventEngine\Persistence\MultiModelStore'
-            - '@EventEngine\Logger\LogEngine'
-            - '@service_container'
-            - '%kernel.environment%'
-            - '%kernel.debug%'
-            - '%event_engine.commands%'
-            - '%event_engine.queries%'
-            - '%event_engine.events%'
-            - '%event_engine.aggregates%'
-            - '%event_engine.types%'
-            - '%event_engine.listeners%'
-            - '%event_engine.projectors%'
-            - '%event_engine.pre_processors%'
-            - '%event_engine.descriptions%'
-            - '@?event_engine.event_queue'
+
     ADS\Bundle\EventEngineBundle\Persistency\SingleStreamStrategy: ~
     ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection:
         arguments:

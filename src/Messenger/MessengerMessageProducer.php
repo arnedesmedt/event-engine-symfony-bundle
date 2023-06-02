@@ -17,7 +17,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Throwable;
 
-use function array_diff_key;
 use function reset;
 
 final class MessengerMessageProducer implements MessageProducer, MessageDispatcher
@@ -67,28 +66,20 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
             );
     }
 
-    public function produce(EventEngineMessage $message): mixed
+    public function produce(EventEngineMessage $messageToPutOnTheQueue): mixed
     {
-        /** @var Message $messageToPutOnTheQueue */
-        $messageToPutOnTheQueue = $message->get(MessageBag::MESSAGE);
-        $metadata = $message->metadata();
+        /** @var Message $message */
+        $message = $messageToPutOnTheQueue->get(MessageBag::MESSAGE);
+        $sendAsync = $messageToPutOnTheQueue->getMetaOrDefault('async', null)
+            ?? $message instanceof Queueable;
 
-        $sendAsync = $message->getMetaOrDefault('async', null)
-            ?? $messageToPutOnTheQueue instanceof Queueable;
-        $emptyMetadata = empty(array_diff_key($metadata, self::ASYNC_METADATA)) && ($metadata['async'] ?? false);
-
-        if (! $emptyMetadata) {
-            // We loose the metadata if it's not send as a message bag.
-            $messageToPutOnTheQueue = $message;
-        }
-
-        if ($sendAsync && $messageToPutOnTheQueue instanceof EventEngineMessage) {
-            $messageToPutOnTheQueue = $this->flavour->prepareNetworkTransmission($message);
+        if ($sendAsync) {
+            $messageToPutOnTheQueue = $this->flavour->prepareNetworkTransmission($messageToPutOnTheQueue);
         }
 
         try {
             /** @var Envelope $envelop */
-            $envelop = match ($message->messageType()) {
+            $envelop = match ($messageToPutOnTheQueue->messageType()) {
                 EventEngineMessage::TYPE_COMMAND => $this->commandBus->dispatch($messageToPutOnTheQueue),
                 EventEngineMessage::TYPE_EVENT => $this->eventBus->dispatch($messageToPutOnTheQueue),
                 default => $this->queryBus->dispatch($messageToPutOnTheQueue),

@@ -13,6 +13,7 @@ use EventEngine\Runtime\Flavour;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 use function assert;
+use function method_exists;
 
 class MessageHandler
 {
@@ -65,9 +66,12 @@ class MessageHandler
         LockAggregateStrategy|null $lockAggregateStrategy = null,
     ): mixed {
         assert($message instanceof ImmutableRecord);
+        $messageClass = $message::class;
+        assert(method_exists($messageClass, 'buildPropTypeMap'));
+        $messageClass::buildPropTypeMap();
 
         $eventEngineMessage = $this->eventEngine->messageFactory()->createMessageFromArray(
-            $message::class,
+            $messageClass,
             ['payload' => $message->toArray()],
         );
 

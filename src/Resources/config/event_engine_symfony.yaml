@@ -56,7 +56,7 @@ services:
             - '@query.bus'
             - '@EventEngine\EventEngine'
 
-    ADS\Bundle\EventEngineBundle\Messenger\QueueableMessageProducer:
+    ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer:
         public: true
         arguments:
             - '@command'

@@ -20,7 +20,7 @@ use Throwable;
 use function array_diff_key;
 use function reset;
 
-final class QueueableMessageProducer implements MessageProducer, MessageDispatcher
+final class MessengerMessageProducer implements MessageProducer, MessageDispatcher
 {
     public const ASYNC_METADATA = ['async' => true];
 

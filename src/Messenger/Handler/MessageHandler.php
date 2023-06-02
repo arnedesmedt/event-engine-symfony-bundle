@@ -11,7 +11,6 @@ use EventEngine\Messaging\Message as EventEngineMessage;
 use EventEngine\Runtime\Flavour;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-use function assert;
 use function method_exists;
 
 class MessageHandler
@@ -65,8 +64,10 @@ class MessageHandler
         LockAggregateStrategy|null $lockAggregateStrategy = null,
     ): mixed {
         $messageClass = $message::class;
-        assert(method_exists($messageClass, 'buildPropTypeMap'));
-        $messageClass::buildPropTypeMap();
+
+        if (method_exists($messageClass, 'buildPropTypeMapIfEmpty')) {
+            $messageClass::buildPropTypeMapIfEmpty();
+        }
 
         $eventEngineMessage = $this->eventEngine->messageFactory()->createMessageFromArray(
             $messageClass,

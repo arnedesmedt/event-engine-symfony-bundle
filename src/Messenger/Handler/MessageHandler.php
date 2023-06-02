@@ -6,7 +6,6 @@ namespace ADS\Bundle\EventEngineBundle\Messenger\Handler;
 
 use ADS\Bundle\EventEngineBundle\Lock\LockAggregateStrategy;
 use ADS\Bundle\EventEngineBundle\Message\Message;
-use EventEngine\Data\ImmutableRecord;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\Message as EventEngineMessage;
 use EventEngine\Runtime\Flavour;
@@ -65,7 +64,6 @@ class MessageHandler
         Message $message,
         LockAggregateStrategy|null $lockAggregateStrategy = null,
     ): mixed {
-        assert($message instanceof ImmutableRecord);
         $messageClass = $message::class;
         assert(method_exists($messageClass, 'buildPropTypeMap'));
         $messageClass::buildPropTypeMap();

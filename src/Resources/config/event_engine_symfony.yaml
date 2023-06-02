@@ -275,7 +275,6 @@ services:
         autoconfigure: true
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
-            - '@EventEngine\EventEngine'
             - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregate'
             - '@ADS\Bundle\EventEngineBundle\Lock\NoLockAggregate'
 

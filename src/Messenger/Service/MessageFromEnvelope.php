@@ -29,7 +29,7 @@ class MessageFromEnvelope
         }
 
         if ($message instanceof EventEngineMessage) {
-            $this->flavour->convertMessageReceivedFromNetwork($message);
+            $message = $this->flavour->convertMessageReceivedFromNetwork($message);
             $message = $message->get(MessageBag::MESSAGE);
         }
 

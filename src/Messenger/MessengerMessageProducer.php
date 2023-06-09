@@ -11,6 +11,7 @@ use EventEngine\Messaging\MessageBag;
 use EventEngine\Messaging\MessageDispatcher;
 use EventEngine\Messaging\MessageProducer;
 use EventEngine\Runtime\Flavour;
+use RuntimeException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -28,7 +29,7 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
         private readonly MessageBusInterface $eventBus,
         private readonly MessageBusInterface $queryBus,
         private readonly Flavour $flavour,
-        private readonly EventEngine $eventEngine,
+        private readonly EventEngine|null $eventEngine = null,
     ) {
     }
 
@@ -55,6 +56,10 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
      */
     private function messageBag(string $messageClass, array $payload, array $metadata): EventEngineMessage
     {
+        if ($this->eventEngine === null) {
+            throw new RuntimeException('EventEngine is not set');
+        }
+
         return $this->eventEngine
             ->messageFactory()
             ->createMessageFromArray(

@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Throwable;
 
+use function is_a;
 use function reset;
 
 final class MessengerMessageProducer implements MessageProducer, MessageDispatcher
@@ -73,12 +74,7 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
 
     public function produce(EventEngineMessage $messageToPutOnTheQueue): mixed
     {
-        /** @var Message $message */
-        $message = $messageToPutOnTheQueue->get(MessageBag::MESSAGE);
-        $sendAsync = $messageToPutOnTheQueue->getMetaOrDefault('async', null)
-            ?? $message instanceof Queueable;
-
-        if ($sendAsync) {
+        if ($this->sendAsync($messageToPutOnTheQueue)) {
             $messageToPutOnTheQueue = $this->flavour->prepareNetworkTransmission($messageToPutOnTheQueue);
         }
 
@@ -108,5 +104,30 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
         $handledStamp = reset($handledStamps);
 
         return $handledStamp->getResult();
+    }
+
+    private function sendAsync(EventEngineMessage $messageToPutOnTheQueue): bool
+    {
+        /** @var bool|null $sendAsync */
+        $sendAsync = $messageToPutOnTheQueue->getMetaOrDefault('async', null);
+
+        if ($sendAsync !== null) {
+            return $sendAsync;
+        }
+
+        /** @var Message|null $message */
+        $message = $messageToPutOnTheQueue->getOrDefault(MessageBag::MESSAGE, null);
+
+        if ($message instanceof Queueable) {
+            return true;
+        }
+
+        if ($message !== null) {
+            return true;
+        }
+
+        $messageClass = $messageToPutOnTheQueue->messageName();
+
+        return is_a($messageClass, Queueable::class, true);
     }
 }

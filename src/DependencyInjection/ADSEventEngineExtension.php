@@ -71,7 +71,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
     public function prepend(ContainerBuilder $container): void
     {
         /** @var array<string, array<string, array<string, array<mixed>>>> $eventEngineConfig */
-        $eventEngineConfig = $container->getExtensionConfig('ads_event_engine');
+        $eventEngineConfig = $container->getExtensionConfig('ads_event_engine')[0] ?? [];
 
         $config = [
             'messenger' => [

@@ -152,8 +152,6 @@ services:
     EventEngine\Runtime\Functional\Port: '@ADS\Bundle\EventEngineBundle\Port\MessagePort'
     EventEngine\Runtime\Oop\Port: '@ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort'
 
-
-
     # Implementations
     Opis\JsonSchema\Validator: ~
     Prooph\EventStore\Pdo\WriteLockStrategy\PostgresAdvisoryLockStrategy:
@@ -244,12 +242,6 @@ services:
         arguments:
             - '@.inner'
 
-    ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler:
-        abstract: true
-        arguments:
-            - '@EventEngine\EventEngine'
-            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
-
     ADS\Bundle\EventEngineBundle\Lock\StoreFactory: ~
     lock.postgres.store:
         class: Symfony\Component\Lock\Store\PostgreSqlStore
@@ -268,34 +260,6 @@ services:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregate'
             - '@ADS\Bundle\EventEngineBundle\Lock\NoLockAggregate'
-
-    ADS\Bundle\EventEngineBundle\Messenger\Handler\CommandHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
-        arguments:
-            $lockAggregateCommand: '@ADS\Bundle\EventEngineBundle\Lock\LockAggregate'
-        autoconfigure: true
-
-    ADS\Bundle\EventEngineBundle\Messenger\Handler\EventHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
-        autoconfigure: true
-
-    ADS\Bundle\EventEngineBundle\Messenger\Handler\QueryHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
-        autoconfigure: true
-
-    ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncCommandHandler:
-        arguments:
-            - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
-            - '@ADS\Bundle\EventEngineBundle\Lock\LockAggregate'
-        autoconfigure: true
-
-    ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncEventHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
-        autoconfigure: true
-
-    ADS\Bundle\EventEngineBundle\Messenger\Handler\AsyncQueryHandler:
-        parent: 'ADS\Bundle\EventEngineBundle\Messenger\Handler\Handler'
-        autoconfigure: true
 
     ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope:
         arguments:

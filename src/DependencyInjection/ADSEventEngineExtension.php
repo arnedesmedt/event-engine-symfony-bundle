@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\DependencyInjection;
 
-use ADS\Bundle\EventEngineBundle\Messenger\Message\CommandMessageWrapper;
-use ADS\Bundle\EventEngineBundle\Messenger\Message\EventMessageWrapper;
-use ADS\Bundle\EventEngineBundle\Messenger\Message\QueryMessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Middleware\DontSendToFailureTransportMiddleware;
 use ADS\Bundle\EventEngineBundle\Messenger\Middleware\PickTransportMiddleware;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry;
@@ -17,6 +14,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
+
+use function array_merge;
 
 final class ADSEventEngineExtension extends ConfigurableExtension implements PrependExtensionInterface
 {
@@ -67,135 +66,51 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
             'event_engine.seed_path',
             $mergedConfig['seed_path'],
         );
-
-        $container->setParameter(
-            'event_engine.messenger.command.transport',
-            $mergedConfig['messenger']['command']['transport'],
-        );
-
-        $container->setParameter(
-            'event_engine.messenger.command.retry',
-            $mergedConfig['messenger']['command']['retry'],
-        );
-
-        $container->setParameter(
-            'event_engine.messenger.event.transport',
-            $mergedConfig['messenger']['event']['transport'],
-        );
-
-        $container->setParameter(
-            'event_engine.messenger.event.retry',
-            $mergedConfig['messenger']['event']['retry'],
-        );
-
-        $container->setParameter(
-            'event_engine.messenger.query.transport',
-            $mergedConfig['messenger']['query']['transport'],
-        );
-
-        $container->setParameter(
-            'event_engine.messenger.query.retry',
-            $mergedConfig['messenger']['query']['retry'],
-        );
     }
 
     public function prepend(ContainerBuilder $container): void
     {
-        $configs = $container->getExtensionConfig($this->getAlias());
-        $resolvingBag = $container->getParameterBag();
-        $configs = $resolvingBag->resolveValue($configs);
+        /** @var array<string, array<string, array<string, array<mixed>>>> $eventEngineConfig */
+        $eventEngineConfig = $container->getExtensionConfig('ads_event_engine');
 
-        //phpcs:disable Squiz.Arrays.ArrayDeclaration.MultiLineNotAllowed
         $config = [
             'messenger' => [
                 'default_bus' => 'command.bus',
                 'buses' => [
-                    // deprecated
-                    'command.bus' => [
-                        'middleware' => [
-                            DontSendToFailureTransportMiddleware::class,
-                        ],
-                    ],
-                    // deprecated
-                    'event.bus' => [
-                        'middleware' => [
-                            DontSendToFailureTransportMiddleware::class,
-                        ],
-                    ],
-                    // deprecated
-                    'query.bus' => [
-                        'middleware' => [
-                            DontSendToFailureTransportMiddleware::class,
-                        ],
-                    ],
                     'command' => [
-                        'middleware' => [
-                            PickTransportMiddleware::class,
-                            DontSendToFailureTransportMiddleware::class,
-                        ],
+                        'middleware' => array_merge(
+                            [
+                                PickTransportMiddleware::class,
+                                DontSendToFailureTransportMiddleware::class,
+                            ],
+                            $eventEngineConfig['messenger']['command']['middleware'],
+                        ),
                     ],
                     'event' => [
-                        'middleware' => [
-                            PickTransportMiddleware::class,
-                            DontSendToFailureTransportMiddleware::class,
-                        ],
+                        'middleware' => array_merge(
+                            [
+                                PickTransportMiddleware::class,
+                                DontSendToFailureTransportMiddleware::class,
+                            ],
+                            $eventEngineConfig['messenger']['event']['middleware'],
+                        ),
                     ],
                     'query' => [
-                        'middleware' => [
-                            PickTransportMiddleware::class,
-                            DontSendToFailureTransportMiddleware::class,
-                        ],
+                        'middleware' => array_merge(
+                            [
+                                PickTransportMiddleware::class,
+                                DontSendToFailureTransportMiddleware::class,
+                            ],
+                            $eventEngineConfig['messenger']['query']['middleware'],
+                        ),
                     ],
                 ],
                 'transports' => [
-                    // deprecated
-                    'event_engine.command' => [
-                        'dsn' => $configs['event_engine.messenger.command.transport']
-                            ?? 'doctrine://default?queue_name=event_engine_command',
-                        'retry_strategy' => [
-                            'service' => $configs['event_engine.messenger.command.retry']
-                                ?? CommandRetry::class,
-                        ],
-                        'failure_transport' => 'failed.event_engine.command',
-                    ],
-                    // deprecated
-                    'failed.event_engine.command' => [
-                        'dsn' => 'doctrine://default?queue_name=failed_event_engine_command',
-                    ],
-                    // deprecated
-                    'event_engine.event' => [
-                        'dsn' => $configs['event_engine.messenger.event.transport']
-                            ?? 'doctrine://default?queue_name=event_engine_event',
-                        'retry_strategy' => [
-                            'service' => $configs['event_engine.messenger.event.retry']
-                                ?? EventRetry::class,
-                        ],
-                        'failure_transport' => 'failed.event_engine.event',
-                    ],
-                    // deprecated
-                    'failed.event_engine.event' => [
-                        'dsn' => 'doctrine://default?queue_name=failed_event_engine_event',
-                    ],
-                    // deprecated
-                    'event_engine.query' => [
-                        'dsn' => $configs['event_engine.messenger.query.transport']
-                            ?? 'doctrine://default?queue_name=event_engine_query',
-                        'retry_strategy' => [
-                            'service' => $configs['event_engine.messenger.query.retry']
-                                ?? QueryRetry::class,
-                        ],
-                        'failure_transport' => 'failed.event_engine.query',
-                    ],
-                    // deprecated
-                    'failed.event_engine.query' => [
-                        'dsn' => 'doctrine://default?queue_name=failed_event_engine_query',
-                    ],
                     'command' => [
-                        'dsn' => $configs['event_engine.messenger.command.transport']
+                        'dsn' => $eventEngineConfig['messenger']['command']['transport']
                             ?? 'doctrine://default?table_name=messenger_commands',
                         'retry_strategy' => [
-                            'service' => $configs['event_engine.messenger.command.retry']
-                                ?? CommandRetry::class,
+                            'service' => $eventEngineConfig['messenger']['command']['retry'] ?? CommandRetry::class,
                         ],
                         'failure_transport' => 'command.failed',
                         'options' => [
@@ -203,15 +118,12 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                             'check_delayed_interval' => 0,
                         ],
                     ],
-                    'command.failed' => [
-                        'dsn' => 'doctrine://default?table_name=messenger_commands&queue_name=failed',
-                    ],
+                    'command.failed' => ['dsn' => 'doctrine://default?table_name=messenger_commands&queue_name=failed'],
                     'event' => [
-                        'dsn' => $configs['event_engine.messenger.event.transport']
+                        'dsn' => $eventEngineConfig['messenger']['event']['transport']
                             ?? 'doctrine://default?table_name=messenger_events',
                         'retry_strategy' => [
-                            'service' => $configs['event_engine.messenger.event.retry']
-                                ?? EventRetry::class,
+                            'service' => $eventEngineConfig['messenger']['event']['retry'] ?? EventRetry::class,
                         ],
                         'failure_transport' => 'event.failed',
                         'options' => [
@@ -219,15 +131,12 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                             'check_delayed_interval' => 0,
                         ],
                     ],
-                    'event.failed' => [
-                        'dsn' => 'doctrine://default?table_name=messenger_events&queue_name=failed',
-                    ],
+                    'event.failed' => ['dsn' => 'doctrine://default?table_name=messenger_events&queue_name=failed'],
                     'query' => [
-                        'dsn' => $configs['event_engine.messenger.query.transport']
+                        'dsn' => $eventEngineConfig['messenger']['query']['transport']
                             ?? 'doctrine://default?table_name=messenger_queries',
                         'retry_strategy' => [
-                            'service' => $configs['event_engine.messenger.query.retry']
-                                ?? QueryRetry::class,
+                            'service' => $eventEngineConfig['messenger']['query']['retry'] ?? QueryRetry::class,
                         ],
                         'failure_transport' => 'query.failed',
                         'options' => [
@@ -235,19 +144,10 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                             'check_delayed_interval' => 0,
                         ],
                     ],
-                    'query.failed' => [
-                        'dsn' => 'doctrine://default?table_name=messenger_queries&queue_name=failed',
-                    ],
-                ],
-                // deprecated
-                'routing' => [
-                    CommandMessageWrapper::class => 'event_engine.command',
-                    EventMessageWrapper::class => 'event_engine.event',
-                    QueryMessageWrapper::class => 'event_engine.query',
+                    'query.failed' => ['dsn' => 'doctrine://default?table_name=messenger_queries&queue_name=failed'],
                 ],
             ],
         ];
-        //phpcs:enable Squiz.Arrays.ArrayDeclaration.MultiLineNotAllowed
 
         $container->prependExtensionConfig(
             'framework',

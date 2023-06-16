@@ -83,7 +83,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                                 PickTransportMiddleware::class,
                                 DontSendToFailureTransportMiddleware::class,
                             ],
-                            $eventEngineConfig['messenger']['command']['middleware'],
+                            $eventEngineConfig['messenger']['command']['middleware'] ?? [],
                         ),
                     ],
                     'event' => [
@@ -92,7 +92,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                                 PickTransportMiddleware::class,
                                 DontSendToFailureTransportMiddleware::class,
                             ],
-                            $eventEngineConfig['messenger']['event']['middleware'],
+                            $eventEngineConfig['messenger']['event']['middleware'] ?? [],
                         ),
                     ],
                     'query' => [
@@ -101,7 +101,7 @@ final class ADSEventEngineExtension extends ConfigurableExtension implements Pre
                                 PickTransportMiddleware::class,
                                 DontSendToFailureTransportMiddleware::class,
                             ],
-                            $eventEngineConfig['messenger']['query']['middleware'],
+                            $eventEngineConfig['messenger']['query']['middleware'] ?? [],
                         ),
                     ],
                 ],

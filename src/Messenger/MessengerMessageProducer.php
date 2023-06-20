@@ -122,10 +122,6 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
             return true;
         }
 
-        if ($message !== null) {
-            return true;
-        }
-
         $messageClass = $messageToPutOnTheQueue->messageName();
 
         return is_a($messageClass, Queueable::class, true);

@@ -15,8 +15,6 @@ use function sprintf;
 
 final class LockAggregate implements LockAggregateStrategy
 {
-    public const NO_LOCK_METADATA = ['lock' => false];
-
     public function __construct(
         private EventEngine $eventEngine,
         private LockFactory $aggregateLockFactory,
@@ -27,11 +25,10 @@ final class LockAggregate implements LockAggregateStrategy
     public function __invoke(Message $message): mixed
     {
         $customMessage = $message->get(MessageBag::MESSAGE);
-        $doLock = $message->getMetaOrDefault('lock', true);
         $lock = null;
         $lockId = '';
 
-        if ($customMessage instanceof AggregateCommand && $doLock) {
+        if ($customMessage instanceof AggregateCommand) {
             $aggregateId = $customMessage->__aggregateId();
             $commandRouting = $this->eventEngine->compileCacheableConfig()['compiledCommandRouting'];
             $aggregateType = $commandRouting[$customMessage::class]['aggregateType'];

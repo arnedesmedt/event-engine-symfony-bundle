@@ -89,7 +89,7 @@ class PDO extends \PDO
     {
         $this->enableConnection();
 
-        return parent::query($statement, $mode, ...$fetch_mode_args);
+        return parent::query($statement, $mode);
     }
 
     public function lastInsertId($name = null): string|false

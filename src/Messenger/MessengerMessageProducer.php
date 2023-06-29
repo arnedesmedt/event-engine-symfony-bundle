@@ -61,14 +61,21 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
             throw new RuntimeException('EventEngine is not set');
         }
 
+        $messageData = [
+            'payload' => $payload,
+            'metadata' => $metadata,
+        ];
+
+        if (isset($metadata['messageUuid'])) {
+            $messageData['uuid'] = $metadata['messageUuid'];
+            unset($metadata['messageUuid']);
+        }
+
         return $this->eventEngine
             ->messageFactory()
             ->createMessageFromArray(
                 $messageClass,
-                [
-                    'payload' => $payload,
-                    'metadata' => $metadata,
-                ],
+                $messageData,
             );
     }
 

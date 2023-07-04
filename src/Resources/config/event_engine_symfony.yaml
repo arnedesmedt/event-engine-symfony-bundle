@@ -151,6 +151,8 @@ services:
     EventEngine\Runtime\Prototyping\Port: '@ADS\Bundle\EventEngineBundle\Port\MessagePort'
     EventEngine\Runtime\Functional\Port: '@ADS\Bundle\EventEngineBundle\Port\MessagePort'
     EventEngine\Runtime\Oop\Port: '@ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort'
+    EventEngine\Messaging\MessageDispatcher: '@ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer'
+    EventEngine\Messaging\MessageProducer: '@ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer'
 
     # Implementations
     Opis\JsonSchema\Validator: ~

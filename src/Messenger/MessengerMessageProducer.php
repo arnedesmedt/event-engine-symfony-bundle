@@ -24,6 +24,7 @@ use function reset;
 final class MessengerMessageProducer implements MessageProducer, MessageDispatcher
 {
     public const ASYNC_METADATA = ['async' => true];
+    public const NO_ASYNC_METADATA = ['async' => false];
 
     public function __construct(
         private readonly MessageBusInterface $commandBus,

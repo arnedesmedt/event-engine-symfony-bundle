@@ -30,4 +30,9 @@ trait DefaultQueueable
     {
         return true;
     }
+
+    public static function __queue(): bool
+    {
+        return false;
+    }
 }

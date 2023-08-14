@@ -127,11 +127,11 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
         $message = $messageToPutOnTheQueue->getOrDefault(MessageBag::MESSAGE, null);
 
         if ($message instanceof Queueable) {
-            return true;
+            return $message::__queue();
         }
 
         $messageClass = $messageToPutOnTheQueue->messageName();
 
-        return is_a($messageClass, Queueable::class, true);
+        return is_a($messageClass, Queueable::class, true) && $messageClass::__queue();
     }
 }

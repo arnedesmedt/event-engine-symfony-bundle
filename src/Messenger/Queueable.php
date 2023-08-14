@@ -15,4 +15,6 @@ interface Queueable
     public static function __maxDelayInMilliseconds(): int;
 
     public static function __sendToLinkedFailureTransport(): bool;
+
+    public static function __queue(): bool;
 }

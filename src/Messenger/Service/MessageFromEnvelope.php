@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Messenger\Service;
 
 use ADS\Bundle\EventEngineBundle\Message\Message;
-use ADS\Bundle\EventEngineBundle\Messenger\Message\MessageWrapper;
 use EventEngine\Messaging\Message as EventEngineMessage;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Flavour;
@@ -21,12 +20,8 @@ class MessageFromEnvelope
 
     public function __invoke(Envelope $envelope): Message
     {
-        /** @var MessageWrapper|Message|EventEngineMessage $message */
+        /** @var Message|EventEngineMessage $message */
         $message = $envelope->getMessage();
-
-        if ($message instanceof MessageWrapper) {
-            $message = $message->message();
-        }
 
         if ($message instanceof EventEngineMessage) {
             $message = $this->flavour->convertMessageReceivedFromNetwork($message);

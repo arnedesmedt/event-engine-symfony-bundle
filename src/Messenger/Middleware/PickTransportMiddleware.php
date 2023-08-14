@@ -24,7 +24,8 @@ class PickTransportMiddleware implements MiddlewareInterface
         /** @var EventEngineMessage $eventEngineMessage */
         $eventEngineMessage = $envelope->getMessage();
         $message = $this->flavour->convertMessageReceivedFromNetwork($eventEngineMessage)->get(MessageBag::MESSAGE);
-        $sendAsync = $eventEngineMessage->getMetaOrDefault('async', null) ?? $message instanceof Queueable;
+        $sendAsync = $eventEngineMessage->getMetaOrDefault('async', null)
+            ?? ($message instanceof Queueable && $message::__queue());
 
         if ($sendAsync) {
             $envelope = $envelope->with(new TransportNamesStamp([$eventEngineMessage->messageType()]));

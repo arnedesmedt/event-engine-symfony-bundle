@@ -6,7 +6,6 @@ namespace ADS\Bundle\EventEngineBundle\Messenger\Middleware;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Message\Message;
-use ADS\Bundle\EventEngineBundle\Messenger\Message\MessageWrapper;
 use ADS\Bundle\EventEngineBundle\Messenger\Queueable;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry;
@@ -38,11 +37,11 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
         try {
             return $stack->next()->handle($envelope, $stack);
         } catch (HandlerFailedException $e) {
-            /** @var MessageWrapper|EventEngineMessage|Message $message */
+            /** @var EventEngineMessage|Message $message */
             $message = $envelope->getMessage();
 
             // Send sync for normal message
-            if ($message instanceof Message && ! $message instanceof Queueable) {
+            if ($message instanceof Message && ! ($message instanceof Queueable && $message::__queue())) {
                 throw $e;
             }
 
@@ -57,7 +56,7 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
 
             $message = ($this->messageFromEnvelope)($envelope);
 
-            if ($message instanceof Queueable && $message::__sendToLinkedFailureTransport()) {
+            if ($message instanceof Queueable && $message::__queue() && $message::__sendToLinkedFailureTransport()) {
                 throw $e;
             }
 

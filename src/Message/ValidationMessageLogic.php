@@ -26,8 +26,8 @@ trait ValidationMessageLogic
     /** @return class-string<object&callable>|null */
     public static function validationClass(): string|null
     {
-        $validationClass = str_replace('/Command/', '/Validation/Command/', static::class);
-        $validationClass = str_replace('/Query/', '/Validation/Query/', $validationClass);
+        $validationClass = str_replace('\\Command\\', '\\Validation\\Command\\', static::class);
+        $validationClass = str_replace('\\Query\\', '\\Validation\\Query\\', $validationClass);
 
         return class_exists($validationClass)
             ? $validationClass

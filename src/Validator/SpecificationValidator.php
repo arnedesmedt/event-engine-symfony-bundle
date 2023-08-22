@@ -24,6 +24,15 @@ class SpecificationValidator extends ConstraintValidator
             return;
         }
 
+        $validationClass = $value->validationClass();
+        if ($validationClass !== null) {
+            /** @var ValidationProcessor $validationObject */
+            $validationObject = $this->container->get($validationClass);
+            $validationObject($value);
+
+            return;
+        }
+
         $this->generalValidate($value);
         $this->messageValidate($value);
     }

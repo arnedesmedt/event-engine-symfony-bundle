@@ -11,8 +11,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 class MessageHandler
 {
-    public const NO_LOCK = ['lock' => false];
-
     public function __construct(
         private readonly Flavour $flavour,
         private readonly LockAggregateStrategy $lockAggregateStrategy,

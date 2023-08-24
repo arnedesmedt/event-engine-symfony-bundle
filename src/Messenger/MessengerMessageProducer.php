@@ -26,6 +26,9 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
     public const ASYNC_METADATA = ['async' => true];
     public const NO_ASYNC_METADATA = ['async' => false];
 
+    public const LOCK = ['lock' => true];
+    public const NO_LOCK = ['lock' => false];
+
     public function __construct(
         private readonly MessageBusInterface $commandBus,
         private readonly MessageBusInterface $eventBus,
@@ -83,6 +86,8 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
     public function produce(EventEngineMessage $messageToPutOnTheQueue): mixed
     {
         if ($this->sendAsync($messageToPutOnTheQueue)) {
+            // We need to lock the aggregate if we send the message async.
+            $messageToPutOnTheQueue = $messageToPutOnTheQueue->withAddedMetadata('lock', true);
             $messageToPutOnTheQueue = $this->flavour->prepareNetworkTransmission($messageToPutOnTheQueue);
         }
 

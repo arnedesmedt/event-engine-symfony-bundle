@@ -11,6 +11,8 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 class MessageHandler
 {
+    public const NO_LOCK = ['lock' => false];
+
     public function __construct(
         private readonly Flavour $flavour,
         private readonly LockAggregateStrategy $lockAggregateStrategy,
@@ -41,6 +43,11 @@ class MessageHandler
         LockAggregateStrategy|null $lockAggregateStrategy = null,
     ): mixed {
         $message = $this->flavour->convertMessageReceivedFromNetwork($message);
+        $followGivenLockStrategy = $message->getMetaOrDefault('lock', true);
+
+        if (! $followGivenLockStrategy) {
+            $lockAggregateStrategy = $this->noLockAggregateStrategy;
+        }
 
         $lockAggregateStrategy ??= $this->lockAggregateStrategy;
 

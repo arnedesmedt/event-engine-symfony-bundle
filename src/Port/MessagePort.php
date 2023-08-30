@@ -13,7 +13,6 @@ use EventEngine\Messaging\CommandDispatchResult;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Functional\Port;
-use Opis\JsonSchema\Schema;
 use Opis\JsonSchema\Validator;
 use ReflectionClass;
 use RuntimeException;
@@ -51,7 +50,7 @@ final class MessagePort implements Port
                 $data = new stdClass();
             }
 
-            $this->validator->schemaValidation($data, Schema::fromJsonString($schema));
+            $this->validator->dataValidation($data, $schema);
         }
 
         $encodedData = json_encode($data, JSON_THROW_ON_ERROR);

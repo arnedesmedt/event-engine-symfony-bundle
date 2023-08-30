@@ -50,7 +50,7 @@ final class MessagePort implements Port
                 $data = new stdClass();
             }
 
-            $this->validator->dataValidation($data, $schema);
+            $this->validator->validate($data, $schema);
         }
 
         $encodedData = json_encode($data, JSON_THROW_ON_ERROR);

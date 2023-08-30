@@ -19,7 +19,7 @@
         "event-engine/php-postgres-document-store": "~0.1",
         "event-engine/prooph-v7-event-store": "~0.1",
         "prooph/pdo-event-store": "~1.0",
-        "opis/json-schema": "~1.0",
+        "opis/json-schema": "~2.0",
         "symfony/cache": "~6.2",
         "symfony/http-kernel": "~6.2",
         "symfony/validator": "~6.2",

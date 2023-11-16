@@ -83,7 +83,7 @@ final class EventSourceAggregatePort implements Port
     }
 
     /**
-     * @param Event $customEvent
+     * @param JsonSchemaAwareRecord $customEvent
      *
      * @inheritDoc
      */

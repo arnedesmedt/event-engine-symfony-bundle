@@ -14,7 +14,6 @@ trait DeletableAggregate
         return $this->deleted === true;
     }
 
-    /** @return static */
     public function delete(): static
     {
         $this->deleted = true;

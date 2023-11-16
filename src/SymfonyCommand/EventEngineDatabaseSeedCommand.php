@@ -79,7 +79,7 @@ class EventEngineDatabaseSeedCommand extends Command
                     $eventClasses = array_keys($eventsPerEventName);
                     $eventApplyMap = array_combine(
                         $eventClasses,
-                        array_fill(0, count($eventsPerEventName), [FlavourHint::class, 'useAggregate']),
+                        array_fill(0, count($eventsPerEventName), FlavourHint::useAggregate(...)),
                     );
 
                     $aggregate = new FlavouredAggregateRoot($aggregateId, $entityClass, $eventApplyMap, $this->flavour);

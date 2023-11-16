@@ -17,7 +17,7 @@ use function sprintf;
 #[AsCommand('event-engine:projections:reset')]
 final class ResetProjections extends Command
 {
-    public function __construct(private ProjectionManager $projectionManager)
+    public function __construct(private readonly ProjectionManager $projectionManager)
     {
         parent::__construct();
     }

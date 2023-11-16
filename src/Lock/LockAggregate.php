@@ -16,9 +16,9 @@ use function sprintf;
 final class LockAggregate implements LockAggregateStrategy
 {
     public function __construct(
-        private EventEngine $eventEngine,
-        private LockFactory $aggregateLockFactory,
-        private LoggerInterface $logger,
+        private readonly EventEngine $eventEngine,
+        private readonly LockFactory $aggregateLockFactory,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

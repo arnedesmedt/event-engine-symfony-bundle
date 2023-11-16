@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand('event-engine:projections:create')]
 final class EventEngineProjectionsCreateCommand extends Command
 {
-    public function __construct(private PDO $connection)
+    public function __construct(private readonly PDO $connection)
     {
         parent::__construct();
     }

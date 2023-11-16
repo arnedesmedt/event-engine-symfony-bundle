@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class Validator implements ValidatorInterface
 {
-    public function __construct(private ValidatorInterface $validator)
+    public function __construct(private readonly ValidatorInterface $validator)
     {
     }
 

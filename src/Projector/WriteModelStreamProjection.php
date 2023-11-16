@@ -14,17 +14,17 @@ use function count;
 
 class WriteModelStreamProjection
 {
-    public const NAME = 'ee_write_model_projection';
+    final public const NAME = 'ee_write_model_projection';
 
     /** @readonly */
-    private ReadModelProjector $projection;
+    private readonly ReadModelProjector $projection;
 
     /** @param array<string, mixed>|null $projectionOptions */
     public function __construct(
         ProjectionManager $projectionManager,
         EventEngine $eventEngine,
         array|null $projectionOptions = null,
-        private bool $testMode = false,
+        private readonly bool $testMode = false,
     ) {
         if ($projectionOptions === null) {
             $projectionOptions = [ReadModelProjector::OPTION_PERSIST_BLOCK_SIZE => 1];

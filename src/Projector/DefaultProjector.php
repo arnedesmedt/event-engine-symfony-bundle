@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Projector;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
-use ADS\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
+use EventEngine\JsonSchema\JsonSchemaAwareCollection;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Projecting\AggregateProjector;
@@ -35,11 +35,6 @@ abstract class DefaultProjector implements Projector
         $this->documentStore->dropCollection(static::generateCollectionName($projectionVersion, $projectionName));
     }
 
-    public static function projectionName(): string
-    {
-        return StringUtil::decamelize(StringUtil::entityNameFromClassName(static::class));
-    }
-
     public static function version(): string
     {
         return '0.1.0';
@@ -50,17 +45,12 @@ abstract class DefaultProjector implements Projector
         return self::generateCollectionName(static::version(), static::projectionName());
     }
 
-    public static function stateClassName(): string
+    public static function statesClass(): string
     {
-        $projectionNamespace = StringUtil::entityNamespaceFromClassName(static::class);
-        $projectionName = StringUtil::entityNameFromClassName(static::class);
+        /** @var class-string<JsonSchemaAwareCollection> $statesClass */
+        $statesClass = static::stateClass() . 's';
 
-        return sprintf('%s\\%s\\%s', $projectionNamespace, $projectionName, 'State');
-    }
-
-    public static function statesClassName(): string
-    {
-        return static::stateClassName() . 's';
+        return $statesClass;
     }
 
     protected static function generateCollectionName(string $projectionVersion, string $projectionName): string

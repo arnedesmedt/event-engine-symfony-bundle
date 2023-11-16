@@ -25,27 +25,59 @@ services:
     # Event Engine
     ADS\Bundle\EventEngineBundle\EventEngineFactory:
         arguments:
-            - '@EventEngine\Schema\Schema'
-            - '@EventEngine\Runtime\Flavour'
-            - '@EventEngine\Persistence\MultiModelStore'
-            - '@EventEngine\Logger\LogEngine'
-            - '@service_container'
-            - '%kernel.environment%'
-            - '%kernel.debug%'
-            - '%event_engine.commands%'
-            - '%event_engine.queries%'
-            - '%event_engine.events%'
-            - '%event_engine.aggregates%'
-            - '%event_engine.types%'
-            - '%event_engine.listeners%'
-            - '%event_engine.projectors%'
-            - '%event_engine.pre_processors%'
-            - '%event_engine.descriptions%'
-            - '@event_engine.cache.config'
-            - '@?event_engine.event_queue'
+            $schema: '@EventEngine\Schema\Schema'
+            $flavour: '@EventEngine\Runtime\Flavour'
+            $multiModelStore: '@EventEngine\Persistence\MultiModelStore'
+            $simpleMessageEngine: '@EventEngine\Logger\LogEngine'
+            $container: '@service_container'
+            $eventQueue: '@?event_engine.event_queue'
+            $cache: '@event_engine.cache.config'
+            $controllerExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor'
+            $aggregateCommandExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor'
+            $resolverExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor'
+            $responseExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor'
+            $stateClassExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor'
+            $eventClassExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor'
+            $projectorExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\ProjectorExtractor'
+            $jsonSchemaExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor'
+            $classMapper: '@ADS\Bundle\EventEngineBundle\Classes\ClassMapper'
+            $commands: '%event_engine.commands%'
+            $controllerCommands: '%event_engine.controller_commands%'
+            $aggregateCommands: '%event_engine.aggregate_commands%'
+            $queries: '%event_engine.queries%'
+            $events: '%event_engine.events%'
+            $aggregates: '%event_engine.aggregates%'
+            $projectors: '%event_engine.projectors%'
+            $types: '%event_engine.types%'
+            $descriptions: '%event_engine.descriptions%'
+            $listeners: '%event_engine.listeners%'
+            $environment: '%kernel.environment%'
+            $debug: '%kernel.debug%'
 
     EventEngine\EventEngine:
         factory: '@ADS\Bundle\EventEngineBundle\EventEngineFactory'
+
+    ADS\Bundle\EventEngineBundle\Classes\ClassMapper:
+        arguments:
+            $eventClassExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor'
+            $preProcessorExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\PreProcessorExtractor'
+            $commandExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor'
+            $commands: '%event_engine.commands%'
+            $aggregateCommands: '%event_engine.aggregate_commands%'
+            $aggregates: '%event_engine.aggregates%'
+            $preProcessors: '%event_engine.pre_processors%'
+
+
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\ProjectorExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\PreProcessorExtractor: ~
 
     ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer:
         public: true

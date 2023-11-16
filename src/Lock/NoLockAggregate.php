@@ -10,7 +10,7 @@ use EventEngine\Messaging\Message;
 final class NoLockAggregate implements LockAggregateStrategy
 {
     public function __construct(
-        private EventEngine $eventEngine,
+        private readonly EventEngine $eventEngine,
     ) {
     }
 

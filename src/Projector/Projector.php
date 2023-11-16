@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Projector;
 
-use ADS\Bundle\EventEngineBundle\Event\Event;
+use EventEngine\JsonSchema\JsonSchemaAwareCollection;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Projecting\CustomEventProjector;
 
 interface Projector extends CustomEventProjector
 {
-    /** @return array<int, class-string<Event>> */
+    /** @return array<int, class-string<JsonSchemaAwareRecord>> */
     public static function events(): array;
 
     public static function projectionName(): string;
@@ -18,7 +19,9 @@ interface Projector extends CustomEventProjector
 
     public static function generateOwnCollectionName(): string;
 
-    public static function stateClassName(): string;
+    /** @return class-string<JsonSchemaAwareRecord> */
+    public static function stateClass(): string;
 
-    public static function statesClassName(): string;
+    /** @return class-string<JsonSchemaAwareCollection> */
+    public static function statesClass(): string;
 }

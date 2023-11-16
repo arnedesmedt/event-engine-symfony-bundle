@@ -36,53 +36,49 @@ final class Handler implements EventSubscriberInterface
     {
         $exception = $event->getThrowable();
 
-        switch (true) {
-            case $exception instanceof ConcurrencyException:
-                $event->setThrowable(
-                    new ConflictHttpException(
-                        'Resource already exists.',
-                        $exception,
-                    ),
-                );
-                break;
-            case $exception instanceof AggregateNotFound:
-                $event->setThrowable(
-                    new NotFoundHttpException(
-                        $exception->getMessage(),
-                        $exception,
-                    ),
-                );
-                break;
-            case $exception instanceof JsonValidationError:
-                $message = $exception->getMessage();
+        $throwable = match (true) {
+            $exception instanceof ConcurrencyException => new ConflictHttpException(
+                'Resource already exists.',
+                $exception,
+            ),
+            $exception instanceof AggregateNotFound => new NotFoundHttpException(
+                $exception->getMessage(),
+                $exception,
+            ),
+            $exception instanceof JsonValidationError => $this->jsonValidationError($exception),
+            default => $exception,
+        };
 
-                if (preg_match('/field "(.+)" \[(.+)\] ([.\S\s]+)$/m', $message, $matches)) {
-                    try {
-                        /** @var string $encodedJson */
-                        $encodedJson = json_encode(
-                            json_decode($matches[3], true, 512, JSON_THROW_ON_ERROR),
-                            JSON_THROW_ON_ERROR,
-                        );
-                    } catch (Throwable) {
-                        /** @var string $encodedJson */
-                        $encodedJson = $matches[3];
-                    }
+        $event->setThrowable($throwable);
+    }
 
-                    $message = sprintf(
-                        'Payload validation error: field \'%s\' [%s] %s',
-                        StringUtil::decamelize($matches[1]),
-                        $matches[2],
-                        str_replace('"', '\'', $encodedJson),
-                    );
-                }
+    private function jsonValidationError(JsonValidationError $exception): BadRequestHttpException
+    {
+        $message = $exception->getMessage();
 
-                $event->setThrowable(
-                    new BadRequestHttpException(
-                        $message,
-                        $exception,
-                    ),
+        if (preg_match('/field "(.+)" \[(.+)\] ([.\S\s]+)$/m', $message, $matches)) {
+            try {
+                /** @var string $encodedJson */
+                $encodedJson = json_encode(
+                    json_decode($matches[3], true, 512, JSON_THROW_ON_ERROR),
+                    JSON_THROW_ON_ERROR,
                 );
-                break;
+            } catch (Throwable) {
+                /** @var string $encodedJson */
+                $encodedJson = $matches[3];
+            }
+
+            $message = sprintf(
+                'Payload validation error: field \'%s\' [%s] %s',
+                StringUtil::decamelize($matches[1]),
+                $matches[2],
+                str_replace('"', '\'', $encodedJson),
+            );
         }
+
+        return new BadRequestHttpException(
+            $message,
+            $exception,
+        );
     }
 }

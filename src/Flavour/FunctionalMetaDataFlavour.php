@@ -19,7 +19,7 @@ use RuntimeException;
 
 class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
 {
-    public function __construct(private FunctionalFlavour $functionalFlavour)
+    public function __construct(private readonly FunctionalFlavour $functionalFlavour)
     {
     }
 

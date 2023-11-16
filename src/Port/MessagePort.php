@@ -28,7 +28,7 @@ use const JSON_THROW_ON_ERROR;
 
 final class MessagePort implements Port
 {
-    public function __construct(private Validator $validator)
+    public function __construct(private readonly Validator $validator)
     {
     }
 

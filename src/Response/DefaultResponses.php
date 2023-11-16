@@ -58,7 +58,13 @@ trait DefaultResponses
         $responses = self::__responseClassesPerStatusCode();
 
         if ($statusCode === null) {
-            return reset($responses);
+            $response = reset($responses);
+
+            if ($response === false) {
+                throw ResponseException::noResponsesFound(static::class);
+            }
+
+            return $response;
         }
 
         if (! isset($responses[$statusCode])) {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Message;
 
-use EventEngine\Data\ImmutableRecord;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 
-interface Message extends ImmutableRecord
+interface Message extends JsonSchemaAwareRecord
 {
 }

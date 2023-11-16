@@ -21,9 +21,9 @@ final class Config implements CacheClearerInterface
     private array|null $config = null;
 
     public function __construct(
-        private EventEngine $eventEngine,
-        private AbstractAdapter $cache,
-        private string $environment,
+        private readonly EventEngine $eventEngine,
+        private readonly AbstractAdapter $cache,
+        private readonly string $environment,
     ) {
     }
 

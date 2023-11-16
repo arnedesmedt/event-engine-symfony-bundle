@@ -21,9 +21,9 @@ class EventEngineEventStreamsCreateCommand extends Command
 {
     /** @param array<class-string> $aggregates */
     public function __construct(
-        private PDO $connection,
-        private EventStore $eventStore,
-        private array $aggregates,
+        private readonly PDO $connection,
+        private readonly EventStore $eventStore,
+        private readonly array $aggregates,
     ) {
         parent::__construct();
     }

@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand('event-engine:projections:run')]
 final class RunProjections extends Command
 {
-    public function __construct(private WriteModelStreamProjection $projection)
+    public function __construct(private readonly WriteModelStreamProjection $projection)
     {
         parent::__construct();
     }

@@ -8,7 +8,7 @@ use PDO;
 
 final class TransactionalConnection implements \EventEngine\Persistence\TransactionalConnection
 {
-    public function __construct(private PDO $connection)
+    public function __construct(private readonly PDO $connection)
     {
     }
 

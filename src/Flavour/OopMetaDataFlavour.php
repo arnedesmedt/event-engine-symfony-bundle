@@ -16,8 +16,8 @@ use Generator;
 final class OopMetaDataFlavour implements Flavour, MessageFactoryAware
 {
     public function __construct(
-        private OopFlavour $oopFlavour,
-        private FunctionalMetaDataFlavour $functionalMetaDataFlavour,
+        private readonly OopFlavour $oopFlavour,
+        private readonly FunctionalMetaDataFlavour $functionalMetaDataFlavour,
     ) {
     }
 

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
-use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionAttribute;
 use ReflectionClass;
 use RuntimeException;
 
 use function method_exists;
+use function reset;
 use function sprintf;
 
 /** @template TState of JsonSchemaAwareRecord */
@@ -40,15 +40,10 @@ trait EventSourced
         return $self;
     }
 
-    /** @return class-string<TState> */
-    public static function stateClass(): string
-    {
-        return EventEngineUtil::fromAggregateClassToStateClass(static::class);
-    }
-
     /** @inheritDoc */
     public static function reconstituteFromStateArray(array $state): static
     {
+        /** @var TState $stateClass */
         $stateClass = static::stateClass();
 
         $self = new static();
@@ -71,7 +66,7 @@ trait EventSourced
         return $events;
     }
 
-    public function apply(Event $event): void
+    public function apply(JsonSchemaAwareRecord $event): void
     {
         $whenMethod = $this->deriveMethodNameFromEvent($event);
 
@@ -89,9 +84,33 @@ trait EventSourced
         $this->{$whenMethod}($event);
     }
 
-    private function deriveMethodNameFromEvent(Event $event): string
+    private function deriveMethodNameFromEvent(JsonSchemaAwareRecord $event): string
     {
-        return $event->__applyMethod();
+        if ($event instanceof Event) {
+            return $event->__applyMethod();
+        }
+
+        $eventReflectionClass = new ReflectionClass($event);
+        $eventReflectionAttributes = $eventReflectionClass->getAttributes(
+            \ADS\Bundle\EventEngineBundle\Attribute\Event::class,
+        );
+
+        if (empty($eventReflectionAttributes)) {
+            throw new RuntimeException(
+                sprintf(
+                    'Unable to apply event \'%s\'. Missing attribute \'%s\' in class \'%s\'.',
+                    $event::class,
+                    \ADS\Bundle\EventEngineBundle\Attribute\Event::class,
+                    static::class,
+                ),
+            );
+        }
+
+        $eventReflectionAttribute = reset($eventReflectionAttributes);
+        /** @var \ADS\Bundle\EventEngineBundle\Attribute\Event $eventAttribute */
+        $eventAttribute = $eventReflectionAttribute->newInstance();
+
+        return $eventAttribute->applyMethod();
     }
 
     /** @inheritDoc */
@@ -107,7 +126,7 @@ trait EventSourced
     {
     }
 
-    public static function aggregateId(): string
+    public static function aggregateIdPropertyName(): string
     {
         $reflectionClass = new ReflectionClass(static::stateClass());
         $reflectionProperties = $reflectionClass->getProperties();
@@ -145,6 +164,6 @@ trait EventSourced
 
     public static function createForSeed(): static
     {
-        return new self();
+        return new static();
     }
 }

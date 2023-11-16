@@ -10,7 +10,7 @@ use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 /** @template TState of JsonSchemaAwareRecord */
 interface AggregateRoot
 {
-    /** @return class-string */
+    /** @return class-string<JsonSchemaAwareRecord> */
     public static function stateClass(): string;
 
     /** @return static */
@@ -26,7 +26,7 @@ interface AggregateRoot
     /** @return array<Event> */
     public function popRecordedEvents(): array;
 
-    public function apply(Event $event): void;
+    public function apply(JsonSchemaAwareRecord $event): void;
 
     /** @return array<string, mixed> */
     public function toArray(): array;
@@ -34,7 +34,7 @@ interface AggregateRoot
     /** @return TState */
     public function state();
 
-    public static function aggregateId(): string;
+    public static function aggregateIdPropertyName(): string;
 
     public static function createForSeed(): static;
 }

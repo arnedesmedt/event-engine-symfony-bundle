@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
-use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
-use ADS\Bundle\EventEngineBundle\Command\Command;
-use ADS\Bundle\EventEngineBundle\Command\ControllerCommand;
-use ADS\Bundle\EventEngineBundle\Event\Event;
-use ADS\Bundle\EventEngineBundle\Event\Listener;
-use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
-use ADS\Bundle\EventEngineBundle\Projector\Projector;
-use ADS\Bundle\EventEngineBundle\Query\Query;
+use ADS\Bundle\EventEngineBundle\Classes\ClassMapper;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ProjectorExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
-use ADS\Bundle\EventEngineBundle\Util\PreProcessorCommandLink;
 use EventEngine\Commanding\CommandProcessorDescription;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;
 use EventEngine\JsonSchema\JsonSchema;
 use EventEngine\JsonSchema\JsonSchemaAwareCollection;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
+use EventEngine\JsonSchema\Type;
 use EventEngine\Logger\SimpleMessageEngine;
 use EventEngine\Messaging\MessageProducer;
 use EventEngine\Persistence\MultiModelStore;
@@ -30,30 +31,16 @@ use EventEngine\Runtime\Oop\FlavourHint;
 use EventEngine\Schema\PayloadSchema;
 use EventEngine\Schema\ResponseTypeSchema;
 use EventEngine\Schema\Schema;
-use EventEngine\Schema\TypeSchema;
-use LogicException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
-use ReflectionAttribute;
 use ReflectionClass;
-use ReflectionMethod;
-use ReflectionNamedType;
-use ReflectionParameter;
-use ReflectionUnionType;
 use RuntimeException;
 
-use function array_filter;
-use function array_key_exists;
 use function array_map;
-use function array_shift;
 use function array_unique;
-use function class_implements;
-use function in_array;
 use function is_callable;
 use function is_string;
-use function reset;
 use function sprintf;
-use function usort;
 
 final class EventEngineFactory
 {
@@ -62,89 +49,83 @@ final class EventEngineFactory
         'acceptance' => EventEngine::ENV_PROD,
         'develop' => EventEngine::ENV_DEV,
     ];
-    /** @readonly */
-    private string $environment;
 
-    /** @var array<class-string<AggregateCommand>, class-string<AggregateRoot<JsonSchemaAwareRecord>>> */
-    private array $commandAggregateMapping = [];
-    /** @var array<class-string<AggregateCommand>, array<class-string<Event>>> */
-    private array $commandEventMapping = [];
-    /** @var array<class-string<AggregateCommand>, array<class-string|string>> */
-    private array $commandServiceMapping = [];
-    /** @var array<class-string<Command>, array<class-string<object>>> */
-    private array $commandPreProcessorMapping = [];
-    /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */
-    private array $aggregateIdentifierMapping = [];
+    private readonly string $environment;
 
     /**
-     * @param array<class-string<Command>> $commandClasses
-     * @param array<class-string<Query>> $queryClasses
-     * @param array<class-string<Event>> $eventClasses
-     * @param array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $aggregateClasses
-     * @param array<class-string> $typeClasses
-     * @param array<class-string<Listener>> $listenerClasses
-     * @param array<class-string<Projector>> $projectorClasses
-     * @param array<class-string<PreProcessor>> $preProcessorClasses
-     * @param array<class-string<EventEngineDescription>> $descriptionServices
+     * @param array<class-string<JsonSchemaAwareRecord>> $commands
+     * @param array<class-string<JsonSchemaAwareRecord>> $controllerCommands
+     * @param array<class-string<JsonSchemaAwareRecord>> $aggregateCommands
+     * @param array<class-string<JsonSchemaAwareRecord>> $queries
+     * @param array<class-string<JsonSchemaAwareRecord>> $events
+     * @param array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $aggregates
+     * @param array<class-string> $projectors
+     * @param array<class-string<JsonSchemaAwareRecord>> $types
+     * @param array<class-string<EventEngineDescription>> $descriptions
+     * @param array<class-string> $listeners
      */
     public function __construct(
-        private Schema $schema,
-        private Flavour $flavour,
-        private MultiModelStore $multiModelStore,
-        private SimpleMessageEngine $simpleMessageEngine,
-        private ContainerInterface $container,
+        private readonly Schema $schema,
+        private readonly Flavour $flavour,
+        private readonly MultiModelStore $multiModelStore,
+        private readonly SimpleMessageEngine $simpleMessageEngine,
+        private readonly ContainerInterface $container,
+        private readonly MessageProducer|null $eventQueue,
+        private readonly CacheItemPoolInterface $cache,
+        private readonly ControllerExtractor $controllerExtractor,
+        private readonly AggregateCommandExtractor $aggregateCommandExtractor,
+        private readonly ResolverExtractor $resolverExtractor,
+        private readonly ResponseExtractor $responseExtractor,
+        private readonly StateClassExtractor $stateClassExtractor,
+        private readonly EventClassExtractor $eventClassExtractor,
+        private readonly ProjectorExtractor $projectorExtractor,
+        private readonly JsonSchemaExtractor $jsonSchemaExtractor,
+        private readonly ClassMapper $classMapper,
+        private readonly array $commands,
+        private readonly array $controllerCommands,
+        private readonly array $aggregateCommands,
+        private readonly array $queries,
+        private readonly array $events,
+        private readonly array $aggregates,
+        private readonly array $projectors,
+        private readonly array $types,
+        private readonly array $descriptions,
+        private readonly array $listeners,
         string $environment,
-        private bool $debug,
-        private array $commandClasses,
-        private array $queryClasses,
-        private array $eventClasses,
-        private array $aggregateClasses,
-        private array $typeClasses,
-        private array $listenerClasses,
-        private array $projectorClasses,
-        private array $preProcessorClasses,
-        private array $descriptionServices,
-        private CacheItemPoolInterface $cache,
-        private MessageProducer|null $eventQueue,
+        private readonly bool $debug,
     ) {
         $this->environment = $this->mapEnvironment($environment);
     }
 
+    private function mapEnvironment(string $environment): string
+    {
+        if (! isset(self::ENVIRONMENT_MAP[$environment])) {
+            return $environment;
+        }
+
+        return self::ENVIRONMENT_MAP[$environment];
+    }
+
     public function __invoke(): EventEngine
     {
-        $cacheConfig = $this->cache->getItem('event_engine_config');
+        $eventEngine = $this->cachedEventEngine();
 
-        if ($cacheConfig->isHit()) {
-            /** @var array<mixed> $config */
-            $config = $cacheConfig->get();
-
-            return EventEngine::fromCachedConfig(
-                $config,
-                $this->schema,
-                $this->flavour,
-                $this->multiModelStore,
-                $this->simpleMessageEngine,
-                $this->container,
-                null,
-                $this->eventQueue,
-            )
-                ->bootstrap(
-                    $this->environment,
-                    $this->debug,
-                );
+        if ($eventEngine) {
+            return $eventEngine;
         }
 
         $eventEngine = new EventEngine($this->schema);
 
         $this
             ->registerCommands($eventEngine)
-            ->registerQueries($eventEngine)
+            ->registerAndResolveQueries($eventEngine)
             ->registerEvents($eventEngine)
             ->registerTypes($eventEngine)
-            ->registerListeners($eventEngine)
-            ->registerProjectors($eventEngine)
-            ->registerDescriptions($eventEngine)
-            ->registerPreProcessorsAndAggregates($eventEngine);
+            ->configureListeners($eventEngine)
+            ->configureProjectors($eventEngine)
+            ->loadDescriptions($eventEngine)
+            ->configurePreProcessorsAndControllerCommands($eventEngine)
+            ->configurePreProcessorsAndAggregates($eventEngine);
 
         $eventEngine->disableAutoProjecting();
 
@@ -172,50 +153,69 @@ final class EventEngineFactory
 
     private function registerCommands(EventEngine $eventEngine): self
     {
-        foreach ($this->commandClasses as $commandClass) {
+        foreach ($this->commands as $commandClass) {
             /** @var PayloadSchema $schema */
-            $schema = self::schemaFromMessage($commandClass);
+            $schema = $this->jsonSchemaExtractor->fromReflectionClass(new ReflectionClass($commandClass));
             $eventEngine->registerCommand($commandClass, $schema);
-
-            $implementedClasses = class_implements($commandClass);
-            if (! $implementedClasses || ! in_array(ControllerCommand::class, $implementedClasses)) {
-                continue;
-            }
-
-            // phpcs:ignore SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.NoAssignment
-            /** @var class-string<ControllerCommand> $commandClass */
-            $eventEngine->passToController($commandClass, $commandClass::__controller());
         }
 
         return $this;
     }
 
-    private function registerQueries(EventEngine $eventEngine): self
+    private function registerAndResolveQueries(EventEngine $eventEngine): self
     {
-        foreach ($this->queryClasses as $queryClass) {
+        foreach ($this->queries as $queryClass) {
+            $reflectionClass = new ReflectionClass($queryClass);
             /** @var PayloadSchema $schema */
-            $schema = self::schemaFromMessage($queryClass);
-            /** @var class-string<JsonSchemaAwareRecord|JsonSchemaAwareCollection> $responseClass */
-            $responseClass = $queryClass::__defaultResponseClass();
-            $reflectionResponseClass = new ReflectionClass($responseClass);
-            /** @var ResponseTypeSchema $typeSchema */
-            $typeSchema = $reflectionResponseClass->implementsInterface(JsonSchemaAwareRecord::class)
-                ? $responseClass::__schema()
-                : JsonSchema::array($responseClass::__itemSchema());
+            $schema = $this->jsonSchemaExtractor->fromReflectionClass($reflectionClass);
+            $resolver = $this->resolverExtractor->fromReflectionClass($reflectionClass);
+            $responseClass = $this->responseExtractor->defaultResponseClassFromReflectionClass($reflectionClass);
+
             $eventEngine->registerQuery($queryClass, $schema)
-                ->resolveWith($queryClass::__resolver())
-                ->setReturnType($typeSchema);
+                ->resolveWith($resolver)
+                ->setReturnType($this->returnType($responseClass));
         }
 
         return $this;
+    }
+
+    /** @param class-string<JsonSchemaAwareRecord|JsonSchemaAwareCollection> $responseClass */
+    private function returnType(string $responseClass): ResponseTypeSchema
+    {
+        $responseReflectionClass = new ReflectionClass($responseClass);
+
+        if ($responseReflectionClass->implementsInterface(JsonSchemaAwareRecord::class)) {
+            // phpcs:ignore SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable
+            /** @var class-string<JsonSchemaAwareRecord> $responseClass */
+            /** @var ResponseTypeSchema $schema */
+            $schema = $responseClass::__schema();
+
+            return $schema;
+        }
+
+        if ($responseReflectionClass->implementsInterface(JsonSchemaAwareCollection::class)) {
+            // phpcs:ignore SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration.MissingVariable
+            /** @var class-string<JsonSchemaAwareCollection> $responseClass */
+            /** @var Type $itemSchema */
+            $itemSchema = $responseClass::__itemSchema();
+
+            return JsonSchema::array($itemSchema);
+        }
+
+        throw new RuntimeException(
+            sprintf(
+                'Response class \'%s\' is not a JsonSchemaAwareRecord or JsonSchemaAwareCollection.',
+                $responseClass,
+            ),
+        );
     }
 
     private function registerEvents(EventEngine $eventEngine): self
     {
-        foreach ($this->eventClasses as $event) {
+        foreach ($this->events as $eventClass) {
             /** @var PayloadSchema $schema */
-            $schema = self::schemaFromMessage($event);
-            $eventEngine->registerEvent($event, $schema);
+            $schema = $this->jsonSchemaExtractor->fromReflectionClass(new ReflectionClass($eventClass));
+            $eventEngine->registerEvent($eventClass, $schema);
         }
 
         return $this;
@@ -226,14 +226,17 @@ final class EventEngineFactory
         $types = array_unique(
             [
                 ...array_map(
-                    static fn ($aggregateClass) => $aggregateClass::stateClass(),
-                    $this->aggregateClasses,
+                    fn (string $aggregateClass) => $this->stateClassExtractor
+                        ->fromAggregateRootReflectionClass(new ReflectionClass($aggregateClass)),
+                    $this->aggregates,
                 ),
                 ...array_map(
-                    static fn ($projectorClass) => $projectorClass::stateClassName(),
-                    $this->projectorClasses,
+                    /** @param ReflectionClass<object> $projectorRelfectionClass */
+                    fn (string $projectorClass) => $this->stateClassExtractor
+                        ->fromProjectorReflectionClass(new ReflectionClass($projectorClass)),
+                    $this->projectors,
                 ),
-                ...$this->typeClasses,
+                ...$this->types,
             ],
         );
 
@@ -244,10 +247,11 @@ final class EventEngineFactory
         return $this;
     }
 
-    private function registerListeners(EventEngine $eventEngine): self
+    private function configureListeners(EventEngine $eventEngine): self
     {
-        foreach ($this->listenerClasses as $listenerClass) {
-            $eventClasses = $listenerClass::__handleEvents();
+        foreach ($this->listeners as $listenerClass) {
+            $eventClasses = $this->eventClassExtractor
+                ->fromListenerReflectionClass(new ReflectionClass($listenerClass));
 
             if (is_string($eventClasses)) {
                 $eventClasses = [$eventClasses];
@@ -261,34 +265,33 @@ final class EventEngineFactory
         return $this;
     }
 
-    private function registerProjectors(EventEngine $eventEngine): self
+    private function configureProjectors(EventEngine $eventEngine): self
     {
-        foreach ($this->projectorClasses as $projectorClass) {
-            $streams = $this->streamsForProjector($projectorClass);
+        foreach ($this->projectors as $projectorClass) {
+            $reflectionClass = new ReflectionClass($projectorClass);
+            $events = $this->eventClassExtractor->fromProjectorReflectionClass($reflectionClass);
+            $name = $this->projectorExtractor->nameFromReflectionClass($reflectionClass);
+            $version = $this->projectorExtractor->versionFromReflectionClass($reflectionClass);
+            $aggregateRootClasses = $this->classMapper->aggregateRootClassesFromEventClasses($events);
+            $aggregateStreams = $this->aggregateStreamsFromAggregateRootClasses($aggregateRootClasses);
 
-            $eventEngine->watch(...$streams)
-                ->with($projectorClass::projectionName(), $projectorClass, $projectorClass::version())
-                ->filterEvents($projectorClass::events());
+            $eventEngine
+                ->watch(...$aggregateStreams)
+                ->with($name, $projectorClass, $version)
+                ->filterEvents($events);
         }
 
         return $this;
     }
 
     /**
-     * @param class-string<Projector> $projectorClass
+     * @param array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $aggregateRootClasses
      *
      * @return array<Stream>
      */
-    private function streamsForProjector(string $projectorClass): array
-    {
-        /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $aggregateRootClasses */
-        $aggregateRootClasses = array_unique(
-            array_map(
-                fn ($eventClass) => $this->aggregateRootClassFromEventClass($eventClass),
-                $projectorClass::events(),
-            ),
-        );
-
+    private function aggregateStreamsFromAggregateRootClasses(
+        array $aggregateRootClasses,
+    ): array {
         return array_map(
             static fn ($aggregateRootClass) => Stream::ofLocalProjection(
                 EventEngineUtil::fromAggregateClassToStreamName($aggregateRootClass),
@@ -297,73 +300,86 @@ final class EventEngineFactory
         );
     }
 
-    /**
-     * @param class-string<Event> $eventClass
-     *
-     * @return class-string<AggregateRoot<JsonSchemaAwareRecord>>
-     */
-    private function aggregateRootClassFromEventClass(string $eventClass): string
+    private function loadDescriptions(EventEngine $eventEngine): self
     {
-        $commandAggregateMappings = $this->commandAggregateMapping();
-
-        foreach ($this->commandEventMapping() as $commandClass => $eventClasses) {
-            if (
-                ! (
-                array_key_exists($commandClass, $commandAggregateMappings)
-                && in_array($eventClass, $eventClasses))
-            ) {
-                continue;
-            }
-
-            return $commandAggregateMappings[$commandClass];
-        }
-
-        throw new LogicException(sprintf('Unable to find aggregate for event %s', $eventClass));
-    }
-
-    private function registerDescriptions(EventEngine $eventEngine): self
-    {
-        foreach ($this->descriptionServices as $descriptionService) {
-            $eventEngine->load($descriptionService);
+        foreach ($this->descriptions as $descriptionClass) {
+            $eventEngine->load($descriptionClass);
         }
 
         return $this;
     }
 
-    private function registerPreProcessorsAndAggregates(EventEngine $eventEngine): self
+    private function configurePreProcessorsAndControllerCommands(EventEngine $eventEngine): self
     {
-        $usedAggregateRoots = [];
-        $preProcessorMapping = $this->commandPreProcessorMapping();
+        $preProcessorMapping = $this->classMapper->commandPreProcessorMapping();
 
-        foreach ($this->commandAggregateMapping() as $commandClass => $aggregateRootClass) {
-            $commandProcessor = $eventEngine->process($commandClass);
+        foreach ($this->controllerCommands as $controllerCommandClass) {
+            if (isset($preProcessorMapping[$controllerCommandClass])) {
+                $preProcessorClasses = $preProcessorMapping[$controllerCommandClass];
+                foreach ($preProcessorClasses as $preProcessorClass) {
+                    $eventEngine->preProcess($controllerCommandClass, $preProcessorClass);
+                }
+            }
 
-            if (array_key_exists($commandClass, $preProcessorMapping)) {
-                $preProcessorClasses = $preProcessorMapping[$commandClass];
+            $eventEngine->passToController(
+                $controllerCommandClass,
+                $this->controllerExtractor->fromReflectionClass(new ReflectionClass($controllerCommandClass)),
+            );
+        }
+
+        return $this;
+    }
+
+    private function configurePreProcessorsAndAggregates(EventEngine $eventEngine): self
+    {
+        $preProcessorMapping = $this->classMapper->commandPreProcessorMapping();
+        $aggregateMapping = $this->classMapper->commandAggregateMapping();
+
+        foreach ($this->aggregateCommands as $aggregateCommandClass) {
+            $aggregateCommandReflectionClass = new ReflectionClass($aggregateCommandClass);
+            $commandProcessor = $eventEngine->process($aggregateCommandClass);
+
+            if (isset($preProcessorMapping[$aggregateCommandClass])) {
+                $preProcessorClasses = $preProcessorMapping[$aggregateCommandClass];
                 foreach ($preProcessorClasses as $preProcessorClass) {
                     $commandProcessor->preProcess($preProcessorClass);
                 }
-
-                unset($preProcessorMapping[$commandClass]);
             }
 
-            $newAggregateRoot = $this->newAggregateRoot($aggregateRootClass, $commandClass, $usedAggregateRoots);
+            if (! isset($aggregateMapping[$aggregateCommandClass])) {
+                throw new RuntimeException(
+                    sprintf(
+                        'No aggregate root found for aggregate command \'%s\'.',
+                        $aggregateCommandClass,
+                    ),
+                );
+            }
+
+            $aggregateRootClass = $aggregateMapping[$aggregateCommandClass];
+
+            $newAggregateRoot = $this->aggregateCommandExtractor
+                ->newFromReflectionClass($aggregateCommandReflectionClass);
 
             $this
-                ->handleCommand($commandProcessor, $aggregateRootClass, $commandClass, $newAggregateRoot)
-                ->handleEvents($commandProcessor, $commandClass)
-                ->handleServices($commandProcessor, $commandClass)
-                ->handleStorage($commandProcessor, $aggregateRootClass, $newAggregateRoot);
-        }
-
-        foreach ($preProcessorMapping as $commandClass => $preProcessorClasses) {
-            foreach ($preProcessorClasses as $preProcessorClass) {
-                $eventEngine
-                    ->process($commandClass)
-                    ->preProcess($preProcessorClass)
-                    ->withNew('test')
-                    ->handle([FlavourHint::class, 'useAggregate']);
-            }
+                ->handleCommand(
+                    $commandProcessor,
+                    $aggregateRootClass,
+                    $aggregateCommandReflectionClass,
+                    $newAggregateRoot,
+                )
+                ->handleEvents(
+                    $commandProcessor,
+                    $aggregateCommandReflectionClass,
+                )
+                ->handleServices(
+                    $commandProcessor,
+                    $aggregateCommandClass,
+                )
+                ->handleStorage(
+                    $commandProcessor,
+                    $aggregateRootClass,
+                    $newAggregateRoot,
+                );
         }
 
         return $this;
@@ -371,52 +387,40 @@ final class EventEngineFactory
 
     /**
      * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateRootClass
-     * @param class-string<AggregateCommand> $commandClass
-     * @param array<class-string<AggregateRoot<JsonSchemaAwareRecord>>> $usedAggregateRoots
+     * @param ReflectionClass<JsonSchemaAwareRecord> $aggregateCommandReflectionClass
      */
-    private function newAggregateRoot(
-        string $aggregateRootClass,
-        string $commandClass,
-        array &$usedAggregateRoots,
-    ): bool {
-        if ($commandClass::__newAggregate()) {
-            $usedAggregateRoots[] = $aggregateRootClass;
-            $usedAggregateRoots = array_unique($usedAggregateRoots);
-
-            return true;
-        }
-
-        $notFound = ! in_array($aggregateRootClass, $usedAggregateRoots);
-
-        if ($notFound) {
-            $usedAggregateRoots[] = $aggregateRootClass;
-        }
-
-        return $notFound;
-    }
-
     private function handleCommand(
         CommandProcessorDescription $commandProcessor,
         string $aggregateRootClass,
-        string $commandClass,
+        ReflectionClass $aggregateCommandReflectionClass,
         bool $newAggregateRoot,
     ): self {
         $aggregateRootMethod = $newAggregateRoot ? 'withNew' : 'withExisting';
+        $aggregateIdentifierMapping = $this->classMapper->aggregateIdentifierMapping();
+
+        if (! isset($aggregateIdentifierMapping[$aggregateRootClass])) {
+            throw new RuntimeException(
+                sprintf(
+                    'No aggregate identifier found for aggregate root \'%s\'.',
+                    $aggregateRootClass,
+                ),
+            );
+        }
 
         $commandProcessor
             ->$aggregateRootMethod($aggregateRootClass)
-            ->identifiedBy($this->aggregateIdentifierMapping()[$aggregateRootClass])
-            ->handle($this->handle($aggregateRootClass, $commandClass, $newAggregateRoot));
+            ->identifiedBy($aggregateIdentifierMapping[$aggregateRootClass])
+            ->handle($this->handle($aggregateRootClass, $aggregateCommandReflectionClass, $newAggregateRoot));
 
         return $this;
     }
 
-    /** @param class-string<AggregateCommand> $commandClass */
+    /** @param ReflectionClass<JsonSchemaAwareRecord> $aggregateCommandReflectionClass */
     private function handleEvents(
         CommandProcessorDescription $commandProcessor,
-        string $commandClass,
+        ReflectionClass $aggregateCommandReflectionClass,
     ): self {
-        $events = $commandClass::__eventsToRecord();
+        $events = $this->eventClassExtractor->fromAggregateCommandReflectionClass($aggregateCommandReflectionClass);
 
         foreach ($events as $eventClass) {
             $commandProcessor
@@ -427,12 +431,23 @@ final class EventEngineFactory
         return $this;
     }
 
-    /** @param class-string<AggregateCommand> $commandClass */
+    /** @param class-string<JsonSchemaAwareRecord> $commandClass */
     private function handleServices(
         CommandProcessorDescription $commandProcessor,
         string $commandClass,
     ): self {
-        $services = $this->commandServiceMapping()[$commandClass] ?? [];
+        $commandServiceMapping = $this->classMapper->commandServiceMapping();
+
+        if (! isset($commandServiceMapping[$commandClass])) {
+            throw new RuntimeException(
+                sprintf(
+                    'No services found for command \'%s\'.',
+                    $commandClass,
+                ),
+            );
+        }
+
+        $services = $commandServiceMapping[$commandClass];
 
         foreach ($services as $serviceId) {
             $commandProcessor->provideService($serviceId);
@@ -460,14 +475,29 @@ final class EventEngineFactory
         return $this;
     }
 
-    /** @return array<string> */
-    private function handle(string $aggregateRootClass, string $commandClass, bool $newAggregateRoot): array
-    {
+    /**
+     * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateRootClass
+     * @param ReflectionClass<JsonSchemaAwareRecord> $aggregateCommandReflectionClass
+     *
+     * @return array{class-string, string}&callable
+     */
+    private function handle(
+        string $aggregateRootClass,
+        ReflectionClass $aggregateCommandReflectionClass,
+        bool $newAggregateRoot,
+    ): array {
         if (! $newAggregateRoot) {
             return [FlavourHint::class, 'useAggregate'];
         }
 
-        $handle = [$aggregateRootClass, $commandClass::__aggregateMethod()];
+        $aggregateMethod = $this->aggregateCommandExtractor->aggregateMethodFromReflectionClass(
+            $aggregateCommandReflectionClass,
+        );
+
+        $handle = [
+            $aggregateRootClass,
+            $aggregateMethod,
+        ];
 
         if (is_callable($handle)) {
             return $handle;
@@ -476,314 +506,36 @@ final class EventEngineFactory
         throw new RuntimeException(
             sprintf(
                 'Aggregate method \'%s\' for aggregate root \'%s\' is not callable.',
-                $commandClass::__aggregateMethod(),
+                $aggregateMethod,
                 $aggregateRootClass,
             ),
         );
     }
 
-    /** @return array<class-string<AggregateCommand>, class-string<AggregateRoot<JsonSchemaAwareRecord>>> */
-    private function commandAggregateMapping(): array
+    private function cachedEventEngine(): EventEngine|null
     {
-        if (! empty($this->commandAggregateMapping)) {
-            return $this->commandAggregateMapping;
-        }
+        $cacheConfig = $this->cache->getItem('event_engine_config');
 
-        foreach ($this->aggregateClasses as $aggregateClass) {
-            $aggregateReflection = new ReflectionClass($aggregateClass);
+        if ($cacheConfig->isHit()) {
+            /** @var array<mixed> $config */
+            $config = $cacheConfig->get();
 
-            $publicAggregateMethods = $aggregateReflection->getMethods(ReflectionMethod::IS_PUBLIC);
-
-            foreach ($publicAggregateMethods as $publicAggregateMethod) {
-                $parameters = $publicAggregateMethod->getParameters();
-                $firstParameter = reset($parameters);
-
-                if (! $firstParameter) {
-                    continue;
-                }
-
-                /** @var ReflectionNamedType|ReflectionUnionType|null $commandTypes */
-                $commandTypes = $firstParameter->getType();
-                $commandTypes = $commandTypes instanceof ReflectionUnionType
-                    ? $commandTypes->getTypes()
-                    : [$commandTypes];
-
-                $commandTypes = array_filter(
-                    $commandTypes,
-                    fn ($type) => $type !== null
-                        && in_array($type->getName(), $this->commandClasses)
+            return EventEngine::fromCachedConfig(
+                $config,
+                $this->schema,
+                $this->flavour,
+                $this->multiModelStore,
+                $this->simpleMessageEngine,
+                $this->container,
+                null,
+                $this->eventQueue,
+            )
+                ->bootstrap(
+                    $this->environment,
+                    $this->debug,
                 );
-
-                foreach ($commandTypes as $commandType) {
-                    /** @var class-string<AggregateCommand> $commandClass */
-                    $commandClass = $commandType->getName();
-
-                    $this->commandAggregateMapping[$commandClass] = $aggregateClass;
-                }
-            }
         }
 
-        return $this->commandAggregateMapping;
-    }
-
-    /** @return array<class-string<AggregateCommand>, array<class-string<Event>>> */
-    private function commandEventMapping(): array
-    {
-        if (! empty($this->commandEventMapping)) {
-            return $this->commandEventMapping;
-        }
-
-        foreach ($this->commandClasses as $commandClass) {
-            /** @var class-string<AggregateCommand> $commandClass */
-            $commandReflection = new ReflectionClass($commandClass);
-
-            if (! $commandReflection->implementsInterface(AggregateCommand::class)) {
-                continue;
-            }
-
-            $this->commandEventMapping[$commandClass] = $commandClass::__eventsToRecord();
-        }
-
-        return $this->commandEventMapping;
-    }
-
-    /** @return array<class-string<AggregateCommand>, array<class-string|string>> */
-    private function commandServiceMapping(): array
-    {
-        if (! empty($this->commandServiceMapping)) {
-            return $this->commandServiceMapping;
-        }
-
-        foreach ($this->aggregateClasses as $aggregateClass) {
-            $aggregateReflection = new ReflectionClass($aggregateClass);
-
-            $publicAggregateMethods = $aggregateReflection->getMethods(ReflectionMethod::IS_PUBLIC);
-
-            foreach ($publicAggregateMethods as $publicAggregateMethod) {
-                $parameters = $publicAggregateMethod->getParameters();
-                $firstParameter = array_shift($parameters);
-
-                if (! $firstParameter) {
-                    continue;
-                }
-
-                /** @var ReflectionNamedType|ReflectionUnionType|null $commandTypes */
-                $commandTypes = $firstParameter->getType();
-                $commandTypes = $commandTypes instanceof ReflectionUnionType
-                    ? $commandTypes->getTypes()
-                    : [$commandTypes];
-
-                $commandTypes = array_filter(
-                    $commandTypes,
-                    fn ($type) => $type !== null
-                        && in_array($type->getName(), $this->commandClasses)
-                );
-
-                /** @var array<class-string|string> $mapping */
-                $mapping = array_map(
-                    static function (ReflectionParameter $parameter) {
-                        /** @var ReflectionNamedType|null $type */
-                        $type = $parameter->getType();
-
-                        return $type ? $type->getName() : null;
-                    },
-                    $parameters,
-                );
-
-                if (in_array(null, $mapping)) {
-                    continue;
-                }
-
-                foreach ($commandTypes as $commandType) {
-                    /** @var class-string<AggregateCommand> $commandClass */
-                    $commandClass = $commandType->getName();
-                    $mapping = $commandClass::__replaceServices($mapping);
-
-                    $this->commandServiceMapping[$commandClass] = $mapping;
-                }
-            }
-        }
-
-        return $this->commandServiceMapping;
-    }
-
-    /** @return array<class-string<Command>, array<class-string<object>>> */
-    private function commandPreProcessorMapping(): array
-    {
-        if (! empty($this->commandPreProcessorMapping)) {
-            return $this->commandPreProcessorMapping;
-        }
-
-        $preProcessorCommandLinks = [];
-        foreach ($this->preProcessorClasses as $preProcessorClass) {
-            $preProcessorReflection = new ReflectionClass($preProcessorClass);
-
-            /** @var array<PreProcessorCommandLink> $preProcessorCommandLinks */
-            $preProcessorCommandLinks = [
-                ...$preProcessorCommandLinks,
-                ...(
-                    $this->preProcessorCommandLinksByAttributes($preProcessorReflection)
-                    ?? $this->preProcessorCommandLinksByParameter($preProcessorReflection)
-                ),
-            ];
-        }
-
-        usort(
-            $preProcessorCommandLinks,
-            static function (PreProcessorCommandLink $a, PreProcessorCommandLink $b) {
-                if ($a->commandClass() !== $b->commandClass()) {
-                    return 0;
-                }
-
-                return $a->priority() <=> $b->priority();
-            },
-        );
-
-        foreach ($preProcessorCommandLinks as $preProcessorCommandLink) {
-            $commandClass = $preProcessorCommandLink->commandClass();
-            if (! isset($this->commandPreProcessorMapping[$commandClass])) {
-                $this->commandPreProcessorMapping[$commandClass] = [];
-            }
-
-            $this->commandPreProcessorMapping[$commandClass][] = $preProcessorCommandLink->preProcessorClass();
-        }
-
-        return $this->commandPreProcessorMapping;
-    }
-
-    /** @param ReflectionClass<object> $preProcessorReflection */
-    private function preProcessorAttribute(ReflectionClass $preProcessorReflection): Attribute\PreProcessor|null
-    {
-        $preProcessorAttributes = $preProcessorReflection->getAttributes(Attribute\PreProcessor::class);
-
-        if (empty($preProcessorAttributes)) {
-            return null;
-        }
-
-        /** @var ReflectionAttribute<Attribute\PreProcessor> $preProcessorAttribute */
-        $preProcessorAttribute = reset($preProcessorAttributes);
-
-        return $preProcessorAttribute->newInstance();
-    }
-
-    /**
-     * @param ReflectionClass<object> $preProcessorReflection
-     *
-     * @return array<PreProcessorCommandLink>|null
-     */
-    private function preProcessorCommandLinksByAttributes(ReflectionClass $preProcessorReflection): array|null
-    {
-        $preProcessor = $this->preProcessorAttribute($preProcessorReflection);
-
-        if ($preProcessor === null || empty($preProcessor->commandClasses())) {
-            return null;
-        }
-
-        return array_map(
-            static fn (string $commandClass) => PreProcessorCommandLink::fromRecordData(
-                [
-                    'commandClass' => $commandClass,
-                    'preProcessorClass' => $preProcessorReflection->getName(),
-                    'priority' => $preProcessor->priority(),
-                ],
-            ),
-            $preProcessor->commandClasses(),
-        );
-    }
-
-    /**
-     * @param ReflectionClass<object> $preProcessorReflection
-     *
-     * @return array<PreProcessorCommandLink>
-     */
-    private function preProcessorCommandLinksByParameter(ReflectionClass $preProcessorReflection): array
-    {
-        $priority = $this->preProcessorAttribute($preProcessorReflection)?->priority() ?? 0;
-        $invokeMethod = $preProcessorReflection->getMethod('__invoke');
-        $invokeParameters = $invokeMethod->getParameters();
-
-        $firstParameter = reset($invokeParameters);
-
-        if (! $firstParameter) {
-            throw new RuntimeException(
-                sprintf(
-                    '__invoke method of preProcessor \'%s\' has no parameters.',
-                    $preProcessorReflection->getName(),
-                ),
-            );
-        }
-
-        /** @var ReflectionNamedType|ReflectionUnionType|null $commandType */
-        $commandType = $firstParameter->getType();
-        $commandTypes = $commandType instanceof ReflectionUnionType
-            ? $commandType->getTypes()
-            : [$commandType];
-
-        return array_map(
-            function (ReflectionNamedType|null $commandType) use ($preProcessorReflection, $priority) {
-                if ($commandType === null || ! in_array($commandType->getName(), $this->commandClasses)) {
-                    throw new RuntimeException(
-                        sprintf(
-                            'The first parameter of the __invoke method of preProcessor \'%s\' ' .
-                            'has no type or is not a command.',
-                            $preProcessorReflection->getName(),
-                        ),
-                    );
-                }
-
-                return PreProcessorCommandLink::fromRecordData(
-                    [
-                        'commandClass' => $commandType->getName(),
-                        'preProcessorClass' => $preProcessorReflection->getName(),
-                        'priority' => $priority,
-                    ],
-                );
-            },
-            $commandTypes,
-        );
-    }
-
-    /** @return array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */
-    private function aggregateIdentifierMapping(): array
-    {
-        if (! empty($this->aggregateIdentifierMapping)) {
-            return $this->aggregateIdentifierMapping;
-        }
-
-        foreach ($this->aggregateClasses as $aggregateClass) {
-            $this->aggregateIdentifierMapping[$aggregateClass] = $aggregateClass::aggregateId();
-        }
-
-        return $this->aggregateIdentifierMapping;
-    }
-
-    /** @param class-string $message */
-    private static function schemaFromMessage(string $message): PayloadSchema|TypeSchema
-    {
-        $reflectionClass = new ReflectionClass($message);
-
-        if ($reflectionClass->implementsInterface(JsonSchemaAwareRecord::class)) {
-            return $message::__schema();
-        }
-
-        if ($reflectionClass->implementsInterface(JsonSchemaAwareCollection::class)) {
-            return JsonSchema::array($message::__itemSchema());
-        }
-
-        throw new RuntimeException(
-            sprintf(
-                'No schema found for message \'%s\'. Implement the JsonSchemaAwareRecord interface.',
-                $message,
-            ),
-        );
-    }
-
-    private function mapEnvironment(string $environment): string
-    {
-        if (! isset(self::ENVIRONMENT_MAP[$environment])) {
-            return $environment;
-        }
-
-        return self::ENVIRONMENT_MAP[$environment];
+        return null;
     }
 }

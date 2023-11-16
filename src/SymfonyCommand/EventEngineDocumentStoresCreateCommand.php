@@ -17,8 +17,8 @@ class EventEngineDocumentStoresCreateCommand extends Command
 {
     /** @param array<class-string> $aggregates */
     public function __construct(
-        private DocumentStore $documentStore,
-        private array $aggregates,
+        private readonly DocumentStore $documentStore,
+        private readonly array $aggregates,
     ) {
         parent::__construct();
     }

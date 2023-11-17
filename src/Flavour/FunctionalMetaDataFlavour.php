@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Flavour;
 
-use ADS\Bundle\EventEngineBundle\Message\EventEngineMessageUuidAware;
 use ADS\Bundle\EventEngineBundle\Resolver\MetaDataResolver;
 use Closure;
 use EventEngine\Messaging\CommandDispatchResult;
@@ -23,20 +22,9 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
     {
     }
 
-    public static function addMessageUuid(mixed $service, Message $message): void
-    {
-        if (! ($service instanceof EventEngineMessageUuidAware)) {
-            return;
-        }
-
-        $service->setEventEngineMessageUuid($message->uuid());
-    }
-
     /** @inheritDoc */
     public function callCommandPreProcessor($preProcessor, Message $command): Message|CommandDispatchResult
     {
-        self::addMessageUuid($preProcessor, $command);
-
         return $this->functionalFlavour->callCommandPreProcessor($preProcessor, $command);
     }
 
@@ -47,8 +35,6 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
      */
     public function callCommandController($controller, Message $command): array|CommandDispatchResult
     {
-        self::addMessageUuid($controller, $command);
-
         return $this->functionalFlavour->callCommandController($controller, $command);
     }
 
@@ -76,10 +62,6 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         Message $command,
         ...$contextServices,
     ): Generator {
-        foreach ($contextServices as $contextService) {
-            self::addMessageUuid($contextService, $command);
-        }
-
         return $this->functionalFlavour->callAggregateFactory(
             $aggregateType,
             $aggregateFunction,
@@ -102,10 +84,6 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         Message $command,
         ...$contextServices,
     ): Generator {
-        foreach ($contextServices as $contextService) {
-            self::addMessageUuid($contextService, $command);
-        }
-
         return $this->functionalFlavour->callSubsequentAggregateFunction(
             $aggregateType,
             $aggregateFunction,
@@ -218,8 +196,6 @@ class FunctionalMetaDataFlavour implements Flavour, MessageFactoryAware
         if ($resolver instanceof MetaDataResolver) {
             $resolver->setMetaData($metadata);
         }
-
-        self::addMessageUuid($resolver, $query);
 
         return $resolver($queryMessage);
     }

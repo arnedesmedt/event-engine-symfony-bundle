@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Tests\Object\Aggregate;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
+use ADS\Bundle\EventEngineBundle\Aggregate\DeletableAggregate;
 use ADS\Bundle\EventEngineBundle\Aggregate\EventSourced;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestAttributeAggregateCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestInterfaceAggregateCommand;
@@ -17,6 +18,7 @@ class TestAggregate implements AggregateRoot
 {
     /** @use EventSourced<TestState> */
     use EventSourced;
+    use DeletableAggregate;
 
     public static function stateClass(): string
     {
@@ -42,5 +44,6 @@ class TestAggregate implements AggregateRoot
 
     private function whenTestInterfaceEvent(TestInterfaceEvent $event): void
     {
+        $this->delete();
     }
 }

@@ -36,6 +36,8 @@ use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use RuntimeException;
 
+use function array_diff_key;
+use function array_flip;
 use function array_map;
 use function array_unique;
 use function is_callable;
@@ -125,7 +127,8 @@ final class EventEngineFactory
             ->configureProjectors($eventEngine)
             ->loadDescriptions($eventEngine)
             ->configurePreProcessorsAndControllerCommands($eventEngine)
-            ->configurePreProcessorsAndAggregates($eventEngine);
+            ->configurePreProcessorsAndAggregates($eventEngine)
+            ->configurePreProcessorsAndCommands($eventEngine);
 
         $eventEngine->disableAutoProjecting();
 
@@ -510,6 +513,28 @@ final class EventEngineFactory
                 $aggregateRootClass,
             ),
         );
+    }
+
+    private function configurePreProcessorsAndCommands(EventEngine $eventEngine): self
+    {
+        $preProcessorMapping = $this->classMapper->commandPreProcessorMapping();
+        $commandPreProcessorMapping = array_diff_key(
+            $preProcessorMapping,
+            array_flip($this->aggregateCommands),
+            array_flip($this->controllerCommands),
+        );
+
+        foreach ($commandPreProcessorMapping as $commandClass => $preProcessorClasses) {
+            foreach ($preProcessorClasses as $preProcessorClass) {
+                $eventEngine
+                    ->process($commandClass)
+                    ->preProcess($preProcessorClass)
+                    ->withNew('test')
+                    ->handle([FlavourHint::class, 'useAggregate']);
+            }
+        }
+
+        return $this;
     }
 
     private function cachedEventEngine(): EventEngine|null

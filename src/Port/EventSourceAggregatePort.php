@@ -7,8 +7,10 @@ namespace ADS\Bundle\EventEngineBundle\Port;
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Event\Event;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Runtime\Oop\Port;
+use ReflectionClass;
 use RuntimeException;
 
 use function get_debug_type;
@@ -18,6 +20,11 @@ use function sprintf;
 
 final class EventSourceAggregatePort implements Port
 {
+    public function __construct(
+        private readonly AggregateCommandExtractor $aggregateCommandExtractor,
+    ) {
+    }
+
     /**
      * @param AggregateCommand $customCommand
      * @param array<int, class-string> $contextServices
@@ -35,7 +42,7 @@ final class EventSourceAggregatePort implements Port
 
     /**
      * @param AggregateRoot<JsonSchemaAwareRecord> $aggregate
-     * @param AggregateCommand $customCommand
+     * @param AggregateCommand|JsonSchemaAwareRecord $customCommand
      * @param array<int, class-string> $contextServices
      *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
@@ -45,7 +52,10 @@ final class EventSourceAggregatePort implements Port
         $customCommand,
         ...$contextServices,
     ): void {
-        $method = lcfirst($customCommand->__aggregateMethod());
+        $method = lcfirst(
+            $this->aggregateCommandExtractor
+                ->aggregateMethodFromReflectionClass(new ReflectionClass($customCommand)),
+        );
 
         if (! method_exists($aggregate, $method)) {
             throw new RuntimeException(

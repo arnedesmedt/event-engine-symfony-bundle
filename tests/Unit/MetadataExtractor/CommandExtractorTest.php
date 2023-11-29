@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Tests\Unit\MetadataExtractor;
 
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\FailingObject\PreProcessor\TestPreProcessorWithoutCommands;
 use ADS\Bundle\EventEngineBundle\Tests\FailingObject\PreProcessor\TestPreProcessorWithoutType;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestAttributeControllerCommand;
@@ -22,7 +26,13 @@ class CommandExtractorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->commandExtractor = new CommandExtractor();
+        $this->commandExtractor = new CommandExtractor(
+            new MetadataExtractor(
+                new AttributeExtractor(),
+                new ClassExtractor(),
+                new InstanceExtractor(),
+            ),
+        );
     }
 
     public function testPreProcessorInterfaceFromReflectionClass(): void

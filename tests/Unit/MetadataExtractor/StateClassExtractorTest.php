@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Tests\Unit\MetadataExtractor;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Aggregate\TestAggregate;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestAttributeProjector;
@@ -14,15 +18,19 @@ use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-use function sprintf;
-
 class StateClassExtractorTest extends TestCase
 {
     private StateClassExtractor $stateClassExtractor;
 
     protected function setUp(): void
     {
-        $this->stateClassExtractor = new StateClassExtractor();
+        $this->stateClassExtractor = new StateClassExtractor(
+            new MetadataExtractor(
+                new AttributeExtractor(),
+                new ClassExtractor(),
+                new InstanceExtractor(),
+            ),
+        );
     }
 
     public function testAggregateRootFromReflectionClass(): void
@@ -58,13 +66,8 @@ class StateClassExtractorTest extends TestCase
         /** @var ReflectionClass<AggregateRoot<JsonSchemaAwareRecord>> $reflectionClass */
         $reflectionClass = new ReflectionClass(TestState::class);
 
-        $this->expectExceptionMessage(
-            sprintf(
-                'No implementation of \'%s\' found for \'%s\'.',
-                AggregateRoot::class,
-                TestState::class,
-            ),
-        );
+        $this->expectExceptionMessage('No metadata found');
+
         $stateClass = $this->stateClassExtractor->fromAggregateRootReflectionClass($reflectionClass);
     }
 }

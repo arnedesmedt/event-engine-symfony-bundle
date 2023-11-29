@@ -17,7 +17,10 @@ use function sprintf;
 
 class ResponseExtractor
 {
-    use ClassOrAttributeExtractor;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /**
      * @param ReflectionClass<object> $reflectionClass
@@ -26,29 +29,35 @@ class ResponseExtractor
      */
     public function responseClassesPerStatusCodeFromReflectionClass(ReflectionClass $reflectionClass): array
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var array<int, class-string<JsonSchemaAwareRecord>> $responseClassesPerStatusCode */
+        $responseClassesPerStatusCode = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            HasResponses::class,
-            [Query::class, Response::class],
+            [
+                /** @param class-string<HasResponses> $class */
+                HasResponses::class => static fn (string $class) => $class::__responseClassesPerStatusCode(),
+                Query::class => static fn (Query $query) => $query->responseClassesPerStatusCode(),
+                Response::class => static fn (Response $response) => $response->responseClassesPerStatusCode(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof Response
-            ? $classOrAttributeInstance->responseClassesPerStatusCode()
-            : $classOrAttributeInstance::__responseClassesPerStatusCode();
+        return $responseClassesPerStatusCode;
     }
 
     /** @param ReflectionClass<object> $reflectionClass **/
     public function defaultStatusCodeFromReflectionClass(ReflectionClass $reflectionClass): int|null
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var int|null $defaultStatusCode */
+        $defaultStatusCode = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            HasResponses::class,
-            [Query::class, Response::class],
+            [
+                /** @param class-string<HasResponses> $class */
+                HasResponses::class => static fn (string $class) => $class::__defaultStatusCode(),
+                Query::class => static fn (Query $query) => $query->defaultStatusCode(),
+                Response::class => static fn (Response $response) => $response->defaultStatusCode(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof Response
-            ? $classOrAttributeInstance->defaultStatusCode()
-            : $classOrAttributeInstance::__defaultStatusCode();
+        return $defaultStatusCode;
     }
 
     /**

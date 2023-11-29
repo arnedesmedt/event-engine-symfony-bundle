@@ -19,7 +19,10 @@ use function sprintf;
 
 class CommandExtractor
 {
-    use ClassOrAttributeExtractor;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /**
      * @param ReflectionClass<object> $reflectionClass
@@ -29,10 +32,12 @@ class CommandExtractor
     public function fromPreProcessorReflectionClass(ReflectionClass $reflectionClass): array
     {
         // Check if we have a pre processor service.
-        $this->needClassOrAttributeInstanceFromReflectionClass(
+        $this->metadataExtractor->needAttributeOrClassFromReflectionClass(
             $reflectionClass,
-            PreProcessor::class,
-            PreProcessorAttribute::class,
+            [
+                PreProcessor::class,
+                PreProcessorAttribute::class,
+            ],
         );
 
         $invokeMethod = $reflectionClass->getMethod('__invoke');

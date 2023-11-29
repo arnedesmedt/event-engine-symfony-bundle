@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Tests\Unit\MetadataExtractor;
 
-use ADS\Bundle\EventEngineBundle\Attribute\Listener as ListenerAttribute;
-use ADS\Bundle\EventEngineBundle\Event\Listener;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Listener\TestAttributeListener;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Listener\TestInterfaceListener;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestAttributeProjector;
@@ -15,15 +17,19 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestInterfaceProjector;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-use function sprintf;
-
 class EventClassExtractorTest extends TestCase
 {
     private EventClassExtractor $eventClassExtractor;
 
     protected function setUp(): void
     {
-        $this->eventClassExtractor = new EventClassExtractor();
+        $this->eventClassExtractor = new EventClassExtractor(
+            new MetadataExtractor(
+                new AttributeExtractor(),
+                new ClassExtractor(),
+                new InstanceExtractor(),
+            ),
+        );
     }
 
     public function testInterfaceListenerFromReflectionClass(): void
@@ -68,14 +74,7 @@ class EventClassExtractorTest extends TestCase
     {
         $reflectionClass = new ReflectionClass(JsonSchemaExtractor::class);
 
-        $this->expectExceptionMessage(
-            sprintf(
-                'No implementation of \'%s\' found or attribute \'%s\' added for \'%s\'.',
-                Listener::class,
-                ListenerAttribute::class,
-                $reflectionClass->getName(),
-            ),
-        );
+        $this->expectExceptionMessage('No metadata found');
 
         $this->eventClassExtractor->fromListenerReflectionClass($reflectionClass);
     }

@@ -10,19 +10,24 @@ use ReflectionClass;
 
 class PreProcessorExtractor
 {
-    use ClassOrAttributeExtractor;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function priorityFromReflectionClass(ReflectionClass $reflectionClass): int
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var int $priority */
+        $priority = $this->metadataExtractor->metadataFromReflectionClass(
             $reflectionClass,
-            PreProcessor::class,
-            PreProcessorAttribute::class,
+            [
+                PreProcessorAttribute::class => static fn (PreProcessorAttribute $attribute) => $attribute->priority(),
+                /** @param class-string<PreProcessor> $class */
+                PreProcessor::class => static fn (string $class) => 0,
+            ],
         );
 
-        return $classOrAttributeInstance instanceof PreProcessorAttribute
-            ? $classOrAttributeInstance->priority()
-            : 0;
+        return $priority;
     }
 }

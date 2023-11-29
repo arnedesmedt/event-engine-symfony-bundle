@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Tests\Unit\MetadataExtractor;
 
-use ADS\Bundle\EventEngineBundle\Attribute\Query as QueryAttribute;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor;
-use ADS\Bundle\EventEngineBundle\Query\Query;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestAttributeQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestInterfaceQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Resolver\TestResolver;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-
-use function sprintf;
 
 class ResolverExtractorTest extends TestCase
 {
@@ -22,7 +22,13 @@ class ResolverExtractorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->resolverExtractor = new ResolverExtractor();
+        $this->resolverExtractor = new ResolverExtractor(
+            new MetadataExtractor(
+                new AttributeExtractor(),
+                new ClassExtractor(),
+                new InstanceExtractor(),
+            ),
+        );
     }
 
     public function testInterfaceFromReflectionClass(): void
@@ -47,14 +53,7 @@ class ResolverExtractorTest extends TestCase
     {
         $reflectionClass = new ReflectionClass(JsonSchemaExtractor::class);
 
-        $this->expectExceptionMessage(
-            sprintf(
-                'No implementation of \'%s\' found or attribute \'%s\' added for \'%s\'.',
-                Query::class,
-                QueryAttribute::class,
-                $reflectionClass->getName(),
-            ),
-        );
+        $this->expectExceptionMessage('No metadata found');
 
         $this->resolverExtractor->fromReflectionClass($reflectionClass);
     }

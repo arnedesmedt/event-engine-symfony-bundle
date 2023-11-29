@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Tests\Unit\MetadataExtractor;
 
-use ADS\Bundle\EventEngineBundle\Attribute\ControllerCommand as ControllerCommandAttribute;
-use ADS\Bundle\EventEngineBundle\Command\ControllerCommand;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestAttributeControllerCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestInterfaceControllerCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Controller\TestController;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-
-use function sprintf;
 
 class ControllerExtractorTest extends TestCase
 {
@@ -22,7 +22,13 @@ class ControllerExtractorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->controllerExtractor = new ControllerExtractor();
+        $this->controllerExtractor = new ControllerExtractor(
+            new MetadataExtractor(
+                new AttributeExtractor(),
+                new ClassExtractor(),
+                new InstanceExtractor(),
+            ),
+        );
     }
 
     public function testInterfaceFromReflectionClass(): void
@@ -47,14 +53,7 @@ class ControllerExtractorTest extends TestCase
     {
         $reflectionClass = new ReflectionClass(JsonSchemaExtractor::class);
 
-        $this->expectExceptionMessage(
-            sprintf(
-                'No implementation of \'%s\' found or attribute \'%s\' added for \'%s\'.',
-                ControllerCommand::class,
-                ControllerCommandAttribute::class,
-                $reflectionClass->getName(),
-            ),
-        );
+        $this->expectExceptionMessage('No metadata found');
 
         $this->controllerExtractor->fromReflectionClass($reflectionClass);
     }

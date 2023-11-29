@@ -10,89 +10,110 @@ use ReflectionClass;
 
 class QueueableExtractor
 {
-    use ClassOrAttributeExtractor;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /** @param ReflectionClass<object> $reflectionClass */
-    public function queueFromReflectionClass(ReflectionClass $reflectionClass): bool
+    public function queueFromReflectionClass(ReflectionClass $reflectionClass): bool|null
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var bool|null $queue */
+        $queue = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Queueable::class,
-            QueueableAttribute::class,
+            [
+                /** @param class-string<Queueable> $class */
+                Queueable::class => static fn (string $class) => $class::__queue(),
+                QueueableAttribute::class => static fn (QueueableAttribute $attribute) => $attribute->queue(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof QueueableAttribute
-            ? $classOrAttributeInstance->queue()
-            : $classOrAttributeInstance::__queue();
+        return $queue;
     }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function maxRetriesFromReflectionClass(ReflectionClass $reflectionClass): int
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var int $maxRetries */
+        $maxRetries = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Queueable::class,
-            QueueableAttribute::class,
+            [
+                /** @param class-string<Queueable> $class */
+                Queueable::class => static fn (string $class) => $class::__maxRetries(),
+                QueueableAttribute::class => static fn (QueueableAttribute $attribute) => $attribute->maxRetries(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof QueueableAttribute
-            ? $classOrAttributeInstance->maxRetries()
-            : $classOrAttributeInstance::__maxRetries();
+        return $maxRetries;
     }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function delayInMillisecondsFromReflectionClass(ReflectionClass $reflectionClass): int
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var int $delayInMilliseconds */
+        $delayInMilliseconds = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Queueable::class,
-            QueueableAttribute::class,
+            [
+                /** @param class-string<Queueable> $class */
+                Queueable::class => static fn (string $class) => $class::__delayInMilliseconds(),
+                QueueableAttribute::class => static fn (
+                    QueueableAttribute $attribute,
+                ) => $attribute->delayInMilliseconds(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof QueueableAttribute
-            ? $classOrAttributeInstance->delayInMilliseconds()
-            : $classOrAttributeInstance::__delayInMilliseconds();
+        return $delayInMilliseconds;
     }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function multiplierFromReflectionClass(ReflectionClass $reflectionClass): int
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var int $multiplier */
+        $multiplier = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Queueable::class,
-            QueueableAttribute::class,
+            [
+                /** @param class-string<Queueable> $class */
+                Queueable::class => static fn (string $class) => $class::__multiplier(),
+                QueueableAttribute::class => static fn (QueueableAttribute $attribute) => $attribute->multiplier(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof QueueableAttribute
-            ? $classOrAttributeInstance->multiplier()
-            : $classOrAttributeInstance::__multiplier();
+        return $multiplier;
     }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function maxDelayInMillisecondsFromReflectionClass(ReflectionClass $reflectionClass): int
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var int $maxDelayInMilliseconds */
+        $maxDelayInMilliseconds = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Queueable::class,
-            QueueableAttribute::class,
+            [
+                /** @param class-string<Queueable> $class */
+                Queueable::class => static fn (string $class) => $class::__maxDelayInMilliseconds(),
+                QueueableAttribute::class => static fn (
+                    QueueableAttribute $attribute,
+                ) => $attribute->maxDelayInMilliseconds(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof QueueableAttribute
-            ? $classOrAttributeInstance->maxDelayInMilliseconds()
-            : $classOrAttributeInstance::__maxDelayInMilliseconds();
+        return $maxDelayInMilliseconds;
     }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function sendToLinkedFailureTransportFromReflectionClass(ReflectionClass $reflectionClass): bool
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var bool $sendToLinkedFailureTransport */
+        $sendToLinkedFailureTransport = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Queueable::class,
-            QueueableAttribute::class,
+            [
+                /** @param class-string<Queueable> $class */
+                Queueable::class => static fn (string $class) => $class::__sendToLinkedFailureTransport(),
+                QueueableAttribute::class => static fn (
+                    QueueableAttribute $attribute,
+                ) => $attribute->sendToLinkedFailureTransport(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof QueueableAttribute
-            ? $classOrAttributeInstance->sendToLinkedFailureTransport()
-            : $classOrAttributeInstance::__sendToLinkedFailureTransport();
+        return $sendToLinkedFailureTransport;
     }
 }

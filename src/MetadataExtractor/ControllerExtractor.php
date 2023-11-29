@@ -10,7 +10,10 @@ use ReflectionClass;
 
 class ControllerExtractor
 {
-    use ClassOrAttributeExtractor;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /**
      * @param ReflectionClass<object> $reflectionClass
@@ -19,14 +22,18 @@ class ControllerExtractor
      */
     public function fromReflectionClass(ReflectionClass $reflectionClass): string
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var class-string $controller */
+        $controller = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            ControllerCommand::class,
-            ControllerCommandAttribute::class,
+            [
+                ControllerCommandAttribute::class => static fn (
+                    ControllerCommandAttribute $attribute,
+                ) => $attribute->controller(),
+                /** @param class-string<ControllerCommand> $class */
+                ControllerCommand::class => static fn (string $class) => $class::__controller(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof ControllerCommandAttribute
-            ? $classOrAttributeInstance->controller()
-            : $classOrAttributeInstance::__controller();
+        return $controller;
     }
 }

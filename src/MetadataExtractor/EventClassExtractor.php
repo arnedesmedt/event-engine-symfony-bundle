@@ -15,7 +15,10 @@ use ReflectionClass;
 
 class EventClassExtractor
 {
-    use ClassOrAttributeExtractor;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /**
      * @param ReflectionClass<object> $reflectionClass
@@ -24,15 +27,17 @@ class EventClassExtractor
      */
     public function fromListenerReflectionClass(ReflectionClass $reflectionClass): array|string
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var array<class-string<JsonSchemaAwareRecord>>|class-string<JsonSchemaAwareRecord> $events */
+        $events = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Listener::class,
-            ListenerAttribute::class,
+            [
+                ListenerAttribute::class => static fn (ListenerAttribute $attribute) => $attribute->eventsToHandle(),
+                /** @param class-string<Listener> $class */
+                Listener::class => static fn (string $class) => $class::__handleEvents(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof ListenerAttribute
-            ? $classOrAttributeInstance->eventsToHandle()
-            : $classOrAttributeInstance::__handleEvents();
+        return $events;
     }
 
     /**
@@ -42,15 +47,17 @@ class EventClassExtractor
      */
     public function fromProjectorReflectionClass(ReflectionClass $reflectionClass): array
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var array<class-string<JsonSchemaAwareRecord>> $events */
+        $events = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Projector::class,
-            ProjectorAttribute::class,
+            [
+                ProjectorAttribute::class => static fn (ProjectorAttribute $attribute) => $attribute->eventsToHandle(),
+                /** @param class-string<Projector> $class */
+                Projector::class => static fn (string $class) => $class::events(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof ProjectorAttribute
-            ? $classOrAttributeInstance->eventsToHandle()
-            : $classOrAttributeInstance::events();
+        return $events;
     }
 
     /**
@@ -60,14 +67,18 @@ class EventClassExtractor
      */
     public function fromAggregateCommandReflectionClass(ReflectionClass $reflectionClass): array
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var array<class-string<JsonSchemaAwareRecord>> $events */
+        $events = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            AggregateCommand::class,
-            AggregateCommandAttribute::class,
+            [
+                AggregateCommandAttribute::class => static fn (
+                    AggregateCommandAttribute $attribute,
+                ) => $attribute->eventsToRecord(),
+                /** @param class-string<AggregateCommand> $class */
+                AggregateCommand::class => static fn (string $class) => $class::__eventsToRecord(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof AggregateCommandAttribute
-            ? $classOrAttributeInstance->eventsToRecord()
-            : $classOrAttributeInstance::__eventsToRecord();
+        return $events;
     }
 }

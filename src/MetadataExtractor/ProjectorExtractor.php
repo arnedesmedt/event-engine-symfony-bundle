@@ -10,33 +10,40 @@ use ReflectionClass;
 
 class ProjectorExtractor
 {
-    use ClassOrAttributeExtractor;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function nameFromReflectionClass(ReflectionClass $reflectionClass): string
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var string $name */
+        $name = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Projector::class,
-            ProjectorAttribute::class,
+            [
+                /** @param class-string<Projector> $class */
+                Projector::class => static fn (string $class) => $class::projectionName(),
+                ProjectorAttribute::class => static fn (ProjectorAttribute $projector) => $projector->name(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof ProjectorAttribute
-            ? $classOrAttributeInstance->name()
-            : $classOrAttributeInstance::projectionName();
+        return $name;
     }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function versionFromReflectionClass(ReflectionClass $reflectionClass): string
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var string $version */
+        $version = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Projector::class,
-            ProjectorAttribute::class,
+            [
+                /** @param class-string<Projector> $class */
+                Projector::class => static fn (string $class) => $class::version(),
+                ProjectorAttribute::class => static fn (ProjectorAttribute $projector) => $projector->version(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof ProjectorAttribute
-            ? $classOrAttributeInstance->version()
-            : $classOrAttributeInstance::version();
+        return $version;
     }
 }

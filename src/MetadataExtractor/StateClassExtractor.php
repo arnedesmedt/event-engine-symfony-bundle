@@ -12,7 +12,10 @@ use ReflectionClass;
 
 class StateClassExtractor
 {
-    use ClassOrAttributeExtractor;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /**
      * @param ReflectionClass<AggregateRoot<JsonSchemaAwareRecord>> $reflectionClass
@@ -21,30 +24,35 @@ class StateClassExtractor
      */
     public function fromAggregateRootReflectionClass(ReflectionClass $reflectionClass): string
     {
-        /** @var class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateRootClass */
-        $aggregateRootClass = $this->needClassOrAttributeInstanceFromReflectionClass( // @phpstan-ignore-line
+        /** @var class-string<JsonSchemaAwareRecord> $stateClass */
+        $stateClass = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            AggregateRoot::class,
+            [
+                /** @param class-string<AggregateRoot> $class */
+                AggregateRoot::class => static fn (string $class) => $class::stateClass(),
+            ],
         );
 
-        return $aggregateRootClass::stateClass();
+        return $stateClass;
     }
 
     /**
      * @param ReflectionClass<object> $reflectionClass
      *
-     * @return class-string
+     * @return class-string<JsonSchemaAwareRecord>
      */
     public function fromProjectorReflectionClass(ReflectionClass $reflectionClass): string
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
+        /** @var class-string<JsonSchemaAwareRecord> $stateClass */
+        $stateClass = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
-            Projector::class,
-            ProjectorAttribute::class,
+            [
+                /** @param class-string<Projector> $class */
+                Projector::class => static fn (string $class) => $class::stateClass(),
+                ProjectorAttribute::class => static fn (ProjectorAttribute $attribute) => $attribute->stateClass(),
+            ],
         );
 
-        return $classOrAttributeInstance instanceof ProjectorAttribute
-            ? $classOrAttributeInstance->stateClass()
-            : $classOrAttributeInstance::stateClass();
+        return $stateClass;
     }
 }

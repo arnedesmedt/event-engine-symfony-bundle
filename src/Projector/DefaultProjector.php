@@ -7,12 +7,15 @@ namespace ADS\Bundle\EventEngineBundle\Projector;
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\JsonSchema\JsonSchemaAwareCollection;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Projecting\AggregateProjector;
+use ReflectionClass;
 use RuntimeException;
 
 use function in_array;
+use function reset;
 use function sprintf;
 
 abstract class DefaultProjector implements Projector
@@ -67,28 +70,49 @@ abstract class DefaultProjector implements Projector
     {
         $eventClass = $event::class;
 
+        /** @var JsonSchemaAwareRecord|Event $eventMessage */
+        $eventMessage = $event;
         if ($event instanceof Message) {
             $eventClass = $event->messageName();
-            $event = $event->get(MessageBag::MESSAGE);
+            /** @var JsonSchemaAwareRecord|Event $eventMessage */
+            $eventMessage = $event->get(MessageBag::MESSAGE);
         }
 
         if (! in_array($eventClass, static::events(), true)) {
             return;
         }
 
-        if (! $event instanceof Event) {
+        $applyMethod = $this->applyMethod($eventMessage);
+
+        $this->{$applyMethod}($eventMessage);
+    }
+
+    private function applyMethod(Event|JsonSchemaAwareRecord $event): string
+    {
+        if ($event instanceof Event) {
+            return $event->__applyMethod();
+        }
+
+        $eventReflectionClass = new ReflectionClass($event);
+        $eventReflectionAttributes = $eventReflectionClass->getAttributes(
+            \ADS\Bundle\EventEngineBundle\Attribute\Event::class,
+        );
+
+        if (empty($eventReflectionAttributes)) {
             throw new RuntimeException(
                 sprintf(
-                    'The event \'%s\' needs to implement the \'%s\' interface, ' .
-                    'if you want to use it in projections.',
-                    $eventClass,
-                    Event::class,
+                    'Unable to apply event \'%s\'. Missing attribute \'%s\' in class \'%s\'.',
+                    $event::class,
+                    \ADS\Bundle\EventEngineBundle\Attribute\Event::class,
+                    static::class,
                 ),
             );
         }
 
-        $applyMethod = $event->__applyMethod();
+        $eventReflectionAttribute = reset($eventReflectionAttributes);
+        /** @var \ADS\Bundle\EventEngineBundle\Attribute\Event $eventAttribute */
+        $eventAttribute = $eventReflectionAttribute->newInstance();
 
-        $this->{$applyMethod}($event);
+        return $eventAttribute->applyMethod();
     }
 }

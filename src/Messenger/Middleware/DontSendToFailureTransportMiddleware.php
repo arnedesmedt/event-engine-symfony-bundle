@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Messenger\Middleware;
 
+use ADS\Bundle\EventEngineBundle\Attribute\Queueable as QueueableAttribute;
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Message\Message;
 use ADS\Bundle\EventEngineBundle\Messenger\Queueable;
@@ -11,8 +12,11 @@ use ADS\Bundle\EventEngineBundle\Messenger\Retry\CommandRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor;
 use ADS\Bundle\EventEngineBundle\Query\Query;
 use EventEngine\Messaging\Message as EventEngineMessage;
+use ReflectionClass;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -29,6 +33,8 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
         private readonly EventRetry $eventRetry,
         private readonly QueryRetry $queryRetry,
         private readonly MessageFromEnvelope $messageFromEnvelope,
+        private readonly MetadataExtractor $metadataExtractor,
+        private readonly QueueableExtractor $queueableExtractor,
     ) {
     }
 
@@ -56,7 +62,22 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
 
             $message = ($this->messageFromEnvelope)($envelope);
 
-            if ($message instanceof Queueable && $message::__queue() && $message::__sendToLinkedFailureTransport()) {
+            $reflectionClass = new ReflectionClass($message);
+            $queueable = $this->metadataExtractor->attributeOrClassFromReflectionClass($reflectionClass, [
+                Queueable::class,
+                QueueableAttribute::class,
+            ]);
+
+            if ($queueable === null) {
+                return $envelope;
+            }
+
+            $queueu = $this->queueableExtractor->queueFromReflectionClass($reflectionClass);
+            $sendToLinkedFailureTransport = $this->queueableExtractor->sendToLinkedFailureTransportFromReflectionClass(
+                $reflectionClass,
+            );
+
+            if ($queueu && $sendToLinkedFailureTransport) {
                 throw $e;
             }
 

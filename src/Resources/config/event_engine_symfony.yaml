@@ -68,16 +68,45 @@ services:
             $preProcessors: '%event_engine.pre_processors%'
 
 
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\ProjectorExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor:
+        arguments:
+            $attributeExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor'
+            $classExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor'
+            $instanceExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\ProjectorExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
     ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\PreProcessorExtractor: ~
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\PreProcessorExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
 
     ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer:
         public: true
@@ -251,6 +280,7 @@ services:
     ADS\Bundle\EventEngineBundle\Port\MessagePort:
         arguments:
             - '@Opis\JsonSchema\Validator'
+            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor'
     ADS\Bundle\EventEngineBundle\Repository\Repository: ~
     ADS\Bundle\EventEngineBundle\Util\EventEngineUtil: ~
     ADS\Bundle\EventEngineBundle\Exception\Handler:
@@ -308,6 +338,7 @@ services:
     ADS\Bundle\EventEngineBundle\Messenger\Retry\Retry:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope'
+            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor'
 
     ADS\Bundle\EventEngineBundle\Messenger\Middleware\DontSendToFailureTransportMiddleware:
         public: true
@@ -316,6 +347,8 @@ services:
             - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry'
             - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry'
             - '@ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope'
+            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor'
 
     ADS\Bundle\EventEngineBundle\Messenger\Middleware\PickTransportMiddleware:
         public: true
@@ -327,6 +360,7 @@ services:
             - '@EventEngine\EventEngine'
             - '@lock.aggregate.factory'
             - '@logger'
+            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor'
 
     ADS\Bundle\EventEngineBundle\Lock\NoLockAggregate:
         arguments:

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Tests\Unit\MetadataExtractor;
 
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ProjectorExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestAttributeProjector;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestInterfaceProjector;
@@ -16,7 +20,13 @@ class ProjectorExtractorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->projectorExtractor = new ProjectorExtractor();
+        $this->projectorExtractor = new ProjectorExtractor(
+            new MetadataExtractor(
+                new AttributeExtractor(),
+                new ClassExtractor(),
+                new InstanceExtractor(),
+            ),
+        );
     }
 
     public function testNameInterfaceFromReflectionClass(): void

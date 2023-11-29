@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Port;
 
-use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
 use ADS\Bundle\EventEngineBundle\Query\Query;
 use Closure;
 use EventEngine\Data\ImmutableRecord;
@@ -28,8 +28,10 @@ use const JSON_THROW_ON_ERROR;
 
 final class MessagePort implements Port
 {
-    public function __construct(private readonly Validator $validator)
-    {
+    public function __construct(
+        private readonly Validator $validator,
+        private readonly AggregateCommandExtractor $aggregateCommandExtractor,
+    ) {
     }
 
     public function deserialize(Message $message): mixed
@@ -122,14 +124,16 @@ final class MessagePort implements Port
     }
 
     /**
-     * @param object $command
+     * @param JsonSchemaAwareRecord $command
      *
      * @inheritDoc
      */
     public function getAggregateIdFromCommand(string $aggregateIdPayloadKey, $command): string
     {
-        if ($command instanceof AggregateCommand) {
-            return $command->__aggregateId();
+        $aggregateId = $this->aggregateCommandExtractor->aggregateIdFromAggregateCommand($command);
+
+        if ($aggregateId) {
+            return $aggregateId;
         }
 
         throw new RuntimeException(

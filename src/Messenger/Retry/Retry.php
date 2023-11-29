@@ -7,6 +7,8 @@ namespace ADS\Bundle\EventEngineBundle\Messenger\Retry;
 use ADS\Bundle\EventEngineBundle\Message\Message;
 use ADS\Bundle\EventEngineBundle\Messenger\Queueable;
 use ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor;
+use ReflectionClass;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -16,6 +18,7 @@ abstract class Retry implements RetryStrategyInterface
 {
     public function __construct(
         private readonly MessageFromEnvelope $messageFromEnvelope,
+        private readonly QueueableExtractor $queueableExtractor,
     ) {
     }
 
@@ -33,7 +36,7 @@ abstract class Retry implements RetryStrategyInterface
 
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
 
-        return $retries < $asyncMessage::__maxRetries();
+        return $retries < $this->queueableExtractor->maxRetriesFromReflectionClass(new ReflectionClass($asyncMessage));
     }
 
     public function getWaitingTime(Envelope $message, Throwable|null $throwable = null): int
@@ -41,14 +44,20 @@ abstract class Retry implements RetryStrategyInterface
         /** @var Message&Queueable $asyncMessage */
         $asyncMessage = ($this->messageFromEnvelope)($message);
 
+        $reflectionClass = new ReflectionClass($asyncMessage);
+        $delayInMilliseconds = $this->queueableExtractor->delayInMillisecondsFromReflectionClass($reflectionClass);
+        $maxDelayInMilliseconds = $this->queueableExtractor->maxDelayInMillisecondsFromReflectionClass(
+            $reflectionClass,
+        );
+        $multiplier = $this->queueableExtractor->multiplierFromReflectionClass($reflectionClass);
         $retries = RedeliveryStamp::getRetryCountFromEnvelope($message);
-        $delay = $asyncMessage::__delayInMilliseconds() * $asyncMessage::__multiplier() ** $retries;
+        $delay = $delayInMilliseconds * $multiplier ** $retries;
 
         if (
-            $delay > $asyncMessage::__maxDelayInMilliseconds()
-            && $asyncMessage::__maxDelayInMilliseconds() !== 0
+            $delay > $maxDelayInMilliseconds
+            && $maxDelayInMilliseconds !== 0
         ) {
-            return $asyncMessage::__maxDelayInMilliseconds();
+            return $maxDelayInMilliseconds;
         }
 
         return $delay;

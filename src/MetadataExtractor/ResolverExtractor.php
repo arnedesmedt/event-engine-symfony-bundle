@@ -10,7 +10,10 @@ use ReflectionClass;
 
 class ResolverExtractor
 {
-    use ClassOrAttributeExtractor;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /**
      * @param ReflectionClass<object> $reflectionClass
@@ -19,16 +22,15 @@ class ResolverExtractor
      */
     public function fromReflectionClass(ReflectionClass $reflectionClass): string
     {
-        $classOrAttributeInstance = $this->needClassOrAttributeInstanceFromReflectionClass(
-            $reflectionClass,
-            Query::class,
-            QueryAttribute::class,
-        );
-
         /** @var class-string $resolver */
-        $resolver = $classOrAttributeInstance instanceof QueryAttribute
-            ? $classOrAttributeInstance->resolver()
-            : $classOrAttributeInstance::__resolver();
+        $resolver = $this->metadataExtractor->needMetadataFromReflectionClass(
+            $reflectionClass,
+            [
+                /** @param class-string<Query> $class */
+                Query::class => static fn (string $class) => $class::__resolver(),
+                QueryAttribute::class => static fn (QueryAttribute $attribute) => $attribute->resolver(),
+            ],
+        );
 
         return $resolver;
     }

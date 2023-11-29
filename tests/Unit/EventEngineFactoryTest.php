@@ -8,10 +8,14 @@ use ADS\Bundle\EventEngineBundle\Classes\ClassDivider;
 use ADS\Bundle\EventEngineBundle\Classes\ClassMapper;
 use ADS\Bundle\EventEngineBundle\EventEngineFactory;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\PreProcessorExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ProjectorExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor;
@@ -68,8 +72,13 @@ class EventEngineFactoryTest extends TestCase
 
     protected function setUp(): void
     {
+        $metadataExtractor = new MetadataExtractor(
+            new AttributeExtractor(),
+            new ClassExtractor(),
+            new InstanceExtractor(),
+        );
         $classDivider = new ClassDivider([__DIR__ . '/../Object/']);
-        $eventClassExtractor = new EventClassExtractor();
+        $eventClassExtractor = new EventClassExtractor($metadataExtractor);
         $this->cache = $this->createMock(CacheItemPoolInterface::class);
         $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
@@ -84,18 +93,18 @@ class EventEngineFactoryTest extends TestCase
             $this->container,
             $this->createMock(MessageProducer::class),
             $this->cache,
-            new ControllerExtractor(),
-            new AggregateCommandExtractor(),
-            new ResolverExtractor(),
-            new ResponseExtractor(),
-            new StateClassExtractor(),
+            new ControllerExtractor($metadataExtractor),
+            new AggregateCommandExtractor($metadataExtractor),
+            new ResolverExtractor($metadataExtractor),
+            new ResponseExtractor($metadataExtractor),
+            new StateClassExtractor($metadataExtractor),
             $eventClassExtractor,
-            new ProjectorExtractor(),
+            new ProjectorExtractor($metadataExtractor),
             new JsonSchemaExtractor(),
             new ClassMapper(
                 $eventClassExtractor,
-                new PreProcessorExtractor(),
-                new CommandExtractor(),
+                new PreProcessorExtractor($metadataExtractor),
+                new CommandExtractor($metadataExtractor),
                 $classDivider->commandClasses(),
                 $classDivider->aggregateCommandClasses(),
                 $classDivider->aggregateClasses(),

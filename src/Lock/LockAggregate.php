@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Lock;
 
-use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
 use EventEngine\EventEngine;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use Psr\Log\LoggerInterface;
@@ -19,17 +20,20 @@ final class LockAggregate implements LockAggregateStrategy
         private readonly EventEngine $eventEngine,
         private readonly LockFactory $aggregateLockFactory,
         private readonly LoggerInterface $logger,
+        private readonly AggregateCommandExtractor $aggregateCommandExtractor,
     ) {
     }
 
     public function __invoke(Message $message): mixed
     {
+        /** @var JsonSchemaAwareRecord $customMessage */
         $customMessage = $message->get(MessageBag::MESSAGE);
         $lock = null;
         $lockId = '';
 
-        if ($customMessage instanceof AggregateCommand) {
-            $aggregateId = $customMessage->__aggregateId();
+        $aggregateId = $this->aggregateCommandExtractor->aggregateIdFromAggregateCommand($customMessage);
+
+        if ($aggregateId) {
             $commandRouting = $this->eventEngine->compileCacheableConfig()['compiledCommandRouting'];
             $aggregateType = $commandRouting[$customMessage::class]['aggregateType'];
 

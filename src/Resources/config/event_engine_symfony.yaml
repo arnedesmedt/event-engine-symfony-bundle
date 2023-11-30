@@ -276,7 +276,9 @@ services:
     ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection:
         arguments:
             - '@event_engine.connection'
-    ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort: ~
+    ADS\Bundle\EventEngineBundle\Port\EventSourceAggregatePort:
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor'
     ADS\Bundle\EventEngineBundle\Port\MessagePort:
         arguments:
             - '@Opis\JsonSchema\Validator'

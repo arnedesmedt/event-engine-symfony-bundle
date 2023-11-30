@@ -24,6 +24,22 @@ final class MetadataExtractor
      * @param ReflectionClass<object> $reflectionClass
      * @param array<class-string> $attributesOrClasses
      */
+    public function hasAttributeOrClassFromReflectionClass(
+        ReflectionClass $reflectionClass,
+        array $attributesOrClasses,
+    ): bool {
+        $attributeOrClass = $this->attributeOrClassFromReflectionClass(
+            $reflectionClass,
+            $attributesOrClasses,
+        );
+
+        return $attributeOrClass !== null;
+    }
+
+    /**
+     * @param ReflectionClass<object> $reflectionClass
+     * @param array<class-string> $attributesOrClasses
+     */
     public function attributeOrClassFromReflectionClass(
         ReflectionClass $reflectionClass,
         array $attributesOrClasses,
@@ -101,6 +117,14 @@ final class MetadataExtractor
         }
 
         return $metadata;
+    }
+
+    /** @param array<class-string> $attributesOrClasses */
+    public function hasAttributeOrInstanceFromInstance(JsonSchemaAwareRecord $record, array $attributesOrClasses): bool
+    {
+        $attributeOrInstance = $this->attributeOrInstanceFromInstance($record, $attributesOrClasses);
+
+        return $attributeOrInstance !== null;
     }
 
     /** @param array<class-string> $attributesOrClasses */

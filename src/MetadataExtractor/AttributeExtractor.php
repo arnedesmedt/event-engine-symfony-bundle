@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
+use ReflectionAttribute;
 use ReflectionClass;
 
 use function reset;
@@ -22,7 +23,7 @@ final class AttributeExtractor
         ReflectionClass $reflectionClass,
         string $attributeClass,
     ): object|null {
-        $attributes = $reflectionClass->getAttributes($attributeClass);
+        $attributes = $reflectionClass->getAttributes($attributeClass, ReflectionAttribute::IS_INSTANCEOF);
 
         if (empty($attributes)) {
             return null;

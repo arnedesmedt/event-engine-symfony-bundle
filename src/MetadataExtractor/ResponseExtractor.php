@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
-use ADS\Bundle\EventEngineBundle\Attribute\Query;
 use ADS\Bundle\EventEngineBundle\Attribute\Response;
 use ADS\Bundle\EventEngineBundle\Response\HasResponses;
 use EventEngine\JsonSchema\JsonSchemaAwareCollection;
@@ -35,7 +34,6 @@ class ResponseExtractor
             [
                 /** @param class-string<HasResponses> $class */
                 HasResponses::class => static fn (string $class) => $class::__responseClassesPerStatusCode(),
-                Query::class => static fn (Query $query) => $query->responseClassesPerStatusCode(),
                 Response::class => static fn (Response $response) => $response->responseClassesPerStatusCode(),
             ],
         );
@@ -52,7 +50,6 @@ class ResponseExtractor
             [
                 /** @param class-string<HasResponses> $class */
                 HasResponses::class => static fn (string $class) => $class::__defaultStatusCode(),
-                Query::class => static fn (Query $query) => $query->defaultStatusCode(),
                 Response::class => static fn (Response $response) => $response->defaultStatusCode(),
             ],
         );

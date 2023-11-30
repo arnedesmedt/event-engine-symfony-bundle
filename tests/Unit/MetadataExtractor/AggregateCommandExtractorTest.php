@@ -11,6 +11,7 @@ use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestAttributeAggregateCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestInterfaceAggregateCommand;
+use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestAttributeQuery;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -65,7 +66,7 @@ class AggregateCommandExtractorTest extends TestCase
         $this->assertTrue($new);
     }
 
-    public function testAggregateIdInterfaceFromReflectionClass(): void
+    public function testAggregateIdInterface(): void
     {
         $aggregateId = $this->aggregateCommandExtractor->aggregateIdFromAggregateCommand(
             TestInterfaceAggregateCommand::fromArray(['test' => 'test']),
@@ -74,12 +75,21 @@ class AggregateCommandExtractorTest extends TestCase
         $this->assertEquals('test', $aggregateId);
     }
 
-    public function testAggregateIdAttributeFromReflectionClass(): void
+    public function testAggregateIdAttribute(): void
     {
         $aggregateId = $this->aggregateCommandExtractor->aggregateIdFromAggregateCommand(
             TestAttributeAggregateCommand::fromArray(['test' => 'test']),
         );
 
         $this->assertEquals('test', $aggregateId);
+    }
+
+    public function testAggregateIdNotFound(): void
+    {
+        $aggregateId = $this->aggregateCommandExtractor->aggregateIdFromAggregateCommand(
+            TestAttributeQuery::fromArray(['test' => 'test']),
+        );
+
+        $this->assertNull($aggregateId);
     }
 }

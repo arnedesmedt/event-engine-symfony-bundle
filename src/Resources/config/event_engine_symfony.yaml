@@ -79,6 +79,9 @@ services:
     ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor:
         arguments:
             $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
+    ADS\Bundle\EventEngineBundle\MetadataExtractor\QueryExtractor:
+        arguments:
+            $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
     ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor:
         arguments:
             $metadataExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'

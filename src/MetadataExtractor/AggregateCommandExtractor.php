@@ -54,7 +54,7 @@ class AggregateCommandExtractor
 
     public function aggregateIdFromAggregateCommand(JsonSchemaAwareRecord $aggregateCommand): string|null
     {
-        /** @var string|null $aggregateId */
+        /** @var string $aggregateId */
         $aggregateId = $this->metadataExtractor->metadataFromInstance(
             $aggregateCommand,
             [
@@ -68,6 +68,10 @@ class AggregateCommandExtractor
                 ) => $aggregateCommand->__aggregateId(),
             ],
         );
+
+        if ($aggregateId === MetadataExtractor::METADATA_NOT_FOUND) {
+            return null;
+        }
 
         return $aggregateId;
     }

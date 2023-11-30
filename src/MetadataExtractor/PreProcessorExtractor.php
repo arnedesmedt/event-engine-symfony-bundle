@@ -19,7 +19,7 @@ class PreProcessorExtractor
     public function priorityFromReflectionClass(ReflectionClass $reflectionClass): int
     {
         /** @var int $priority */
-        $priority = $this->metadataExtractor->metadataFromReflectionClass(
+        $priority = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
             [
                 PreProcessorAttribute::class => static fn (PreProcessorAttribute $attribute) => $attribute->priority(),

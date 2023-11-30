@@ -11,7 +11,7 @@ use RuntimeException;
 
 final class MetadataExtractor
 {
-    private const METADATA_NOT_FOUND = '---no-metadata-found---';
+    public const METADATA_NOT_FOUND = '---no-metadata-found---';
 
     public function __construct(
         private readonly AttributeExtractor $attributeExtractor,

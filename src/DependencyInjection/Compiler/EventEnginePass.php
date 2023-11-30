@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\DependencyInjection\Compiler;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor;
 use ADS\Bundle\EventEngineBundle\Repository\Repository;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
@@ -124,8 +128,13 @@ final class EventEnginePass implements CompilerPassInterface
 
     private function makeDependenciesPublic(ContainerBuilder $container): void
     {
-        $controllerExtractor = new ControllerExtractor();
-        $resolverExtractor = new ResolverExtractor();
+        $metadataExtractor = new MetadataExtractor(
+            new AttributeExtractor(),
+            new ClassExtractor(),
+            new InstanceExtractor(),
+        );
+        $controllerExtractor = new ControllerExtractor($metadataExtractor);
+        $resolverExtractor = new ResolverExtractor($metadataExtractor);
 
         /** @var array<class-string> $listeners */
         $listeners = $container->getParameter('event_engine.listeners');

@@ -10,6 +10,7 @@ use ADS\Bundle\EventEngineBundle\Attribute\Projector as ProjectorAttribute;
 use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Event\Listener;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 

@@ -6,6 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
 use ADS\Bundle\EventEngineBundle\Attribute\ControllerCommand as ControllerCommandAttribute;
 use ADS\Bundle\EventEngineBundle\Command\ControllerCommand;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use ReflectionClass;
 
 class ControllerExtractor

@@ -6,6 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
 use ADS\Bundle\EventEngineBundle\Attribute\Projector as ProjectorAttribute;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use ReflectionClass;
 
 class ProjectorExtractor

@@ -95,11 +95,12 @@ class ClassMapper
                     continue;
                 }
 
-                /** @var ReflectionNamedType|ReflectionUnionType|null $commandTypes */
-                $commandTypes = $firstParameter->getType();
-                $commandTypes = $commandTypes instanceof ReflectionUnionType
-                    ? $commandTypes->getTypes()
-                    : [$commandTypes];
+                /** @var ReflectionNamedType|ReflectionUnionType|null $commandType */
+                $commandType = $firstParameter->getType();
+                /** @var array<ReflectionNamedType|null> $commandTypes */
+                $commandTypes = $commandType instanceof ReflectionUnionType
+                    ? $commandType->getTypes()
+                    : [$commandType];
 
                 $commandTypes = array_filter(
                     $commandTypes,

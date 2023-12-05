@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\DependencyInjection\Compiler;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
-use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
-use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor;
-use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
-use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor;
 use ADS\Bundle\EventEngineBundle\Repository\Repository;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
+use ADS\Util\MetadataExtractor\AttributeExtractor;
+use ADS\Util\MetadataExtractor\ClassExtractor;
+use ADS\Util\MetadataExtractor\InstanceExtractor;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use ADS\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;

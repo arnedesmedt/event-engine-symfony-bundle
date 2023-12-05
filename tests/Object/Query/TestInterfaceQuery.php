@@ -8,7 +8,7 @@ use ADS\Bundle\EventEngineBundle\Query\DefaultQuery;
 use ADS\Bundle\EventEngineBundle\Query\Query;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Resolver\TestResolver;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Response\Ok;
-use EventEngine\JsonSchema\JsonSchemaAwareRecord;
+use Symfony\Component\HttpFoundation\Response;
 
 class TestInterfaceQuery implements Query
 {
@@ -21,11 +21,13 @@ class TestInterfaceQuery implements Query
         return TestResolver::class;
     }
 
-    /** @return array<int, class-string<JsonSchemaAwareRecord>> */
-    public static function __extraResponseClasses(): array
+    public static function __defaultStatusCode(): int
     {
-        return [
-            200 => Ok::class,
-        ];
+        return Response::HTTP_OK;
+    }
+
+    public static function __defaultResponseClass(): string
+    {
+        return Ok::class;
     }
 }

@@ -155,8 +155,11 @@ final class ADSEventEngineBundle extends AbstractBundle
     }
 
     /**
-     * phpcs:ignore Generic.Files.LineLength.TooLong
+     * phpcs:disable Generic.Files.LineLength.TooLong
+     *
      * @param array{"event_store": array{"transactional": bool}, "messenger": array<string, array<string, string>>, "document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "pdo_dsn": string, "seed_path": string, "directories": array<string>} $config
+     *
+     * phpcs:enable Generic.Files.LineLength.TooLong
      */
     public function loadExtension(
         array $config,

@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Attribute\PreProcessor as PreProcessorAttribute
 use ADS\Bundle\EventEngineBundle\Command\Command;
 use ADS\Bundle\EventEngineBundle\Command\Command as CommandAttribute;
 use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 use ReflectionNamedType;
@@ -70,18 +71,15 @@ class CommandExtractor
 
         /** @var ReflectionNamedType|ReflectionUnionType|null $commandType */
         $commandType = $firstParameter->getType();
+        /** @var array<ReflectionNamedType|null> $commandTypes */
         $commandTypes = $commandType instanceof ReflectionUnionType
             ? $commandType->getTypes()
             : [$commandType];
 
+        /** @var array<class-string<JsonSchemaAwareRecord>> $commandClasses */
         $commandClasses = array_filter(
             array_map(
-                static function (ReflectionNamedType|null $commandType) {
-                    /** @var class-string<JsonSchemaAwareRecord> $commandClass */
-                    $commandClass = $commandType?->getName();
-
-                    return $commandClass;
-                },
+                static fn (ReflectionNamedType|null $commandType) => $commandType?->getName(),
                 $commandTypes,
             ),
         );

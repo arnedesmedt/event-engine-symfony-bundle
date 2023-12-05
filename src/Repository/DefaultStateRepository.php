@@ -430,6 +430,7 @@ abstract class DefaultStateRepository implements StateRepository
 
     /**
      * phpcs:ignore Generic.Files.LineLength.TooLong
+     *
      * @param array<array<string, mixed>> $documentStates
      *
      * @return TStates

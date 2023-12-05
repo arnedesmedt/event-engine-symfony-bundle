@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Tests\Unit\MetadataExtractor;
 
-use ADS\Bundle\EventEngineBundle\MetadataExtractor\AttributeExtractor;
-use ADS\Bundle\EventEngineBundle\MetadataExtractor\ClassExtractor;
-use ADS\Bundle\EventEngineBundle\MetadataExtractor\InstanceExtractor;
-use ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor;
-use ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor;
-use ADS\Bundle\EventEngineBundle\Tests\FailingObject\Query\TestAttributeQueryWithEmptyResponse;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestAttributeQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestInterfaceQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Response\Ok;
+use ADS\Util\MetadataExtractor\AttributeExtractor;
+use ADS\Util\MetadataExtractor\ClassExtractor;
+use ADS\Util\MetadataExtractor\InstanceExtractor;
+use ADS\Util\MetadataExtractor\JsonSchemaExtractor;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-
-use function sprintf;
+use Symfony\Component\HttpFoundation\Response;
 
 class ResponseExtractorTest extends TestCase
 {
@@ -34,33 +32,13 @@ class ResponseExtractorTest extends TestCase
         );
     }
 
-    public function testResponsesPerStatusCodeForInterfaceQueryFromReflectionClass(): void
-    {
-        $reflectionClass = new ReflectionClass(TestInterfaceQuery::class);
-
-        $responseClassesPerStatusCode = $this->responseExtractor
-            ->responseClassesPerStatusCodeFromReflectionClass($reflectionClass);
-
-        $this->assertCount(1, $responseClassesPerStatusCode);
-    }
-
-    public function testResponsesPerStatusCodeForAttributeFromReflectionClass(): void
-    {
-        $reflectionClass = new ReflectionClass(TestAttributeQuery::class);
-
-        $responseClassesPerStatusCode = $this->responseExtractor
-            ->responseClassesPerStatusCodeFromReflectionClass($reflectionClass);
-
-        $this->assertCount(2, $responseClassesPerStatusCode);
-    }
-
     public function testDefaultStatusCodeForInterfaceQueryFromReflectionClass(): void
     {
         $reflectionClass = new ReflectionClass(TestInterfaceQuery::class);
 
         $defaultStatusCode = $this->responseExtractor->defaultStatusCodeFromReflectionClass($reflectionClass);
 
-        $this->assertNull($defaultStatusCode);
+        $this->assertEquals(Response::HTTP_OK, $defaultStatusCode);
     }
 
     public function testDefaultStatusCodeForAttributeFromReflectionClass(): void
@@ -69,7 +47,7 @@ class ResponseExtractorTest extends TestCase
 
         $defaultStatusCode = $this->responseExtractor->defaultStatusCodeFromReflectionClass($reflectionClass);
 
-        $this->assertEquals(200, $defaultStatusCode);
+        $this->assertEquals(Response::HTTP_OK, $defaultStatusCode);
     }
 
     public function testDefaultResponseClassForInterfaceQueryFromReflectionClass(): void
@@ -88,20 +66,6 @@ class ResponseExtractorTest extends TestCase
         $defaultResponseClass = $this->responseExtractor->defaultResponseClassFromReflectionClass($reflectionClass);
 
         $this->assertEquals(Ok::class, $defaultResponseClass);
-    }
-
-    public function testNoDefaultResponseClassFoundFromReflectionClass(): void
-    {
-        $reflectionClass = new ReflectionClass(TestAttributeQueryWithEmptyResponse::class);
-
-        $this->expectExceptionMessage(
-            sprintf(
-                'No default response class found for message \'%s\'.',
-                $reflectionClass->getName(),
-            ),
-        );
-
-        $this->responseExtractor->defaultResponseClassFromReflectionClass($reflectionClass);
     }
 
     public function testNonQueryExtractor(): void

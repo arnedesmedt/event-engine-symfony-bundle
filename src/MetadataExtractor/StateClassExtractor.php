@@ -7,6 +7,7 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Attribute\Projector as ProjectorAttribute;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 

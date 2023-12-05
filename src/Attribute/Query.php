@@ -6,20 +6,21 @@ namespace ADS\Bundle\EventEngineBundle\Attribute;
 
 use Attribute;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class Query extends Response
 {
     /**
      * @param class-string $resolver
-     * @param array<class-string<JsonSchemaAwareRecord>> $responseClassesPerStatusCode
+     * @param class-string<JsonSchemaAwareRecord> $defaultResponseClass
      */
     public function __construct(
         private readonly string $resolver,
-        readonly int|null $defaultStatusCode = null,
-        readonly array $responseClassesPerStatusCode = [],
+        readonly string $defaultResponseClass,
+        readonly int $defaultStatusCode = SymfonyResponse::HTTP_OK,
     ) {
-        parent::__construct($defaultStatusCode, $responseClassesPerStatusCode);
+        parent::__construct($defaultResponseClass, $defaultStatusCode);
     }
 
     /** @return class-string */

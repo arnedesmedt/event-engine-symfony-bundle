@@ -21,6 +21,18 @@ class ResponseExtractor
     ) {
     }
 
+    /** @param ReflectionClass<object> $reflectionClass */
+    public function hasResponsesFromReflectionClass(ReflectionClass $reflectionClass): bool
+    {
+        return $this->metadataExtractor->hasAttributeOrClassFromReflectionClass(
+            $reflectionClass,
+            [
+                HasResponses::class,
+                Response::class,
+            ],
+        );
+    }
+
     /**
      * @param ReflectionClass<object> $reflectionClass
      *

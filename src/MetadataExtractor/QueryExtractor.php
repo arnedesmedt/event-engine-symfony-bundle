@@ -6,15 +6,12 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
 use ADS\Bundle\EventEngineBundle\Query\Query;
 use ADS\Bundle\EventEngineBundle\Query\Query as QueryAttribute;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
+use ADS\Util\MetadataExtractor\MetadataExtractorAware;
 use ReflectionClass;
 
 class QueryExtractor
 {
-    public function __construct(
-        private readonly MetadataExtractor $metadataExtractor,
-    ) {
-    }
+    use MetadataExtractorAware;
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function isQueryFromReflectionClass(ReflectionClass $reflectionClass): bool

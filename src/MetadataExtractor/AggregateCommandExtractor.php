@@ -7,15 +7,13 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\Attribute\AggregateCommand as AggregateCommandAttribute;
 use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
+use ADS\Util\MetadataExtractor\MetadataExtractorAware;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 
 class AggregateCommandExtractor
 {
-    public function __construct(
-        private readonly MetadataExtractor $metadataExtractor,
-    ) {
-    }
+    use MetadataExtractorAware;
 
     /** @param ReflectionClass<JsonSchemaAwareRecord> $reflectionClass */
     public function newFromReflectionClass(ReflectionClass $reflectionClass): bool

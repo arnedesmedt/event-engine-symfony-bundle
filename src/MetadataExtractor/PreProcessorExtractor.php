@@ -6,15 +6,12 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
 use ADS\Bundle\EventEngineBundle\Attribute\PreProcessor as PreProcessorAttribute;
 use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
+use ADS\Util\MetadataExtractor\MetadataExtractorAware;
 use ReflectionClass;
 
 class PreProcessorExtractor
 {
-    public function __construct(
-        private readonly MetadataExtractor $metadataExtractor,
-    ) {
-    }
+    use MetadataExtractorAware;
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function priorityFromReflectionClass(ReflectionClass $reflectionClass): int

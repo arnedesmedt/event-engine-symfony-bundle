@@ -39,7 +39,6 @@ services:
             $stateClassExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor'
             $eventClassExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor'
             $projectorExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\ProjectorExtractor'
-            $jsonSchemaExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\JsonSchemaExtractor'
             $classMapper: '@ADS\Bundle\EventEngineBundle\Classes\ClassMapper'
             $commands: '%event_engine.commands%'
             $controllerCommands: '%event_engine.controller_commands%'
@@ -321,7 +320,6 @@ services:
             - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\EventRetry'
             - '@ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry'
             - '@ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope'
-            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\MetadataExtractor'
             - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor'
 
     ADS\Bundle\EventEngineBundle\Messenger\Middleware\PickTransportMiddleware:

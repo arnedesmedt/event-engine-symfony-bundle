@@ -14,6 +14,9 @@ use ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor;
 use ADS\Bundle\EventEngineBundle\Query\Query;
+use ADS\Util\MetadataExtractor\AttributeExtractor;
+use ADS\Util\MetadataExtractor\ClassExtractor;
+use ADS\Util\MetadataExtractor\InstanceExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\Messaging\Message as EventEngineMessage;
 use ReflectionClass;
@@ -28,14 +31,20 @@ use Throwable;
 
 class DontSendToFailureTransportMiddleware implements MiddlewareInterface
 {
+    private MetadataExtractor $metadataExtractor;
+
     public function __construct(
         private readonly CommandRetry $commandRetry,
         private readonly EventRetry $eventRetry,
         private readonly QueryRetry $queryRetry,
         private readonly MessageFromEnvelope $messageFromEnvelope,
-        private readonly MetadataExtractor $metadataExtractor,
         private readonly QueueableExtractor $queueableExtractor,
     ) {
+        $this->metadataExtractor = new MetadataExtractor(
+            new AttributeExtractor(),
+            new ClassExtractor(),
+            new InstanceExtractor(),
+        );
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

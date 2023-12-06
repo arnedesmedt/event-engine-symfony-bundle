@@ -53,6 +53,7 @@ final class EventEngineFactory
     ];
 
     private readonly string $environment;
+    private JsonSchemaExtractor $jsonSchemaExtractor;
 
     /**
      * @param array<class-string<JsonSchemaAwareRecord>> $commands
@@ -81,7 +82,6 @@ final class EventEngineFactory
         private readonly StateClassExtractor $stateClassExtractor,
         private readonly EventClassExtractor $eventClassExtractor,
         private readonly ProjectorExtractor $projectorExtractor,
-        private readonly JsonSchemaExtractor $jsonSchemaExtractor,
         private readonly ClassMapper $classMapper,
         private readonly array $commands,
         private readonly array $controllerCommands,
@@ -97,6 +97,7 @@ final class EventEngineFactory
         private readonly bool $debug,
     ) {
         $this->environment = $this->mapEnvironment($environment);
+        $this->jsonSchemaExtractor = new JsonSchemaExtractor();
     }
 
     private function mapEnvironment(string $environment): string

@@ -11,7 +11,6 @@ use ADS\Bundle\EventEngineBundle\Repository\Repository;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use ADS\Util\StringUtil;
 use EventEngine\DocumentStore\DocumentStore;
@@ -131,7 +130,6 @@ final class EventEnginePass implements CompilerPassInterface
         $metadataExtractor = new MetadataExtractor(
             new AttributeExtractor(),
             new ClassExtractor(),
-            new InstanceExtractor(),
         );
         $controllerExtractor = new ControllerExtractor($metadataExtractor);
         $resolverExtractor = new ResolverExtractor($metadataExtractor);

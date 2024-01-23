@@ -68,7 +68,7 @@ services:
 
 
     metadataExtractors:
-        namespace: ADS\Bundle\EventEngineBundle\MetadataExtractor
+        namespace: ADS\Bundle\EventEngineBundle\MetadataExtractor\
         resource: '../../MetadataExtractor/*Extractor.php'
         arguments:
             $metadataExtractor: '@ADS\Util\MetadataExtractor\MetadataExtractor'

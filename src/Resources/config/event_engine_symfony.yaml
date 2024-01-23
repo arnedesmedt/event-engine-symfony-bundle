@@ -67,17 +67,11 @@ services:
             $preProcessors: '%event_engine.pre_processors%'
 
 
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\QueryExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\ProjectorExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\PreProcessorExtractor: ~
-    ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor: ~
+    metadataExtractors:
+        namespace: ADS\Bundle\EventEngineBundle\MetadataExtractor
+        resource: '../../MetadataExtractor/*Extractor.php'
+        arguments:
+            $metadataExtractor: '@ADS\Util\MetadataExtractor\MetadataExtractor'
 
     ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer:
         public: true

@@ -8,7 +8,7 @@ use ADS\Bundle\EventEngineBundle\Attribute\PreProcessor as PreProcessorAttribute
 use ADS\Bundle\EventEngineBundle\Command\Command;
 use ADS\Bundle\EventEngineBundle\Command\Command as CommandAttribute;
 use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
-use ADS\Util\MetadataExtractor\MetadataExtractorAware;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 use ReflectionNamedType;
@@ -22,7 +22,10 @@ use function sprintf;
 
 class CommandExtractor
 {
-    use MetadataExtractorAware;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function isCommandFromReflectionClass(ReflectionClass $reflectionClass): bool

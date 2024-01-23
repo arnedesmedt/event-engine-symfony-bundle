@@ -31,7 +31,7 @@ use Throwable;
 
 class DontSendToFailureTransportMiddleware implements MiddlewareInterface
 {
-    private MetadataExtractor $metadataExtractor;
+    private readonly MetadataExtractor $metadataExtractor;
 
     public function __construct(
         private readonly CommandRetry $commandRetry,
@@ -105,7 +105,7 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
         // if ALL nested Exceptions are an instance of UnrecoverableExceptionInterface we should not retry
         if ($e instanceof HandlerFailedException) {
             $shouldNotRetry = true;
-            foreach ($e->getNestedExceptions() as $nestedException) {
+            foreach ($e->getWrappedExceptions() as $nestedException) {
                 if ($nestedException instanceof RecoverableExceptionInterface) {
                     return true;
                 }

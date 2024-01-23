@@ -53,7 +53,7 @@ final class EventEngineFactory
     ];
 
     private readonly string $environment;
-    private JsonSchemaExtractor $jsonSchemaExtractor;
+    private readonly JsonSchemaExtractor $jsonSchemaExtractor;
 
     /**
      * @param array<class-string<JsonSchemaAwareRecord>> $commands

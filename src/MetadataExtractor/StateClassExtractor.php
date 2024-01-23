@@ -7,13 +7,16 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Attribute\Projector as ProjectorAttribute;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
-use ADS\Util\MetadataExtractor\MetadataExtractorAware;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 
 class StateClassExtractor
 {
-    use MetadataExtractorAware;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /**
      * @param ReflectionClass<AggregateRoot<JsonSchemaAwareRecord>> $reflectionClass

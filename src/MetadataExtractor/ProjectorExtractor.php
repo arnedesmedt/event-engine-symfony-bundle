@@ -6,12 +6,15 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
 use ADS\Bundle\EventEngineBundle\Attribute\Projector as ProjectorAttribute;
 use ADS\Bundle\EventEngineBundle\Projector\Projector;
-use ADS\Util\MetadataExtractor\MetadataExtractorAware;
+use ADS\Util\MetadataExtractor\MetadataExtractor;
 use ReflectionClass;
 
 class ProjectorExtractor
 {
-    use MetadataExtractorAware;
+    public function __construct(
+        private readonly MetadataExtractor $metadataExtractor,
+    ) {
+    }
 
     /** @param ReflectionClass<object> $reflectionClass */
     public function nameFromReflectionClass(ReflectionClass $reflectionClass): string

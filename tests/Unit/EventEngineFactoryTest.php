@@ -26,7 +26,6 @@ use ADS\Bundle\EventEngineBundle\Tests\Service\TestFlavour;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
 use ADS\Util\MetadataExtractor\InstanceExtractor;
-use ADS\Util\MetadataExtractor\JsonSchemaExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\EventEngine;
@@ -100,7 +99,6 @@ class EventEngineFactoryTest extends TestCase
             new StateClassExtractor($metadataExtractor),
             $eventClassExtractor,
             new ProjectorExtractor($metadataExtractor),
-            new JsonSchemaExtractor(),
             new ClassMapper(
                 $eventClassExtractor,
                 new PreProcessorExtractor($metadataExtractor),

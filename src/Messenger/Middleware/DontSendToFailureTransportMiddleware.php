@@ -16,7 +16,6 @@ use ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor;
 use ADS\Bundle\EventEngineBundle\Query\Query;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\Messaging\Message as EventEngineMessage;
 use ReflectionClass;
@@ -43,7 +42,6 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
         $this->metadataExtractor = new MetadataExtractor(
             new AttributeExtractor(),
             new ClassExtractor(),
-            new InstanceExtractor(),
         );
     }
 

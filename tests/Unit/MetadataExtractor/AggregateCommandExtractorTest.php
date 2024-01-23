@@ -10,7 +10,6 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestInterfaceAggregateComm
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestAttributeQuery;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -25,7 +24,6 @@ class AggregateCommandExtractorTest extends TestCase
             new MetadataExtractor(
                 new AttributeExtractor(),
                 new ClassExtractor(),
-                new InstanceExtractor(),
             ),
         );
     }

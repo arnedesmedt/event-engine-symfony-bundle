@@ -8,10 +8,9 @@ use ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestAttributeControllerCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestInterfaceControllerCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Controller\TestController;
+use ADS\JsonImmutableObjects\MetadataExtractor\JsonSchemaExtractor;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
-use ADS\Util\MetadataExtractor\JsonSchemaExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -26,7 +25,6 @@ class ControllerExtractorTest extends TestCase
             new MetadataExtractor(
                 new AttributeExtractor(),
                 new ClassExtractor(),
-                new InstanceExtractor(),
             ),
         );
     }

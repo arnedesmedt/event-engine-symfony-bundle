@@ -9,7 +9,6 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\PreProcessor\TestAttributePreProce
 use ADS\Bundle\EventEngineBundle\Tests\Object\PreProcessor\TestInterfacePreProcessor;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -24,7 +23,6 @@ class PreProcessorExtractorTest extends TestCase
             new MetadataExtractor(
                 new AttributeExtractor(),
                 new ClassExtractor(),
-                new InstanceExtractor(),
             ),
         );
     }

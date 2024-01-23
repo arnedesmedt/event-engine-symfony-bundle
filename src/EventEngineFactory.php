@@ -14,7 +14,7 @@ use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
-use ADS\Util\MetadataExtractor\JsonSchemaExtractor;
+use ADS\JsonImmutableObjects\MetadataExtractor\JsonSchemaExtractor;
 use EventEngine\Commanding\CommandProcessorDescription;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;

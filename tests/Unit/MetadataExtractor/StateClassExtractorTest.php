@@ -12,7 +12,6 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestInterfaceProjector;
 use ADS\Bundle\EventEngineBundle\Tests\Object\State\TestState;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +27,6 @@ class StateClassExtractorTest extends TestCase
             new MetadataExtractor(
                 new AttributeExtractor(),
                 new ClassExtractor(),
-                new InstanceExtractor(),
             ),
         );
     }

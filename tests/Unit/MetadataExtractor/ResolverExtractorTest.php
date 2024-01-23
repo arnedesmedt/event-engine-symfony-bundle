@@ -8,10 +8,9 @@ use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestAttributeQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestInterfaceQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Resolver\TestResolver;
+use ADS\JsonImmutableObjects\MetadataExtractor\JsonSchemaExtractor;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
-use ADS\Util\MetadataExtractor\JsonSchemaExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -26,7 +25,6 @@ class ResolverExtractorTest extends TestCase
             new MetadataExtractor(
                 new AttributeExtractor(),
                 new ClassExtractor(),
-                new InstanceExtractor(),
             ),
         );
     }

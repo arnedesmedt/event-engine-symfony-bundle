@@ -9,10 +9,9 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\Listener\TestAttributeListener;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Listener\TestInterfaceListener;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestAttributeProjector;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestInterfaceProjector;
+use ADS\JsonImmutableObjects\MetadataExtractor\JsonSchemaExtractor;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
-use ADS\Util\MetadataExtractor\JsonSchemaExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -27,7 +26,6 @@ class EventClassExtractorTest extends TestCase
             new MetadataExtractor(
                 new AttributeExtractor(),
                 new ClassExtractor(),
-                new InstanceExtractor(),
             ),
         );
     }

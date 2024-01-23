@@ -25,7 +25,6 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestInterfaceQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Service\TestFlavour;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\EventEngine;
@@ -74,7 +73,6 @@ class EventEngineFactoryTest extends TestCase
         $metadataExtractor = new MetadataExtractor(
             new AttributeExtractor(),
             new ClassExtractor(),
-            new InstanceExtractor(),
         );
         $classDivider = new ClassDivider([__DIR__ . '/../Object/']);
         $eventClassExtractor = new EventClassExtractor($metadataExtractor);

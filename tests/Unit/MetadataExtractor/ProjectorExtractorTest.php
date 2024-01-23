@@ -9,7 +9,6 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestAttributeProjector;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Projector\TestInterfaceProjector;
 use ADS\Util\MetadataExtractor\AttributeExtractor;
 use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\InstanceExtractor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -24,7 +23,6 @@ class ProjectorExtractorTest extends TestCase
             new MetadataExtractor(
                 new AttributeExtractor(),
                 new ClassExtractor(),
-                new InstanceExtractor(),
             ),
         );
     }

@@ -7,6 +7,7 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\Attribute\Response;
 use ADS\Bundle\EventEngineBundle\Response\HasResponses;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
+use EventEngine\JsonSchema\JsonSchemaAwareCollection;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 
@@ -48,11 +49,11 @@ class ResponseExtractor
     /**
      * @param ReflectionClass<object> $reflectionClass
      *
-     * @return class-string<JsonSchemaAwareRecord>
+     * @return class-string<JsonSchemaAwareRecord|JsonSchemaAwareCollection>
      */
     public function defaultResponseClassFromReflectionClass(ReflectionClass $reflectionClass): string
     {
-        /** @var class-string<JsonSchemaAwareRecord> $defaultResponseClass */
+        /** @var class-string<JsonSchemaAwareRecord|JsonSchemaAwareCollection> $defaultResponseClass */
         $defaultResponseClass = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
             [

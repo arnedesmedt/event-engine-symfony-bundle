@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Attribute;
 
 use Attribute;
+use EventEngine\JsonSchema\JsonSchemaAwareCollection;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -13,7 +14,7 @@ class Query extends Response
 {
     /**
      * @param class-string $resolver
-     * @param class-string<JsonSchemaAwareRecord> $defaultResponseClass
+     * @param class-string<JsonSchemaAwareRecord|JsonSchemaAwareCollection> $defaultResponseClass
      */
     public function __construct(
         private readonly string $resolver,

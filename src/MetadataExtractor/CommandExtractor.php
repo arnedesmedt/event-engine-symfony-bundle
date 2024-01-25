@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
+use ADS\Bundle\EventEngineBundle\Attribute\Command as CommandAttribute;
 use ADS\Bundle\EventEngineBundle\Attribute\PreProcessor as PreProcessorAttribute;
 use ADS\Bundle\EventEngineBundle\Command\Command;
-use ADS\Bundle\EventEngineBundle\Command\Command as CommandAttribute;
 use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;

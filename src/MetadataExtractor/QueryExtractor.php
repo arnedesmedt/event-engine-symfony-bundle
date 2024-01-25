@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
+use ADS\Bundle\EventEngineBundle\Attribute\Query as QueryAttribute;
 use ADS\Bundle\EventEngineBundle\Query\Query;
-use ADS\Bundle\EventEngineBundle\Query\Query as QueryAttribute;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
 use ReflectionClass;
 

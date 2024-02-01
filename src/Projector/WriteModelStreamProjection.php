@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Projector;
 
 use EventEngine\EventEngine;
-use LogicException;
 use Prooph\Common\Messaging\Message;
 use Prooph\EventStore\Projection\ProjectionManager;
 use Prooph\EventStore\Projection\ReadModelProjector;
@@ -17,8 +16,7 @@ class WriteModelStreamProjection
 {
     final public const NAME = 'ee_write_model_projection';
 
-    /** @readonly */
-    private readonly ReadModelProjector $projection;
+    private ReadModelProjector $projection;
 
     /** @param array<string, mixed>|null $projectionOptions */
     public function __construct(
@@ -47,7 +45,7 @@ class WriteModelStreamProjection
         $totalSourceStreams = count($sourceStreams);
 
         if ($totalSourceStreams === 0) {
-            throw new LogicException('No source streams found for write model projection');
+            return;
         }
 
         $this->projection = $projectionManager->createReadModelProjection(

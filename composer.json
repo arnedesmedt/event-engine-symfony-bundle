@@ -25,7 +25,8 @@
         "symfony/http-kernel": "~6.0 || ~7.0",
         "symfony/lock": "~6.0 || ~7.0",
         "symfony/messenger": "~6.0 || ~7.0",
-        "symfony/validator": "~6.0 || ~7.0"
+        "symfony/validator": "~6.0 || ~7.0",
+        "symfony/property-info": "~6.0 || ~7.0"
     },
     "require-dev": {
         "doctrine/coding-standard": "~11.0",

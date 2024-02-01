@@ -1,5 +1,5 @@
 services:
-    # General
+    # GENERAL
     event_engine.cache:
         class: Symfony\Component\Cache\Adapter\FilesystemAdapter
 
@@ -9,7 +9,20 @@ services:
         arguments:
             $dsn: '%event_engine.pdo_dsn%'
 
-    # Cache
+    # PROPERTY INFO
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyValueObjectTypeExtractor:
+        tags:
+            - 'property_info.type_extractor'
+
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyValueObjectDescriptionExtractor:
+        tags:
+            - 'property_info.description_extractor'
+
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyJsonSchemaAccessExtractor:
+        tags:
+            - 'property_info.access_extractor'
+
+    # CACHE
     event_engine.cache.config:
         class: 'Symfony\Component\Cache\Adapter\ChainAdapter'
         arguments:
@@ -18,11 +31,11 @@ services:
         tags:
             - { name: cache.pool }
 
-    # Schema
+    # SCHEMA
     EventEngine\Schema\Schema: '@EventEngine\JsonSchema\OpisJsonSchema'
     EventEngine\JsonSchema\OpisJsonSchema: ~
 
-    # Event Engine
+    # EVENT ENGINE
     ADS\Bundle\EventEngineBundle\EventEngineFactory:
         arguments:
             $schema: '@EventEngine\Schema\Schema'
@@ -82,7 +95,7 @@ services:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@EventEngine\EventEngine'
 
-    # Flavours
+    # FLAVOURS
     EventEngine\Runtime\PrototypingFlavour:
         arguments:
             - '@EventEngine\Runtime\Prototyping\Port'
@@ -101,7 +114,7 @@ services:
             - '@EventEngine\Runtime\OopFlavour'
             - '@ADS\Bundle\EventEngineBundle\Flavour\FunctionalMetaDataFlavour'
 
-    # Commands
+    # COMMANDS
     event_engine.command.database_clear:
         class: ADS\Bundle\EventEngineBundle\SymfonyCommand\EventEngineDatabaseClearCommand
         arguments:
@@ -162,7 +175,7 @@ services:
         tags:
             - console.command
 
-    # Interfaces
+    # INTERFACES
     Prooph\Common\Event\ActionEventEmitter: '@Prooph\Common\Event\ProophActionEventEmitter'
     Prooph\EventStore\EventStore: '@Prooph\EventStore\TransactionalActionEventEmitterEventStore'
     Prooph\EventStore\Pdo\PersistenceStrategy\PostgresPersistenceStrategy: '@ADS\Bundle\EventEngineBundle\Persistency\SingleStreamStrategy'
@@ -180,7 +193,7 @@ services:
     EventEngine\Messaging\MessageDispatcher: '@ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer'
     EventEngine\Messaging\MessageProducer: '@ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer'
 
-    # Implementations
+    # IMPLEMENTATIONS
     Opis\JsonSchema\Validator: ~
     Prooph\EventStore\Pdo\WriteLockStrategy\PostgresAdvisoryLockStrategy:
         arguments:

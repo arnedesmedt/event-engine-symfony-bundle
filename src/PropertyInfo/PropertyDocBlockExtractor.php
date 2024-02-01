@@ -24,9 +24,9 @@ class PropertyDocBlockExtractor
     /** @param class-string $class */
     public function propertyDocBlockFromClassAndProperty(string $class, string $property): DocBlock
     {
-        $reflectionProperty = PropertyTypeExtractor::propertyReflectionType($class, $property);
+        $propertyReflection = PropertyReflection::propertyReflectionFromClassAndProperty($class, $property);
 
-        if ($reflectionProperty === null) {
+        if ($propertyReflection === null) {
             throw new RuntimeException(
                 sprintf(
                     'Property \'%s\' not found on class \'%s\'',
@@ -36,7 +36,7 @@ class PropertyDocBlockExtractor
             );
         }
 
-        return $this->docBlockFactory->create($reflectionProperty);
+        return $this->docBlockFactory->create($propertyReflection);
     }
 
     /**
@@ -46,7 +46,7 @@ class PropertyDocBlockExtractor
      */
     public function propertyTypeClassDocBlocksFromClassAndProperty(string $class, string $property): array
     {
-        $typeReflectionClasses = PropertyTypeExtractor::propertyReflectionClassesFromClassAndProperty(
+        $typeReflectionClasses = PropertyReflection::propertyTypeReflectionClassesFromClassAndProperty(
             $class,
             $property,
         );

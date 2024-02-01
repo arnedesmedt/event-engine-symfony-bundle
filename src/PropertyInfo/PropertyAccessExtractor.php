@@ -10,7 +10,7 @@ use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 
 use function str_starts_with;
 
-class PropertyJsonSchemaAccessExtractor implements PropertyAccessExtractorInterface
+class PropertyAccessExtractor implements PropertyAccessExtractorInterface
 {
     /**
      * @param class-string $class

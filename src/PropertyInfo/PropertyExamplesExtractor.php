@@ -25,11 +25,11 @@ class PropertyExamplesExtractor
      *
      * @return array<string>
      */
-    public function examplesFromClassAndProperty(string $class, string $property): array
+    public function fromClassAndProperty(string $class, string $property): array
     {
-        return $this->examplesFromInterface($class, $property)
-            ?? $this->examplesFromPropertyDocBlock($class, $property)
-            ?? $this->examplesFromPropertyTypeClassDocBlocks($class, $property)
+        return $this->fromInterface($class, $property)
+            ?? $this->fromPropertyDocBlock($class, $property)
+            ?? $this->fromPropertyTypeClassDocBlocks($class, $property)
             ?? [];
     }
 
@@ -38,11 +38,11 @@ class PropertyExamplesExtractor
      *
      * @return array<string>|null
      */
-    private function examplesFromPropertyDocBlock(string $class, string $property): array|null
+    private function fromPropertyDocBlock(string $class, string $property): array|null
     {
         $docBlock = $this->propertyDocBlockExtractor->propertyDocBlockFromClassAndProperty($class, $property);
 
-        $examples = $this->examplesFromDocBlock($docBlock);
+        $examples = $this->fromDocBlock($docBlock);
 
         return empty($examples) ? null : $examples;
     }
@@ -52,7 +52,7 @@ class PropertyExamplesExtractor
      *
      * @return array<string>|null
      */
-    private function examplesFromPropertyTypeClassDocBlocks(string $class, string $property): array|null
+    private function fromPropertyTypeClassDocBlocks(string $class, string $property): array|null
     {
         $docBlocksPerType = $this->propertyDocBlockExtractor->propertyTypeClassDocBlocksFromClassAndProperty(
             $class,
@@ -61,7 +61,7 @@ class PropertyExamplesExtractor
 
         $examples = array_reduce(
             $docBlocksPerType,
-            fn (array $carry, DocBlock $docBlock) => [...$carry, ...$this->examplesFromDocBlock($docBlock)],
+            fn (array $carry, DocBlock $docBlock) => [...$carry, ...$this->fromDocBlock($docBlock)],
             [],
         );
 
@@ -69,7 +69,7 @@ class PropertyExamplesExtractor
     }
 
     /** @return array<string> */
-    private function examplesFromDocBlock(DocBlock $docBlock): array
+    private function fromDocBlock(DocBlock $docBlock): array
     {
         $exampleTags = $docBlock->getTagsByName('example');
 
@@ -84,7 +84,7 @@ class PropertyExamplesExtractor
      *
      * @return array<string>|null
      */
-    private function examplesFromInterface(string $class, string $property): array|null
+    private function fromInterface(string $class, string $property): array|null
     {
         $reflectionClass = new ReflectionClass($class);
         if (! $reflectionClass->implementsInterface(HasPropertyExamples::class)) {

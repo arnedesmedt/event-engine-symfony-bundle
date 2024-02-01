@@ -10,15 +10,21 @@ services:
             $dsn: '%event_engine.pdo_dsn%'
 
     # PROPERTY INFO
-    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyValueObjectTypeExtractor:
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDefaultExtractor: ~
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDeprecationExtractor: ~
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor: ~
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyExamplesExtractor: ~
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyTypeExtractor:
         tags:
             - 'property_info.type_extractor'
 
-    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyValueObjectDescriptionExtractor:
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDescriptionExtractor:
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor'
         tags:
             - 'property_info.description_extractor'
 
-    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyJsonSchemaAccessExtractor:
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyAccessExtractor:
         tags:
             - 'property_info.access_extractor'
 

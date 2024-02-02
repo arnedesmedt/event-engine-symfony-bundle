@@ -65,14 +65,22 @@ final class PropertyTypeExtractor implements PropertyTypeExtractorInterface
             $reflectionPropertyType?->allowsNull() ?? false,
             $reflectionClass->getName(),
             $reflectionClass->implementsInterface(ListValue::class),
-            self::collectionKey(),
+            self::collectionKey($reflectionClass),
             self::collectionValue($reflectionClass),
         );
     }
 
-    /** @return array<Type> */
-    private static function collectionKey(): array
+    /**
+     * @param ReflectionClass<ValueObject|ImmutableRecord> $reflectionClass
+     *
+     * @return array<Type>|null
+     */
+    private static function collectionKey(ReflectionClass $reflectionClass): array|null
     {
+        if (! $reflectionClass->implementsInterface(ListValue::class)) {
+            return null;
+        }
+
         // todo don't hardcode this. But fetch it from the list. Metadata still needs to be added.
         return [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)];
     }

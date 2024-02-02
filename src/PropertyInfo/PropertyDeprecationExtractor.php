@@ -31,8 +31,12 @@ class PropertyDeprecationExtractor
         return empty($examples) ? null : $examples;
     }
 
-    private function fromDocBlock(DocBlock $docBlock): string|null
+    private function fromDocBlock(DocBlock|null $docBlock): string|null
     {
+        if ($docBlock === null) {
+            return null;
+        }
+
         $deprecatedTags = $docBlock->getTagsByName('deprecated');
 
         if (empty($deprecatedTags)) {

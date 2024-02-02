@@ -69,9 +69,9 @@ class PropertyExamplesExtractor
     }
 
     /** @return array<string> */
-    private function fromDocBlock(DocBlock $docBlock): array
+    private function fromDocBlock(DocBlock|null $docBlock): array
     {
-        $exampleTags = $docBlock->getTagsByName('example');
+        $exampleTags = $docBlock?->getTagsByName('example') ?? [];
 
         return array_map(
             static fn (DocBlock\Tag $exampleTag) => (string) $exampleTag,

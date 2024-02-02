@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\PropertyInfo;
 
+use InvalidArgumentException;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
@@ -22,7 +23,7 @@ class PropertyDocBlockExtractor
     }
 
     /** @param class-string $class */
-    public function propertyDocBlockFromClassAndProperty(string $class, string $property): DocBlock
+    public function propertyDocBlockFromClassAndProperty(string $class, string $property): DocBlock|null
     {
         $propertyReflection = PropertyReflection::propertyReflectionFromClassAndProperty($class, $property);
 
@@ -36,7 +37,11 @@ class PropertyDocBlockExtractor
             );
         }
 
-        return $this->docBlockFactory->create($propertyReflection);
+        try {
+            return $this->docBlockFactory->create($propertyReflection);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
     }
 
     /**

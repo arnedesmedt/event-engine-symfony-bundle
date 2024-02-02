@@ -111,8 +111,12 @@ class PropertyDescriptionExtractor implements PropertyDescriptionExtractorInterf
         return implode('<br/>', array_filter($descriptions));
     }
 
-    private function fullDescriptionFromDocBlock(DocBlock $docBlock): string|null
+    private function fullDescriptionFromDocBlock(DocBlock|null $docBlock): string|null
     {
+        if ($docBlock === null) {
+            return null;
+        }
+
         $summary = $docBlock->getSummary();
         $description = $docBlock->getDescription()->render();
 
@@ -131,8 +135,12 @@ class PropertyDescriptionExtractor implements PropertyDescriptionExtractorInterf
         );
     }
 
-    private function descriptionFromDocBlock(DocBlock $docBlock): string|null
+    private function descriptionFromDocBlock(DocBlock|null $docBlock): string|null
     {
+        if ($docBlock === null) {
+            return null;
+        }
+
         $description = $docBlock->getDescription()->render();
 
         if (empty($description)) {
@@ -142,8 +150,12 @@ class PropertyDescriptionExtractor implements PropertyDescriptionExtractorInterf
         return $description;
     }
 
-    private function summaryFromDocBlock(DocBlock $docBlock): string|null
+    private function summaryFromDocBlock(DocBlock|null $docBlock): string|null
     {
+        if ($docBlock === null) {
+            return null;
+        }
+
         $summary = $docBlock->getSummary();
 
         if (empty($summary)) {

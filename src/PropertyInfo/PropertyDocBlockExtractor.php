@@ -10,6 +10,7 @@ use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
 use RuntimeException;
 
+use function array_filter;
 use function array_map;
 use function sprintf;
 
@@ -56,9 +57,17 @@ class PropertyDocBlockExtractor
             $property,
         );
 
-        return array_map(
-            fn (ReflectionClass $typeReflectionClass) => $this->docBlockFactory->create($typeReflectionClass),
-            $typeReflectionClasses,
+        return array_filter(
+            array_map(
+                function (ReflectionClass $typeReflectionClass) {
+                    try {
+                        return $this->docBlockFactory->create($typeReflectionClass);
+                    } catch (InvalidArgumentException) {
+                        return null;
+                    }
+                },
+                $typeReflectionClasses,
+            ),
         );
     }
 }

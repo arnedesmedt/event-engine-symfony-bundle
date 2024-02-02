@@ -8,11 +8,9 @@ use InvalidArgumentException;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
-use RuntimeException;
 
 use function array_filter;
 use function array_map;
-use function sprintf;
 
 class PropertyDocBlockExtractor
 {
@@ -29,13 +27,7 @@ class PropertyDocBlockExtractor
         $propertyReflection = PropertyReflection::propertyReflectionFromClassAndProperty($class, $property);
 
         if ($propertyReflection === null) {
-            throw new RuntimeException(
-                sprintf(
-                    'Property \'%s\' not found on class \'%s\'',
-                    $property,
-                    $class,
-                ),
-            );
+            return null;
         }
 
         try {

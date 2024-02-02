@@ -11,9 +11,13 @@ services:
 
     # PROPERTY INFO
     ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDefaultExtractor: ~
-    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDeprecationExtractor: ~
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDeprecationExtractor:
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor'
     ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor: ~
-    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyExamplesExtractor: ~
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyExamplesExtractor:
+        arguments:
+            - '@ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor'
     ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyTypeExtractor:
         tags:
             - 'property_info.type_extractor'

@@ -13,7 +13,7 @@ use function array_map;
 use function array_reduce;
 use function is_array;
 
-class PropertyExamplesExtractor
+class PropertyExampleExtractor
 {
     public function __construct(
         private readonly PropertyDocBlockExtractor $propertyDocBlockExtractor,

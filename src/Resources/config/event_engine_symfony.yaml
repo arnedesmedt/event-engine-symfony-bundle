@@ -15,7 +15,7 @@ services:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor'
     ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor: ~
-    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyExamplesExtractor:
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyExampleExtractor:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor'
     ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyTypeExtractor:

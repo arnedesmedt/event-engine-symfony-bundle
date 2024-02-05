@@ -9,9 +9,10 @@ use ADS\ValueObjects\ValueObject;
 use phpDocumentor\Reflection\DocBlock;
 use ReflectionClass;
 
-use function array_map;
+use function array_filter;
 use function array_reduce;
 use function is_array;
+use function reset;
 
 class PropertyExampleExtractor
 {
@@ -20,39 +21,24 @@ class PropertyExampleExtractor
     ) {
     }
 
-    /**
-     * @param class-string $class
-     *
-     * @return array<string>
-     */
-    public function fromClassAndProperty(string $class, string $property): array
+    /** @param class-string $class */
+    public function fromClassAndProperty(string $class, string $property): mixed
     {
         return $this->fromInterface($class, $property)
             ?? $this->fromPropertyDocBlock($class, $property)
-            ?? $this->fromPropertyTypeClassDocBlocks($class, $property)
-            ?? [];
+            ?? $this->fromPropertyTypeClassDocBlocks($class, $property);
     }
 
-    /**
-     * @param class-string $class
-     *
-     * @return array<string>|null
-     */
-    private function fromPropertyDocBlock(string $class, string $property): array|null
+    /** @param class-string $class */
+    private function fromPropertyDocBlock(string $class, string $property): string|null
     {
         $docBlock = $this->propertyDocBlockExtractor->propertyDocBlockFromClassAndProperty($class, $property);
 
-        $examples = $this->fromDocBlock($docBlock);
-
-        return empty($examples) ? null : $examples;
+        return $this->fromDocBlock($docBlock);
     }
 
-    /**
-     * @param class-string $class
-     *
-     * @return array<string>|null
-     */
-    private function fromPropertyTypeClassDocBlocks(string $class, string $property): array|null
+    /** @param class-string $class */
+    private function fromPropertyTypeClassDocBlocks(string $class, string $property): string|null
     {
         $docBlocksPerType = $this->propertyDocBlockExtractor->propertyTypeClassDocBlocksFromClassAndProperty(
             $class,
@@ -61,30 +47,34 @@ class PropertyExampleExtractor
 
         $examples = array_reduce(
             $docBlocksPerType,
-            fn (array $carry, DocBlock $docBlock) => [...$carry, ...$this->fromDocBlock($docBlock)],
+            function (array $carry, DocBlock $docBlock) {
+                $carry[] = $this->fromDocBlock($docBlock);
+
+                return $carry;
+            },
             [],
         );
 
-        return empty($examples) ? null : $examples;
+        $nonEmptyExamples = array_filter($examples);
+
+        return empty($examples) ? null : (string) reset($nonEmptyExamples);
     }
 
-    /** @return array<string> */
-    private function fromDocBlock(DocBlock|null $docBlock): array
+    private function fromDocBlock(DocBlock|null $docBlock): string|null
     {
         $exampleTags = $docBlock?->getTagsByName('example') ?? [];
 
-        return array_map(
-            static fn (DocBlock\Tag $exampleTag) => (string) $exampleTag,
-            $exampleTags,
-        );
+        if (empty($exampleTags)) {
+            return null;
+        }
+
+        $exampleTag = reset($exampleTags);
+
+        return (string) $exampleTag;
     }
 
-    /**
-     * @param class-string $class
-     *
-     * @return array<string>|null
-     */
-    private function fromInterface(string $class, string $property): array|null
+    /** @param class-string $class */
+    private function fromInterface(string $class, string $property): mixed
     {
         $reflectionClass = new ReflectionClass($class);
         if (! $reflectionClass->implementsInterface(HasPropertyExamples::class)) {
@@ -104,9 +94,8 @@ class PropertyExampleExtractor
             return null;
         }
 
-        return array_map(
-            static fn (mixed $example) => $example instanceof ValueObject ? $example->toValue() : $example,
-            $examples,
-        );
+        $example = reset($examples);
+
+        return $example instanceof ValueObject ? $example->toValue() : $example;
     }
 }

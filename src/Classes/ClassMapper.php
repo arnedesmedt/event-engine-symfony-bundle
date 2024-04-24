@@ -9,6 +9,7 @@ use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\PreProcessorExtractor;
+use EventEngine\Aggregate\ContextProvider;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 use ReflectionMethod;
@@ -17,6 +18,7 @@ use ReflectionParameter;
 use ReflectionUnionType;
 use RuntimeException;
 
+use function array_diff;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
@@ -35,6 +37,8 @@ class ClassMapper
     private array $commandEventMapping = [];
     /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string|string>> */
     private array $commandServiceMapping = [];
+    /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string|string>> */
+    private array $commandContextProviderMapping = [];
     /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string>> */
     private array $commandPreProcessorMapping = [];
     /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */
@@ -81,6 +85,18 @@ class ClassMapper
         return $this->commandServiceMapping;
     }
 
+    /** @return array<class-string<JsonSchemaAwareRecord>, array<class-string|string>> */
+    public function commandContextProviderMapping(): array
+    {
+        if (! empty($this->commandContextProviderMapping)) {
+            return $this->commandContextProviderMapping;
+        }
+
+        $this->mapForAggregates();
+
+        return $this->commandContextProviderMapping;
+    }
+
     private function mapForAggregates(): void
     {
         foreach ($this->aggregates as $aggregateClass) {
@@ -107,8 +123,8 @@ class ClassMapper
                     fn ($type) => $type !== null && in_array($type->getName(), $this->aggregateCommands)
                 );
 
-                /** @var array<class-string|string> $services */
-                $services = array_filter(
+                /** @var array<class-string|string> $servicesAndContextProviders */
+                $servicesAndContextProviders = array_filter(
                     array_map(
                         static function (ReflectionParameter $parameter) {
                             /** @var ReflectionNamedType|null $type */
@@ -118,6 +134,16 @@ class ClassMapper
                         },
                         $parameters,
                     ),
+                );
+
+                $services = array_filter(
+                    $servicesAndContextProviders,
+                    static fn (string $service) => ! is_a($service, ContextProvider::class, true),
+                );
+
+                $contextProviders = array_diff(
+                    $servicesAndContextProviders,
+                    $services,
                 );
 
                 foreach ($commandTypes as $commandType) {
@@ -131,6 +157,7 @@ class ClassMapper
 
                     $this->commandAggregateMapping[$commandClass] = $aggregateClass;
                     $this->commandServiceMapping[$commandClass] = $services;
+                    $this->commandContextProviderMapping[$commandClass] = $contextProviders;
                 }
             }
         }

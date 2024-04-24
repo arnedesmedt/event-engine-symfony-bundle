@@ -379,6 +379,10 @@ final class EventEngineFactory
                     $commandProcessor,
                     $aggregateCommandClass,
                 )
+                ->handleContextProviders(
+                    $commandProcessor,
+                    $aggregateCommandClass,
+                )
                 ->handleStorage(
                     $commandProcessor,
                     $aggregateRootClass,
@@ -455,6 +459,31 @@ final class EventEngineFactory
 
         foreach ($services as $serviceId) {
             $commandProcessor->provideService($serviceId);
+        }
+
+        return $this;
+    }
+
+    /** @param class-string<JsonSchemaAwareRecord> $commandClass */
+    private function handleContextProviders(
+        CommandProcessorDescription $commandProcessor,
+        string $commandClass,
+    ): self {
+        $commandContextProviderMapping = $this->classMapper->commandContextProviderMapping();
+
+        if (! isset($commandContextProviderMapping[$commandClass])) {
+            throw new RuntimeException(
+                sprintf(
+                    'No context providers found for command \'%s\'.',
+                    $commandClass,
+                ),
+            );
+        }
+
+        $contextProviders = $commandContextProviderMapping[$commandClass];
+
+        foreach ($contextProviders as $contextProviderId) {
+            $commandProcessor->provideContext($contextProviderId);
         }
 
         return $this;

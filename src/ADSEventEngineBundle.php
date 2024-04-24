@@ -74,7 +74,7 @@ final class ADSEventEngineBundle extends AbstractBundle
 
         $config = [
             'messenger' => [
-                'default_bus' => 'command.bus',
+                'default_bus' => 'command',
                 'buses' => [
                     'command' => [
                         'middleware' => array_merge(

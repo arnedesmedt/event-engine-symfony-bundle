@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Classes;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
-use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\PreProcessorExtractor;
-use EventEngine\Aggregate\ContextProvider;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 use ReflectionMethod;
@@ -18,14 +17,16 @@ use ReflectionParameter;
 use ReflectionUnionType;
 use RuntimeException;
 
-use function array_diff;
 use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function array_shift;
+use function array_slice;
 use function array_unique;
+use function class_exists;
+use function count;
 use function in_array;
-use function is_a;
+use function reset;
 use function sprintf;
 use function usort;
 
@@ -37,7 +38,7 @@ class ClassMapper
     private array $commandEventMapping = [];
     /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string|string>> */
     private array $commandServiceMapping = [];
-    /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string|string>> */
+    /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string>> */
     private array $commandContextProviderMapping = [];
     /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string>> */
     private array $commandPreProcessorMapping = [];
@@ -54,6 +55,7 @@ class ClassMapper
         private readonly EventClassExtractor $eventClassExtractor,
         private readonly PreProcessorExtractor $preProcessorExtractor,
         private readonly CommandExtractor $commandExtractor,
+        private readonly AggregateCommandExtractor $aggregateCommandExtractor,
         private readonly array $commands,
         private readonly array $aggregateCommands,
         private readonly array $aggregates,
@@ -73,6 +75,18 @@ class ClassMapper
         return $this->commandAggregateMapping;
     }
 
+    /** @return array<class-string<JsonSchemaAwareRecord>, array<class-string>> */
+    public function commandContextProviderMapping(): array
+    {
+        if (! empty($this->commandContextProviderMapping)) {
+            return $this->commandContextProviderMapping;
+        }
+
+        $this->mapForAggregates();
+
+        return $this->commandContextProviderMapping;
+    }
+
     /** @return array<class-string<JsonSchemaAwareRecord>, array<class-string|string>> */
     public function commandServiceMapping(): array
     {
@@ -85,18 +99,6 @@ class ClassMapper
         return $this->commandServiceMapping;
     }
 
-    /** @return array<class-string<JsonSchemaAwareRecord>, array<class-string|string>> */
-    public function commandContextProviderMapping(): array
-    {
-        if (! empty($this->commandContextProviderMapping)) {
-            return $this->commandContextProviderMapping;
-        }
-
-        $this->mapForAggregates();
-
-        return $this->commandContextProviderMapping;
-    }
-
     private function mapForAggregates(): void
     {
         foreach ($this->aggregates as $aggregateClass) {
@@ -105,26 +107,41 @@ class ClassMapper
 
             foreach ($publicAggregateMethods as $publicAggregateMethod) {
                 $parameters = $publicAggregateMethod->getParameters();
-                $firstParameter = array_shift($parameters);
+                $command = array_shift($parameters);
 
-                if (! $firstParameter) {
+                if (! $command) {
                     continue;
                 }
 
                 /** @var ReflectionNamedType|ReflectionUnionType|null $commandType */
-                $commandType = $firstParameter->getType();
+                $commandType = $command->getType();
                 /** @var array<ReflectionNamedType|null> $commandTypes */
                 $commandTypes = $commandType instanceof ReflectionUnionType
                     ? $commandType->getTypes()
                     : [$commandType];
+
+                /** @var ReflectionNamedType|null $commandType */
+                $commandType = reset($commandTypes);
+                /** @var class-string<JsonSchemaAwareRecord>|null $commandClass */
+                $commandClass = $commandType?->getName();
+
+                if ($commandClass === null || ! class_exists($commandClass)) {
+                    continue;
+                }
+
+                $commandReflection = new ReflectionClass($commandClass);
+
+                if (! $this->commandExtractor->isCommandFromReflectionClass($commandReflection)) {
+                    continue;
+                }
 
                 $commandTypes = array_filter(
                     $commandTypes,
                     fn ($type) => $type !== null && in_array($type->getName(), $this->aggregateCommands)
                 );
 
-                /** @var array<class-string|string> $servicesAndContextProviders */
-                $servicesAndContextProviders = array_filter(
+                /** @var array<class-string|string> $services */
+                $services = array_filter(
                     array_map(
                         static function (ReflectionParameter $parameter) {
                             /** @var ReflectionNamedType|null $type */
@@ -136,28 +153,17 @@ class ClassMapper
                     ),
                 );
 
-                $services = array_filter(
-                    $servicesAndContextProviders,
-                    static fn (string $service) => ! is_a($service, ContextProvider::class, true),
-                );
-
-                $contextProviders = array_diff(
-                    $servicesAndContextProviders,
-                    $services,
-                );
+                $contextProviders = $this->aggregateCommandExtractor
+                    ->contextProvidersFromReflectionClass($commandReflection);
+                $services = array_slice($services, count($contextProviders));
 
                 foreach ($commandTypes as $commandType) {
                     /** @var class-string<JsonSchemaAwareRecord> $commandClass */
                     $commandClass = $commandType->getName();
 
-                    if (is_a($commandClass, AggregateCommand::class, true)) {
-                        // todo how to fix replace services with attribute?
-                        $services = $commandClass::__replaceServices($services);
-                    }
-
                     $this->commandAggregateMapping[$commandClass] = $aggregateClass;
-                    $this->commandServiceMapping[$commandClass] = $services;
                     $this->commandContextProviderMapping[$commandClass] = $contextProviders;
+                    $this->commandServiceMapping[$commandClass] = $services;
                 }
             }
         }

@@ -84,6 +84,7 @@ services:
             $eventClassExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\EventClassExtractor'
             $preProcessorExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\PreProcessorExtractor'
             $commandExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor'
+            $aggregateCommandExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor'
             $commands: '%event_engine.commands%'
             $aggregateCommands: '%event_engine.aggregate_commands%'
             $aggregates: '%event_engine.aggregates%'

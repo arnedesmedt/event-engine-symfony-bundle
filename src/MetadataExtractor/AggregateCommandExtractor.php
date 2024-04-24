@@ -7,6 +7,7 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\Attribute\AggregateCommand as AggregateCommandAttribute;
 use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use ADS\Util\MetadataExtractor\MetadataExtractor;
+use EventEngine\Aggregate\ContextProvider;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 
@@ -53,6 +54,28 @@ class AggregateCommandExtractor
         return $aggregateMethod;
     }
 
+    /**
+     * @param ReflectionClass<JsonSchemaAwareRecord> $reflectionClass
+     *
+     * @return array<class-string<ContextProvider>>
+     */
+    public function contextProvidersFromReflectionClass(ReflectionClass $reflectionClass): array
+    {
+        /** @var array<class-string<ContextProvider>> $contextProviders */
+        $contextProviders = $this->metadataExtractor->needMetadataFromReflectionClass(
+            $reflectionClass,
+            [
+                AggregateCommandAttribute::class => static fn (
+                    AggregateCommandAttribute $attribute,
+                ) => $attribute->contextProviders(),
+                /** @param class-string<AggregateCommand> $class */
+                AggregateCommand::class => static fn (string $class) => $class::__contextProviders(),
+            ],
+        );
+
+        return $contextProviders;
+    }
+
     public function aggregateIdFromAggregateCommand(JsonSchemaAwareRecord $aggregateCommand): string|null
     {
         /** @var string $aggregateId */
@@ -63,7 +86,6 @@ class AggregateCommandExtractor
                     AggregateCommandAttribute $attribute,
                     JsonSchemaAwareRecord $aggregateCommand,
                 ) => $aggregateCommand->toArray()[$attribute->aggregateIdProperty()],
-                /** @param class-string<AggregateCommand> $class */
                 AggregateCommand::class => static fn (
                     AggregateCommand $aggregateCommand,
                 ) => $aggregateCommand->__aggregateId(),

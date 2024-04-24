@@ -101,6 +101,7 @@ class EventEngineFactoryTest extends TestCase
                 $eventClassExtractor,
                 new PreProcessorExtractor($metadataExtractor),
                 new CommandExtractor($metadataExtractor),
+                new AggregateCommandExtractor($metadataExtractor),
                 $classDivider->commandClasses(),
                 $classDivider->aggregateCommandClasses(),
                 $classDivider->aggregateClasses(),

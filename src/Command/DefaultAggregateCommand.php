@@ -31,8 +31,8 @@ trait DefaultAggregateCommand
     }
 
     /** @inheritDoc */
-    public static function __replaceServices(array $services): array
+    public static function __contextProviders(): array
     {
-        return $services;
+        return [];
     }
 }

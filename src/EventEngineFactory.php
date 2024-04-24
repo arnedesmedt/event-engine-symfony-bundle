@@ -375,11 +375,11 @@ final class EventEngineFactory
                     $commandProcessor,
                     $aggregateCommandReflectionClass,
                 )
-                ->handleServices(
+                ->handleContextProviders(
                     $commandProcessor,
                     $aggregateCommandClass,
                 )
-                ->handleContextProviders(
+                ->handleServices(
                     $commandProcessor,
                     $aggregateCommandClass,
                 )
@@ -440,31 +440,6 @@ final class EventEngineFactory
     }
 
     /** @param class-string<JsonSchemaAwareRecord> $commandClass */
-    private function handleServices(
-        CommandProcessorDescription $commandProcessor,
-        string $commandClass,
-    ): self {
-        $commandServiceMapping = $this->classMapper->commandServiceMapping();
-
-        if (! isset($commandServiceMapping[$commandClass])) {
-            throw new RuntimeException(
-                sprintf(
-                    'No services found for command \'%s\'.',
-                    $commandClass,
-                ),
-            );
-        }
-
-        $services = $commandServiceMapping[$commandClass];
-
-        foreach ($services as $serviceId) {
-            $commandProcessor->provideService($serviceId);
-        }
-
-        return $this;
-    }
-
-    /** @param class-string<JsonSchemaAwareRecord> $commandClass */
     private function handleContextProviders(
         CommandProcessorDescription $commandProcessor,
         string $commandClass,
@@ -484,6 +459,31 @@ final class EventEngineFactory
 
         foreach ($contextProviders as $contextProviderId) {
             $commandProcessor->provideContext($contextProviderId);
+        }
+
+        return $this;
+    }
+
+    /** @param class-string<JsonSchemaAwareRecord> $commandClass */
+    private function handleServices(
+        CommandProcessorDescription $commandProcessor,
+        string $commandClass,
+    ): self {
+        $commandServiceMapping = $this->classMapper->commandServiceMapping();
+
+        if (! isset($commandServiceMapping[$commandClass])) {
+            throw new RuntimeException(
+                sprintf(
+                    'No services found for command \'%s\'.',
+                    $commandClass,
+                ),
+            );
+        }
+
+        $services = $commandServiceMapping[$commandClass];
+
+        foreach ($services as $serviceId) {
+            $commandProcessor->provideService($serviceId);
         }
 
         return $this;

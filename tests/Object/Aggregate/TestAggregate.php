@@ -11,6 +11,7 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestAttributeAggregateComm
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestInterfaceAggregateCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Event\TestAttributeEvent;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Event\TestInterfaceEvent;
+use ADS\Bundle\EventEngineBundle\Tests\Object\Service\TestService;
 use ADS\Bundle\EventEngineBundle\Tests\Object\State\TestState;
 
 /** @implements AggregateRoot<TestState> */
@@ -30,8 +31,11 @@ class TestAggregate implements AggregateRoot
         return 'test';
     }
 
-    public static function attributeCommand(TestAttributeAggregateCommand $testCommand): void
-    {
+    public static function attributeCommand(
+        TestAttributeAggregateCommand $testCommand,
+        TestAttributeAggregateCommand $testCommandFromContextProvider,
+        TestService $testService,
+    ): void {
     }
 
     private function whenTestAttributeEventAdded(TestAttributeEvent $event): void

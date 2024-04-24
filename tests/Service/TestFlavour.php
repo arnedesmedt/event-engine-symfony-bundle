@@ -56,7 +56,10 @@ class TestFlavour implements Flavour
     /** @param class-string<callable> $contextProvider */
     public function callContextProvider($contextProvider, Message $command): mixed
     {
-        // TODO: Implement callContextProvider() method.
+        $commandName = $command->messageName();
+        $payload = $command->payload();
+
+        return $contextProvider($commandName::fromArray($payload));
     }
 
     /**

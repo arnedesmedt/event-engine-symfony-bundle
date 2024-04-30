@@ -85,6 +85,8 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
 
     public function produce(EventEngineMessage $messageToPutOnTheQueue): mixed
     {
+        $messageToPutOnTheQueue = $this->flavour->convertMessageReceivedFromNetwork($messageToPutOnTheQueue);
+
         if ($this->sendAsync($messageToPutOnTheQueue)) {
             // We need to lock the aggregate if we send the message async.
             $messageToPutOnTheQueue = $messageToPutOnTheQueue->withAddedMetadata('lock', true);

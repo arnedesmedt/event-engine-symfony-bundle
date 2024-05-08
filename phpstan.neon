@@ -5,9 +5,6 @@ parameters:
         - tests
     excludePaths:
         - tests/Service/TestFlavour.php
-    ignoreErrors:
-        - message: '#Unsafe usage of new static#'
-          path: src/Aggregate/EventSourced.php
 services:
     -
         class: ADS\JsonImmutableObjects\PhpStan\PropertiesExtension

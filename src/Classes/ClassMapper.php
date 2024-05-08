@@ -66,7 +66,7 @@ class ClassMapper
     /** @return array<class-string<JsonSchemaAwareRecord>, class-string<AggregateRoot<JsonSchemaAwareRecord>>> */
     public function commandAggregateMapping(): array
     {
-        if (! empty($this->commandAggregateMapping)) {
+        if ($this->commandAggregateMapping !== []) {
             return $this->commandAggregateMapping;
         }
 
@@ -78,7 +78,7 @@ class ClassMapper
     /** @return array<class-string<JsonSchemaAwareRecord>, array<class-string>> */
     public function commandContextProviderMapping(): array
     {
-        if (! empty($this->commandContextProviderMapping)) {
+        if ($this->commandContextProviderMapping !== []) {
             return $this->commandContextProviderMapping;
         }
 
@@ -90,7 +90,7 @@ class ClassMapper
     /** @return array<class-string<JsonSchemaAwareRecord>, array<class-string|string>> */
     public function commandServiceMapping(): array
     {
-        if (! empty($this->commandServiceMapping)) {
+        if ($this->commandServiceMapping !== []) {
             return $this->commandServiceMapping;
         }
 
@@ -137,7 +137,8 @@ class ClassMapper
 
                 $commandTypes = array_filter(
                     $commandTypes,
-                    fn ($type) => $type !== null && in_array($type->getName(), $this->aggregateCommands)
+                    fn ($type) => $type instanceof ReflectionNamedType
+                        && in_array($type->getName(), $this->aggregateCommands)
                 );
 
                 /** @var array<class-string|string> $services */
@@ -172,7 +173,7 @@ class ClassMapper
     /** @return array<class-string<JsonSchemaAwareRecord>, array<class-string<JsonSchemaAwareRecord>>> */
     public function commandEventMapping(): array
     {
-        if (! empty($this->commandEventMapping)) {
+        if ($this->commandEventMapping !== []) {
             return $this->commandEventMapping;
         }
 
@@ -230,7 +231,7 @@ class ClassMapper
     /** @return array<class-string<JsonSchemaAwareRecord>, array<class-string>> */
     public function commandPreProcessorMapping(): array
     {
-        if (! empty($this->commandPreProcessorMapping)) {
+        if ($this->commandPreProcessorMapping !== []) {
             return $this->commandPreProcessorMapping;
         }
 
@@ -240,7 +241,7 @@ class ClassMapper
             $priority = $this->preProcessorExtractor->priorityFromReflectionClass($preProcessorReflectionClass);
             $commandClasses = $this->commandExtractor->fromPreProcessorReflectionClass($preProcessorReflectionClass);
 
-            if (empty($commandClasses)) {
+            if ($commandClasses === []) {
                 throw new RuntimeException(
                     sprintf(
                         'PreProcessor \'%s\' has no commands.',
@@ -292,7 +293,7 @@ class ClassMapper
     /** @return array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */
     public function aggregateIdentifierMapping(): array
     {
-        if (! empty($this->aggregateIdentifierMapping)) {
+        if ($this->aggregateIdentifierMapping !== []) {
             return $this->aggregateIdentifierMapping;
         }
 

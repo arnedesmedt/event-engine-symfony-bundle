@@ -57,14 +57,14 @@ class PropertyExampleExtractor
 
         $nonEmptyExamples = array_filter($examples);
 
-        return empty($examples) ? null : (string) reset($nonEmptyExamples);
+        return $examples === [] ? null : (string) reset($nonEmptyExamples);
     }
 
     private function fromDocBlock(DocBlock|null $docBlock): string|null
     {
         $exampleTags = $docBlock?->getTagsByName('example') ?? [];
 
-        if (empty($exampleTags)) {
+        if ($exampleTags === []) {
             return null;
         }
 
@@ -90,7 +90,7 @@ class PropertyExampleExtractor
 
         $examples = is_array($propertyExample) ? $propertyExample : [$propertyExample];
 
-        if (empty($examples)) {
+        if ($examples === []) {
             return null;
         }
 

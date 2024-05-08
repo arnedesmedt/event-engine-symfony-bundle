@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
 use ReflectionClass;
+use ReflectionProperty;
 
 use function array_filter;
 use function array_map;
@@ -26,7 +27,7 @@ class PropertyDocBlockExtractor
     {
         $propertyReflection = PropertyReflection::propertyReflectionFromClassAndProperty($class, $property);
 
-        if ($propertyReflection === null) {
+        if (! $propertyReflection instanceof ReflectionProperty) {
             return null;
         }
 

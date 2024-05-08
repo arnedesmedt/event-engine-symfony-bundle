@@ -113,14 +113,14 @@ class PropertyDescriptionExtractor implements PropertyDescriptionExtractorInterf
 
     private function fullDescriptionFromDocBlock(DocBlock|null $docBlock): string|null
     {
-        if ($docBlock === null) {
+        if (! $docBlock instanceof DocBlock) {
             return null;
         }
 
         $summary = $docBlock->getSummary();
         $description = $docBlock->getDescription()->render();
 
-        if (empty($summary) && empty($description)) {
+        if ($summary === '' && $description === '') {
             return null;
         }
 
@@ -137,13 +137,13 @@ class PropertyDescriptionExtractor implements PropertyDescriptionExtractorInterf
 
     private function descriptionFromDocBlock(DocBlock|null $docBlock): string|null
     {
-        if ($docBlock === null) {
+        if (! $docBlock instanceof DocBlock) {
             return null;
         }
 
         $description = $docBlock->getDescription()->render();
 
-        if (empty($description)) {
+        if ($description === '') {
             return null;
         }
 
@@ -152,13 +152,13 @@ class PropertyDescriptionExtractor implements PropertyDescriptionExtractorInterf
 
     private function summaryFromDocBlock(DocBlock|null $docBlock): string|null
     {
-        if ($docBlock === null) {
+        if (! $docBlock instanceof DocBlock) {
             return null;
         }
 
         $summary = $docBlock->getSummary();
 
-        if (empty($summary)) {
+        if ($summary === '') {
             return null;
         }
 

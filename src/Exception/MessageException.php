@@ -13,7 +13,7 @@ final class MessageException extends Exception
     /** @param class-string $message */
     public static function noHandlerFound(string $message, string $type): self
     {
-        return new static(
+        return new self(
             sprintf(
                 'Could not find a %s for message \'%s\'.',
                 $type,
@@ -24,7 +24,7 @@ final class MessageException extends Exception
 
     public static function nestedMessageFolder(string $class, string $folder): self
     {
-        return new static(
+        return new self(
             sprintf(
                 'The message \'%s\' has a nested folder structure for the directory \'%s\'.',
                 $class,

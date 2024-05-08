@@ -98,7 +98,7 @@ abstract class DefaultProjector implements Projector
             \ADS\Bundle\EventEngineBundle\Attribute\Event::class,
         );
 
-        if (empty($eventReflectionAttributes)) {
+        if ($eventReflectionAttributes === []) {
             throw new RuntimeException(
                 sprintf(
                     'Unable to apply event \'%s\'. Missing attribute \'%s\' in class \'%s\'.',

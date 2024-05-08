@@ -60,7 +60,7 @@ class ClassDivider
     /** @param array<string> $directories */
     public function __construct(readonly array $directories)
     {
-        if (empty($directories)) {
+        if ($directories === []) {
             throw new RuntimeException(
                 sprintf(
                     'No directories configured for %s',
@@ -90,18 +90,23 @@ class ClassDivider
         $this->reflectionClasses->rewind();
 
         foreach ($this->reflectionClasses as $className => $reflectionClass) {
-            $this->addPossibleControllerCommand($className, $reflectionClass)
-            || $this->addPossibleAggregateCommand($className, $reflectionClass)
-            || $this->addPossibleCommand($className, $reflectionClass)
-            || $this->addPossibleQuery($className, $reflectionClass)
-            || $this->addPossibleEvent($className, $reflectionClass)
-            || $this->addPossibleAggregate($className, $reflectionClass)
-            || $this->addPossiblePreProcessor($className, $reflectionClass)
-            || $this->addPossibleListener($className, $reflectionClass)
-            || $this->addPossibleProjector($className, $reflectionClass)
-            || $this->addPossibleType($className, $reflectionClass)
-            || $this->addPossibleDescription($className, $reflectionClass)
-            || $this->addPossibleRepository($className, $reflectionClass);
+            if (
+                $this->addPossibleControllerCommand($className, $reflectionClass)
+                || $this->addPossibleAggregateCommand($className, $reflectionClass)
+                || $this->addPossibleCommand($className, $reflectionClass)
+                || $this->addPossibleQuery($className, $reflectionClass)
+                || $this->addPossibleEvent($className, $reflectionClass)
+                || $this->addPossibleAggregate($className, $reflectionClass)
+                || $this->addPossiblePreProcessor($className, $reflectionClass)
+                || $this->addPossibleListener($className, $reflectionClass)
+                || $this->addPossibleProjector($className, $reflectionClass)
+                || $this->addPossibleType($className, $reflectionClass)
+                || $this->addPossibleDescription($className, $reflectionClass)
+            ) {
+                continue;
+            }
+
+            $this->addPossibleRepository($className, $reflectionClass);
         }
     }
 

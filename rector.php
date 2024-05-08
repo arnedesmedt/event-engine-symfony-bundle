@@ -23,7 +23,7 @@ return RectorConfig::configure()
     ->withPhpSets(php81: true)
     ->withPreparedSets(
         deadCode: true,
-        //        codeQuality: true,
+        codeQuality: true,
         //        codingStyle: true,
         //        typeDeclarations: true,
         //        privatization: true,
@@ -35,8 +35,10 @@ return RectorConfig::configure()
             RemoveUnusedPrivateMethodParameterRector::class,
             RemoveUnusedPrivateMethodRector::class,
             RemoveEmptyClassMethodRector::class,
+
             ReadOnlyPropertyRector::class => [
                 __DIR__ . '/tests',
+                __DIR__ . '/src/Projector/WriteModelStreamProjection.php',
             ],
             FirstClassCallableRector::class => [
                 __DIR__ . '/src/EventEngineFactory.php',

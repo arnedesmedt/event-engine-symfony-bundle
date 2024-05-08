@@ -109,7 +109,7 @@ abstract class DefaultStateRepository implements StateRepository
         int|null $limit = null,
         OrderBy|null $orderBy = null,
     ): array {
-        if ($filter === null) {
+        if (! $filter instanceof Filter) {
             $filter = new AnyFilter();
         }
 
@@ -132,7 +132,7 @@ abstract class DefaultStateRepository implements StateRepository
         int|null $limit = null,
         OrderBy|null $orderBy = null,
     ): array {
-        if ($filter === null) {
+        if (! $filter instanceof Filter) {
             $filter = new AnyFilter();
         }
 
@@ -170,7 +170,7 @@ abstract class DefaultStateRepository implements StateRepository
     /** @inheritDoc */
     public function findDocumentIds(Filter|null $filter = null): array
     {
-        if ($filter === null) {
+        if (! $filter instanceof Filter) {
             $filter = new AnyFilter();
         }
 
@@ -182,7 +182,7 @@ abstract class DefaultStateRepository implements StateRepository
 
     public function countDocuments(Filter|null $filter = null): int
     {
-        if ($filter === null) {
+        if (! $filter instanceof Filter) {
             $filter = new AnyFilter();
         }
 
@@ -282,9 +282,9 @@ abstract class DefaultStateRepository implements StateRepository
     {
         $filter = $this->identifiersToFilter($identifiers);
 
-        return $filter === null
-            ? []
-            : $this->findDocuments($filter);
+        return $filter instanceof Filter
+            ? $this->findDocuments($filter)
+            : [];
     }
 
     /** @inheritDoc */
@@ -309,9 +309,9 @@ abstract class DefaultStateRepository implements StateRepository
     {
         $filter = $this->identifiersToFilter($identifiers);
 
-        return $filter === null
-            ? []
-            : $this->findDocumentStates($filter);
+        return $filter instanceof Filter
+            ? $this->findDocumentStates($filter)
+            : [];
     }
 
     /** @inheritDoc */

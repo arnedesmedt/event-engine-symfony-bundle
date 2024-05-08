@@ -87,7 +87,7 @@ class EventEngineDatabaseSeedCommand extends Command
                     foreach ($eventsPerEventName as $eventClass => $payloads) {
                         foreach ($payloads as $payload) {
                             $event = $eventClass::fromArray($payload);
-                            if ($aggregateAndEventBag === null) {
+                            if (! $aggregateAndEventBag instanceof AggregateAndEventBag) {
                                 $aggregateAndEventBag = $event = new AggregateAndEventBag(
                                     $entityClass::createForSeed(),
                                     $event,

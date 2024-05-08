@@ -51,7 +51,7 @@ class PropertyReflection
     {
         $propertyReflectionType = self::propertyReflectionTypeFromClassAndProperty($class, $property);
 
-        if ($propertyReflectionType === null) {
+        if (! $propertyReflectionType instanceof ReflectionType) {
             return [];
         }
 

@@ -28,18 +28,18 @@ class PropertyDeprecationExtractor
 
         $examples = $this->fromDocBlock($docBlock);
 
-        return empty($examples) ? null : $examples;
+        return $examples ?? null;
     }
 
     private function fromDocBlock(DocBlock|null $docBlock): string|null
     {
-        if ($docBlock === null) {
+        if (! $docBlock instanceof DocBlock) {
             return null;
         }
 
         $deprecatedTags = $docBlock->getTagsByName('deprecated');
 
-        if (empty($deprecatedTags)) {
+        if ($deprecatedTags === []) {
             return null;
         }
 
@@ -54,7 +54,7 @@ class PropertyDeprecationExtractor
         $propertyReflection = PropertyReflection::propertyReflectionFromClassAndProperty($class, $property);
         $deprecatedAttributes = $propertyReflection?->getAttributes(Deprecated::class);
 
-        if (empty($deprecatedAttributes)) {
+        if ($deprecatedAttributes === null || $deprecatedAttributes === []) {
             return null;
         }
 

@@ -11,6 +11,7 @@ use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\SharedLockInterface;
 
 use function sprintf;
 
@@ -48,7 +49,7 @@ final class LockAggregate implements LockAggregateStrategy
         try {
             $result = $this->eventEngine->dispatch($message);
         } finally {
-            if ($lock !== null) {
+            if ($lock instanceof SharedLockInterface) {
                 $lock->release();
                 $this->logger->info(sprintf('Lock released for \'%s\'.', $lockId));
             }

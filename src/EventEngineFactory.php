@@ -113,7 +113,7 @@ final class EventEngineFactory
     {
         $eventEngine = $this->cachedEventEngine();
 
-        if ($eventEngine) {
+        if ($eventEngine instanceof EventEngine) {
             return $eventEngine;
         }
 
@@ -433,7 +433,7 @@ final class EventEngineFactory
         foreach ($events as $eventClass) {
             $commandProcessor
                 ->recordThat($eventClass)
-                ->apply([FlavourHint::class, 'useAggregate']);
+                ->apply(static fn () => FlavourHint::useAggregate());
         }
 
         return $this;
@@ -560,7 +560,7 @@ final class EventEngineFactory
                     ->process($commandClass)
                     ->preProcess($preProcessorClass)
                     ->withNew('test')
-                    ->handle([FlavourHint::class, 'useAggregate']);
+                    ->handle(static fn () => FlavourHint::useAggregate());
             }
         }
 

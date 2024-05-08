@@ -61,7 +61,7 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
      */
     private function messageBag(string $messageClass, array $payload, array $metadata): EventEngineMessage
     {
-        if ($this->eventEngine === null) {
+        if (! $this->eventEngine instanceof EventEngine) {
             throw new RuntimeException('EventEngine is not set');
         }
 

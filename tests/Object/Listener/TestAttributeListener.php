@@ -8,7 +8,7 @@ use ADS\Bundle\EventEngineBundle\Attribute\Listener;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Event\TestAttributeEvent;
 
 #[Listener(
-    eventsToHandle: [ // @phpstan-ignore-line
+    eventsToHandle: [
         TestAttributeEvent::class,
     ],
 )]

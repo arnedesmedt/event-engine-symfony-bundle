@@ -14,7 +14,7 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\State\TestStates;
     version: '1.0.0',
     stateClass: TestState::class,
     statesClass: TestStates::class,
-    eventsToHandle: [ // @phpstan-ignore-line
+    eventsToHandle: [
         TestAttributeEvent::class,
     ],
 )]

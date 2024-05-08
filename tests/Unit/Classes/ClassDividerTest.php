@@ -35,6 +35,13 @@ class ClassDividerTest extends TestCase
         $this->classDivider = new ClassDivider([__DIR__ . '/../../Object/']);
     }
 
+    public function testItThrowsAnExceptionIfNoFoldersAreGiven(): void
+    {
+        $this->expectExceptionMessageMatches('/No directories configured/');
+
+        new ClassDivider([]);
+    }
+
     public function testCommands(): void
     {
         $commands = $this->classDivider->commands();

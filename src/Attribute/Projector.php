@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Attribute;
 
-use ADS\Bundle\EventEngineBundle\Event\Event;
 use Attribute;
 use EventEngine\JsonSchema\JsonSchemaAwareCollection;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
@@ -15,7 +14,7 @@ class Projector
     /**
      * @param class-string<JsonSchemaAwareRecord> $stateClass
      * @param class-string<JsonSchemaAwareCollection> $statesClass
-     * @param array<class-string<Event>> $eventsToHandle
+     * @param array<class-string<JsonSchemaAwareRecord>> $eventsToHandle
      */
     public function __construct(
         private readonly string $name,
@@ -48,7 +47,7 @@ class Projector
         return $this->statesClass;
     }
 
-    /** @return array<class-string<Event>> */
+    /** @return array<class-string<JsonSchemaAwareRecord>> */
     public function eventsToHandle(): array
     {
         return $this->eventsToHandle;

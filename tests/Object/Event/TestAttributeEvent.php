@@ -9,7 +9,7 @@ use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 
 #[Event(
-    applyMethod: 'whenTestAttributeEventAdded', // @phpstan-ignore-line
+    applyMethod: 'whenTestAttributeEventAdded',
 )]
 class TestAttributeEvent implements JsonSchemaAwareRecord
 {

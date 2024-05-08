@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Attribute;
 
-use ADS\Bundle\EventEngineBundle\Event\Event;
 use Attribute;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 
 #[Attribute(Attribute::TARGET_CLASS)]
 class AggregateCommand extends Command
 {
     /**
-     * @param array<class-string<Event>> $eventsToRecord
+     * @param array<class-string<JsonSchemaAwareRecord>> $eventsToRecord
      * @param array<class-string> $contextProviders
      */
     public function __construct(
@@ -33,7 +33,7 @@ class AggregateCommand extends Command
         return $this->aggregateMethod;
     }
 
-    /** @return array<class-string<Event>> */
+    /** @return array<class-string<JsonSchemaAwareRecord>> */
     public function eventsToRecord(): array
     {
         return $this->eventsToRecord;

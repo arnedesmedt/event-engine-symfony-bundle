@@ -9,7 +9,6 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS)]
 class Event
 {
-    /** @param class-string $applyMethod */
     public function __construct(
         private readonly string $applyMethod,
     ) {

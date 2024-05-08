@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Tests\Object\Command;
 
 use ADS\Bundle\EventEngineBundle\Attribute\AggregateCommand;
+use ADS\Bundle\EventEngineBundle\Attribute\Queueable;
 use ADS\Bundle\EventEngineBundle\Tests\Object\ContextProvider\TestContextProvider;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Event\TestAttributeEvent;
 use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
@@ -13,13 +14,21 @@ use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 #[AggregateCommand(
     aggregateIdProperty: 'test',
     aggregateMethod: 'attributeCommand',
-    eventsToRecord: [ // @phpstan-ignore-line
+    eventsToRecord: [
         TestAttributeEvent::class,
     ],
     contextProviders: [
         TestContextProvider::class,
     ],
     newAggregate: true,
+)]
+#[Queueable(
+    queue: true,
+    maxRetries: 10,
+    delayInMilliseconds: 1000,
+    multiplier: 8,
+    maxDelayInMilliseconds: 10 * 60 * 1000,
+    sendToLinkedFailureTransport: false,
 )]
 class TestAttributeAggregateCommand implements JsonSchemaAwareRecord
 {

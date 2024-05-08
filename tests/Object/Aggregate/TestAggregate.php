@@ -48,6 +48,10 @@ class TestAggregate implements AggregateRoot
 
     private function whenTestInterfaceEvent(TestInterfaceEvent $event): void
     {
+        if ($this->deleted()) {
+            return;
+        }
+
         $this->delete();
     }
 }

@@ -14,7 +14,7 @@ use function array_map;
 
 class PropertyDocBlockExtractor
 {
-    private DocBlockFactory $docBlockFactory;
+    private readonly DocBlockFactory $docBlockFactory;
 
     public function __construct()
     {

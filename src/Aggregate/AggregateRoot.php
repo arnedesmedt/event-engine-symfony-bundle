@@ -13,14 +13,9 @@ interface AggregateRoot
     /** @return class-string<JsonSchemaAwareRecord> */
     public static function stateClass(): string;
 
-    /** @return static */
     public static function reconstituteFromHistory(Event ...$domainEvents): static;
 
-    /**
-     * @param array<string, mixed> $state
-     *
-     * @return static
-     */
+    /** @param array<string, mixed> $state */
     public static function reconstituteFromStateArray(array $state): static;
 
     /** @return array<Event> */

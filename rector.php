@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
@@ -33,6 +34,7 @@ return RectorConfig::configure()
         [
             RemoveUnusedPrivateMethodParameterRector::class,
             RemoveUnusedPrivateMethodRector::class,
+            RemoveEmptyClassMethodRector::class,
             ReadOnlyPropertyRector::class => [
                 __DIR__ . '/tests',
             ],

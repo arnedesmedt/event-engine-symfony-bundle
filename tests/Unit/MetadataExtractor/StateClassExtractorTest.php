@@ -66,6 +66,6 @@ class StateClassExtractorTest extends TestCase
 
         $this->expectExceptionMessage('No metadata found');
 
-        $stateClass = $this->stateClassExtractor->fromAggregateRootReflectionClass($reflectionClass);
+        $this->stateClassExtractor->fromAggregateRootReflectionClass($reflectionClass);
     }
 }

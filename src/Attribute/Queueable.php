@@ -16,6 +16,7 @@ class Queueable
         private readonly int $multiplier = 2,
         private readonly int $maxDelayInMilliseconds = 5 * 60 * 1000,
         private readonly bool $sendToLinkedFailureTransport = true,
+        private readonly bool $lowPriority = true,
     ) {
     }
 
@@ -47,5 +48,10 @@ class Queueable
     public function sendToLinkedFailureTransport(): bool
     {
         return $this->sendToLinkedFailureTransport;
+    }
+
+    public function lowPriority(): bool
+    {
+        return $this->lowPriority;
     }
 }

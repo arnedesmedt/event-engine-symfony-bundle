@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Messenger;
 
 use ADS\Bundle\EventEngineBundle\Message\Message;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\Message as EventEngineMessage;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Messaging\MessageDispatcher;
 use EventEngine\Messaging\MessageProducer;
 use EventEngine\Runtime\Flavour;
+use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -36,6 +38,7 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
         private readonly MessageBusInterface $queryBus,
         private readonly Flavour $flavour,
         private readonly EventEngine|null $eventEngine = null,
+        private readonly QueueableExtractor $queueableExtractor,
     ) {
     }
 
@@ -138,11 +141,13 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
 
     private function dispatchMessage(EventEngineMessage $messageToPutOnTheQueue): Envelope
     {
-        $messageToPutOnTheQueue->getMetaOrDefault('lock', false);
+        $messageReflectionClass = new ReflectionClass($messageToPutOnTheQueue);
+        $onLowPriority = $this->queueableExtractor->lowPriorityFromReflectionClass($messageReflectionClass) ?? false;
+
         $bus = $this->queryBus;
 
         if ($messageToPutOnTheQueue->messageType() === EventEngineMessage::TYPE_COMMAND) {
-            if ($messageToPutOnTheQueue instanceof LowPriorityMessage) {
+            if ($onLowPriority) {
                 $bus = $this->commandLowPriorityBus;
             } else {
                 $bus = $this->commandBus;

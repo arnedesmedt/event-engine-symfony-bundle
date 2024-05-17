@@ -32,6 +32,20 @@ class QueueableExtractor
     }
 
     /** @param ReflectionClass<object> $reflectionClass */
+    public function lowPriorityFromReflectionClass(ReflectionClass $reflectionClass): bool|null
+    {
+        /** @var bool|null $lowPriority */
+        $lowPriority = $this->metadataExtractor->needMetadataFromReflectionClass(
+            $reflectionClass,
+            [
+                QueueableAttribute::class => static fn (QueueableAttribute $attribute) => $attribute->lowPriority(),
+            ],
+        );
+
+        return $lowPriority;
+    }
+
+    /** @param ReflectionClass<object> $reflectionClass */
     public function maxRetriesFromReflectionClass(ReflectionClass $reflectionClass): int
     {
         /** @var int $maxRetries */

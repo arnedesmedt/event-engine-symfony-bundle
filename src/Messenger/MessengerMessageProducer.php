@@ -31,6 +31,7 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
 
     public function __construct(
         private readonly MessageBusInterface $commandBus,
+        private readonly MessageBusInterface $commandLowPriorityBus,
         private readonly MessageBusInterface $eventBus,
         private readonly MessageBusInterface $queryBus,
         private readonly Flavour $flavour,
@@ -92,12 +93,7 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
         }
 
         try {
-            /** @var Envelope $envelop */
-            $envelop = match ($messageToPutOnTheQueue->messageType()) {
-                EventEngineMessage::TYPE_COMMAND => $this->commandBus->dispatch($messageToPutOnTheQueue),
-                EventEngineMessage::TYPE_EVENT => $this->eventBus->dispatch($messageToPutOnTheQueue),
-                default => $this->queryBus->dispatch($messageToPutOnTheQueue),
-            };
+            $envelop = $this->dispatchMessage($messageToPutOnTheQueue);
         } catch (HandlerFailedException $exception) {
             while ($exception instanceof HandlerFailedException) {
                 /** @var Throwable $exception */
@@ -138,5 +134,23 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
         $messageClass = $messageToPutOnTheQueue->messageName();
 
         return is_a($messageClass, Queueable::class, true) && $messageClass::__queue();
+    }
+
+    private function dispatchMessage(EventEngineMessage $messageToPutOnTheQueue): Envelope
+    {
+        $messageToPutOnTheQueue->getMetaOrDefault('lock', false);
+        $bus = $this->queryBus;
+
+        if ($messageToPutOnTheQueue->messageType() === EventEngineMessage::TYPE_COMMAND) {
+            if ($messageToPutOnTheQueue instanceof LowPriorityMessage) {
+                $bus = $this->commandLowPriorityBus;
+            } else {
+                $bus = $this->commandBus;
+            }
+        } elseif ($messageToPutOnTheQueue->messageType() === EventEngineMessage::TYPE_EVENT) {
+            $bus = $this->eventBus;
+        }
+
+        return $bus->dispatch($messageToPutOnTheQueue);
     }
 }

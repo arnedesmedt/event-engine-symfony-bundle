@@ -117,6 +117,18 @@ final class ADSEventEngineBundle extends AbstractBundle
                             'check_delayed_interval' => 0,
                         ],
                     ],
+                    'command.low-priority' => [
+                        'dsn' => $eventEngineConfig['messenger']['command']['transport']
+                            ?? 'doctrine://default?table_name=messenger_commands&queue_name=low-priority',
+                        'retry_strategy' => [
+                            'service' => $eventEngineConfig['messenger']['command']['retry'] ?? CommandRetry::class,
+                        ],
+                        'failure_transport' => 'command.failed',
+                        'options' => [
+                            'use_notify' => true,
+                            'check_delayed_interval' => 0,
+                        ],
+                    ],
                     'command.failed' => ['dsn' => 'doctrine://default?table_name=messenger_commands&queue_name=failed'],
                     'event' => [
                         'dsn' => $eventEngineConfig['messenger']['event']['transport']
@@ -156,6 +168,7 @@ final class ADSEventEngineBundle extends AbstractBundle
 
     /**
      * phpcs:ignore Generic.Files.LineLength.TooLong
+     *
      * @param array{"event_store": array{"transactional": bool}, "messenger": array<string, array<string, string>>, "document_store": array{"prefix": string, "id": array{"schema": string}, "transactional": bool}, "entity_namespace": string, "pdo_dsn": string, "seed_path": string, "directories": array<string>} $config
      */
     public function loadExtension(

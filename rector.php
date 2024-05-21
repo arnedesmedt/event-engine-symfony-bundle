@@ -28,8 +28,8 @@ return RectorConfig::configure()
         codingStyle: true,
         typeDeclarations: true,
         privatization: true,
-        //        instanceOf: true,
-        //        earlyReturn: true,
+        instanceOf: true,
+        earlyReturn: true,
     )
     ->withSkip(
         [

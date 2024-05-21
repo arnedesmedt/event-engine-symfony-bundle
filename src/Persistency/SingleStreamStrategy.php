@@ -108,7 +108,7 @@ EOT;
         $schema = $this->extractSchema($table);
 
         if ($schema) {
-            $table = $schema . '.' . $table;
+            return $schema . '.' . $table;
         }
 
         return $table;

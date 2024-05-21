@@ -102,19 +102,47 @@ class ClassDivider
         $this->reflectionClasses->rewind();
 
         foreach ($this->reflectionClasses as $className => $reflectionClass) {
-            if (
-                $this->addPossibleControllerCommand($className, $reflectionClass)
-                || $this->addPossibleAggregateCommand($className, $reflectionClass)
-                || $this->addPossibleCommand($className, $reflectionClass)
-                || $this->addPossibleQuery($className, $reflectionClass)
-                || $this->addPossibleEvent($className, $reflectionClass)
-                || $this->addPossibleAggregate($className, $reflectionClass)
-                || $this->addPossiblePreProcessor($className, $reflectionClass)
-                || $this->addPossibleListener($className, $reflectionClass)
-                || $this->addPossibleProjector($className, $reflectionClass)
-                || $this->addPossibleType($className, $reflectionClass)
-                || $this->addPossibleDescription($className, $reflectionClass)
-            ) {
+            if ($this->addPossibleControllerCommand($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossibleAggregateCommand($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossibleCommand($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossibleQuery($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossibleEvent($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossibleAggregate($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossiblePreProcessor($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossibleListener($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossibleProjector($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossibleType($className, $reflectionClass)) {
+                continue;
+            }
+
+            if ($this->addPossibleDescription($className, $reflectionClass)) {
                 continue;
             }
 

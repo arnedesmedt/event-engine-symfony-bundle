@@ -63,7 +63,11 @@ class PropertyReflection
         $propertyTypeReflectionClasses = [];
 
         foreach ($namedReflectionTypes as $namedReflectionType) {
-            if (! $namedReflectionType instanceof ReflectionNamedType || $namedReflectionType->isBuiltin()) {
+            if (! $namedReflectionType instanceof ReflectionNamedType) {
+                continue;
+            }
+
+            if ($namedReflectionType->isBuiltin()) {
                 continue;
             }
 

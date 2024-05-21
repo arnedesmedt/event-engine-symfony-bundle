@@ -129,8 +129,11 @@ class ClassMapper
                 $commandType = reset($commandTypes);
                 /** @var class-string<JsonSchemaAwareRecord>|null $commandClass */
                 $commandClass = $commandType?->getName();
+                if ($commandClass === null) {
+                    continue;
+                }
 
-                if ($commandClass === null || ! class_exists($commandClass)) {
+                if (! class_exists($commandClass)) {
                     continue;
                 }
 

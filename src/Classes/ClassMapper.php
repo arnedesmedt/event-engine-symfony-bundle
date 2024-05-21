@@ -286,7 +286,7 @@ class ClassMapper
 
         $this->commandPreProcessorMapping = array_map(
             static fn (array $preProcessors): array => array_map(
-                static fn (array $preProcessor) => $preProcessor['preProcessor'],
+                static fn (array $preProcessor): string => $preProcessor['preProcessor'],
                 $preProcessors,
             ),
             $mapping,

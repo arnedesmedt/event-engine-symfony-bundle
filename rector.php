@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
@@ -34,6 +35,7 @@ return RectorConfig::configure()
         [
             RemoveUnusedPrivateMethodParameterRector::class,
             RemoveUnusedPrivateMethodRector::class,
+            CallableThisArrayToAnonymousFunctionRector::class,
             RemoveEmptyClassMethodRector::class,
 
             ReadOnlyPropertyRector::class => [

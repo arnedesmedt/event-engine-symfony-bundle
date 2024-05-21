@@ -15,6 +15,7 @@ use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
 use ADS\JsonImmutableObjects\MetadataExtractor\JsonSchemaExtractor;
+use Closure;
 use EventEngine\Commanding\CommandProcessorDescription;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;
@@ -512,15 +513,15 @@ final class EventEngineFactory
      * @param class-string<AggregateRoot<JsonSchemaAwareRecord>> $aggregateRootClass
      * @param ReflectionClass<JsonSchemaAwareRecord> $aggregateCommandReflectionClass
      *
-     * @return array{class-string, string}&callable
+     * @return array{class-string, string}|Closure
      */
     private function handle(
         string $aggregateRootClass,
         ReflectionClass $aggregateCommandReflectionClass,
         bool $newAggregateRoot,
-    ): array {
+    ): array|Closure {
         if (! $newAggregateRoot) {
-            return [FlavourHint::class, 'useAggregate'];
+            return static fn () => FlavourHint::useAggregate();
         }
 
         $aggregateMethod = $this->aggregateCommandExtractor->aggregateMethodFromReflectionClass(

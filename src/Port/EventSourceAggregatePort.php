@@ -146,7 +146,7 @@ final class EventSourceAggregatePort implements Port
         return $aggregateClass::reconstituteFromStateArray($state);
     }
 
-    protected function aggregateClassByType(string $aggregateType): string
+    private function aggregateClassByType(string $aggregateType): string
     {
         return $aggregateType;
     }

@@ -60,7 +60,7 @@ final class EventSourceAggregatePort implements Port
         if (! method_exists($aggregate, $method)) {
             throw new RuntimeException(
                 sprintf(
-                    'Aggregate \'%s\' has no method \'%s\'.',
+                    "Aggregate '%s' has no method '%s'.",
                     $aggregate::class,
                     $method,
                 ),
@@ -82,7 +82,7 @@ final class EventSourceAggregatePort implements Port
         if (! $aggregate instanceof AggregateRoot) {
             throw new RuntimeException(
                 sprintf(
-                    'Cannot apply event. Given aggregate is not an instance of \'%s\'. Got \'%s\'.',
+                    "Cannot apply event. Given aggregate is not an instance of '%s'. Got '%s'.",
                     AggregateRoot::class,
                     get_debug_type($aggregate),
                 ),
@@ -102,7 +102,7 @@ final class EventSourceAggregatePort implements Port
         if (! $aggregate instanceof AggregateRoot) {
             throw new RuntimeException(
                 sprintf(
-                    'Cannot apply event. Given aggregate is not an instance of \'%s\'. Got \'%s\'',
+                    "Cannot apply event. Given aggregate is not an instance of '%s'. Got '%s'",
                     AggregateRoot::class,
                     get_debug_type($aggregate),
                 ),
@@ -118,7 +118,7 @@ final class EventSourceAggregatePort implements Port
         if (! $aggregate instanceof AggregateRoot) {
             throw new RuntimeException(
                 sprintf(
-                    'Cannot serialize aggregate. Given aggregate is not an instance of \'%s\'. Got \'%s\'',
+                    "Cannot serialize aggregate. Given aggregate is not an instance of '%s'. Got '%s'",
                     AggregateRoot::class,
                     get_debug_type($aggregate),
                 ),

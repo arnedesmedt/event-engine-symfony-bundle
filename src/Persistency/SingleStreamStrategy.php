@@ -32,7 +32,7 @@ final class SingleStreamStrategy implements PostgresPersistenceStrategy
         $tableName = $this->quoteIdent($tableName);
 
         $statement = <<<EOT
-CREATE TABLE $tableName (
+CREATE TABLE {$tableName} (
     no BIGSERIAL,
     event_id UUID NOT NULL,
     event_name VARCHAR(255) NOT NULL,
@@ -48,12 +48,12 @@ CREATE TABLE $tableName (
 EOT;
 
         $index1 = <<<EOT
-CREATE UNIQUE INDEX ON $tableName
+CREATE UNIQUE INDEX ON {$tableName}
 ((metadata->>'_aggregate_type'), (metadata->>'_aggregate_id'), (metadata->>'_aggregate_version'));
 EOT;
 
         $index2 = <<<EOT
-CREATE INDEX ON $tableName
+CREATE INDEX ON {$tableName}
 ((metadata->>'_aggregate_type'), (metadata->>'_aggregate_id'), no);
 EOT;
 

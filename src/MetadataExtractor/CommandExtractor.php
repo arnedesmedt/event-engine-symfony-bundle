@@ -63,7 +63,7 @@ class CommandExtractor
         if (! $firstParameter) {
             throw new RuntimeException(
                 sprintf(
-                    '__invoke method of PreProcessor \'%s\' has no parameters.',
+                    "__invoke method of PreProcessor '%s' has no parameters.",
                     $reflectionClass->getName(),
                 ),
             );
@@ -87,7 +87,7 @@ class CommandExtractor
         if (empty($commandClasses)) {
             throw new RuntimeException(
                 sprintf(
-                    'PreProcessor \'%s\' has no linked commands.',
+                    "PreProcessor '%s' has no linked commands.",
                     $reflectionClass->getName(),
                 ),
             );

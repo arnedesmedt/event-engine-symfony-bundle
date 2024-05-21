@@ -32,28 +32,40 @@ class ClassDivider
 {
     /** @var Iterator<class-string, ReflectionClass<object>> */
     private readonly Iterator $reflectionClasses;
+
     /** @var array<class-string<JsonSchemaAwareRecord>, ReflectionClass<JsonSchemaAwareRecord>> */
     private array $commands;
+
     /** @var array<class-string<JsonSchemaAwareRecord>, ReflectionClass<JsonSchemaAwareRecord>> */
     private array $controllerCommands;
+
     /** @var array<class-string<JsonSchemaAwareRecord>, ReflectionClass<JsonSchemaAwareRecord>> */
     private array $aggregateCommands;
+
     /** @var array<class-string<JsonSchemaAwareRecord>, ReflectionClass<JsonSchemaAwareRecord>> */
     private array $queries;
+
     /** @var array<class-string<JsonSchemaAwareRecord>, ReflectionClass<JsonSchemaAwareRecord>> */
     private array $events;
+
     /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, ReflectionClass<AggregateRoot<JsonSchemaAwareRecord>>> */
     private array $aggregates;
+
     /** @var array<class-string, ReflectionClass<object>> */
     private array $preProcessors;
+
     /** @var array<class-string, ReflectionClass<object>> */
     private array $listeners;
+
     /** @var array<class-string<JsonSchemaAwareRecord>, ReflectionClass<JsonSchemaAwareRecord>> */
     private array $types;
+
     /** @var array<class-string, ReflectionClass<object>> */
     private array $projectors;
+
     /** @var array<class-string<EventEngineDescription>, ReflectionClass<EventEngineDescription>> */
     private array $descriptions;
+
     /** @var array<class-string<StateRepository<IterableListValue<object>, JsonSchemaAwareRecord, ValueObject>>, ReflectionClass<StateRepository<IterableListValue<object>, JsonSchemaAwareRecord, ValueObject>>> */
     private array $repositories;
 

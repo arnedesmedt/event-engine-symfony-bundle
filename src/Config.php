@@ -15,6 +15,7 @@ use function preg_match;
 final class Config implements CacheClearerInterface
 {
     public const CONFIG = 'config';
+
     public const AGGREGATE_IDENTIFIERS = 'aggregateIdentifiers';
 
     /** @var array<string, array<string, string>>|null */

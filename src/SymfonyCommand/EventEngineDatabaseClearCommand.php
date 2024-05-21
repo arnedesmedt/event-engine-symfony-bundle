@@ -36,7 +36,7 @@ class EventEngineDatabaseClearCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (str_contains($this->environment, 'prod')) {
-            $io->comment('You can\'t reset the database in production.');
+            $io->comment("You can't reset the database in production.");
 
             return Command::SUCCESS;
         }

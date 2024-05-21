@@ -50,7 +50,7 @@ class EventEngineDatabaseSeedCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (str_contains($this->environment, 'prod')) {
-            $io->comment('You can\'t seed the database in production.');
+            $io->comment("You can't seed the database in production.");
 
             return Command::SUCCESS;
         }
@@ -88,10 +88,11 @@ class EventEngineDatabaseSeedCommand extends Command
                         foreach ($payloads as $payload) {
                             $event = $eventClass::fromArray($payload);
                             if (! $aggregateAndEventBag instanceof AggregateAndEventBag) {
-                                $aggregateAndEventBag = $event = new AggregateAndEventBag(
+                                $aggregateAndEventBag = new AggregateAndEventBag(
                                     $entityClass::createForSeed(),
                                     $event,
                                 );
+                                $event = $aggregateAndEventBag;
                             }
 
                             $aggregate->recordThat(

@@ -15,7 +15,7 @@ final class ResponseException
     {
         return new RuntimeException(
             sprintf(
-                'Could not found a response with status code \'%d\' for message \'%s\'.',
+                "Could not found a response with status code '%d' for message '%s'.",
                 $statusCode,
                 $class,
             ),
@@ -27,7 +27,7 @@ final class ResponseException
     {
         return new RuntimeException(
             sprintf(
-                'No responses found for message \'%s\'.',
+                "No responses found for message '%s'.",
                 $class,
             ),
         );

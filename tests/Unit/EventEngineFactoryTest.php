@@ -64,6 +64,7 @@ class EventEngineFactoryTest extends TestCase
     ];
 
     private MockObject $cache;
+
     private ContainerInterface $container;
 
     private EventEngineFactory $eventEngineFactory;

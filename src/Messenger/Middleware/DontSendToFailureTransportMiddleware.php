@@ -49,22 +49,22 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
     {
         try {
             return $stack->next()->handle($envelope, $stack);
-        } catch (HandlerFailedException $e) {
+        } catch (HandlerFailedException $handlerFailedException) {
             /** @var EventEngineMessage|Message $message */
             $message = $envelope->getMessage();
 
             // Send sync for normal message
             if ($message instanceof Message && ! ($message instanceof Queueable && $message::__queue())) {
-                throw $e;
+                throw $handlerFailedException;
             }
 
             // Send sync for event engine message that contains the async metadata flag.
             if ($message instanceof EventEngineMessage && ! $message->getMetaOrDefault('async', false)) {
-                throw $e;
+                throw $handlerFailedException;
             }
 
-            if ($this->shouldRetry($e, $envelope)) {
-                throw $e;
+            if ($this->shouldRetry($handlerFailedException, $envelope)) {
+                throw $handlerFailedException;
             }
 
             $message = ($this->messageFromEnvelope)($envelope);
@@ -85,7 +85,7 @@ class DontSendToFailureTransportMiddleware implements MiddlewareInterface
             );
 
             if ($queueu && $sendToLinkedFailureTransport) {
-                throw $e;
+                throw $handlerFailedException;
             }
 
             return $envelope;

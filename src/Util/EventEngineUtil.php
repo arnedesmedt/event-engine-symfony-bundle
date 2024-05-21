@@ -37,8 +37,8 @@ final class EventEngineUtil
         if ($stateClassByReturnType !== $stateClass) {
             throw new RuntimeException(
                 sprintf(
-                    'The state classes found (by property (\'%s\') and by namespace (\'%s\')) ' .
-                    'for aggregate root \'%s\' don\'t match.',
+                    "The state classes found (by property ('%s') and by namespace ('%s')) " .
+                    "for aggregate root '%s' don't match.",
                     $stateClassByReturnType,
                     $stateClass,
                     $aggregateRootClass,
@@ -81,7 +81,7 @@ final class EventEngineUtil
         if ($replaced === null) {
             throw new RuntimeException(
                 sprintf(
-                    'Couldn\'t convert the aggregate class \'%s\' into a state class',
+                    "Couldn't convert the aggregate class '%s' into a state class",
                     $aggregateClass,
                 ),
             );

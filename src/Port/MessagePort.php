@@ -74,7 +74,7 @@ final class MessagePort implements Port
 
         throw new RuntimeException(
             sprintf(
-                'Invalid message passed to \'%s\'. This should be an immutable record but got \'%s\' instead.',
+                "Invalid message passed to '%s'. This should be an immutable record but got '%s' instead.",
                 __METHOD__,
                 get_debug_type($customMessage),
             ),
@@ -138,7 +138,7 @@ final class MessagePort implements Port
 
         throw new RuntimeException(
             sprintf(
-                'Unknown command. Cannot get the aggregate id from command \'%s\'.',
+                "Unknown command. Cannot get the aggregate id from command '%s'.",
                 $command::class,
             ),
         );

@@ -54,6 +54,7 @@ final class EventEngineFactory
     ];
 
     private readonly string $environment;
+
     private readonly JsonSchemaExtractor $jsonSchemaExtractor;
 
     /**
@@ -209,7 +210,7 @@ final class EventEngineFactory
 
         throw new RuntimeException(
             sprintf(
-                'Response class \'%s\' is not a JsonSchemaAwareRecord or JsonSchemaAwareCollection.',
+                "Response class '%s' is not a JsonSchemaAwareRecord or JsonSchemaAwareCollection.",
                 $responseClass,
             ),
         );
@@ -354,7 +355,7 @@ final class EventEngineFactory
             if (! isset($aggregateMapping[$aggregateCommandClass])) {
                 throw new RuntimeException(
                     sprintf(
-                        'No aggregate root found for aggregate command \'%s\'.',
+                        "No aggregate root found for aggregate command '%s'.",
                         $aggregateCommandClass,
                     ),
                 );
@@ -410,7 +411,7 @@ final class EventEngineFactory
         if (! isset($aggregateIdentifierMapping[$aggregateRootClass])) {
             throw new RuntimeException(
                 sprintf(
-                    'No aggregate identifier found for aggregate root \'%s\'.',
+                    "No aggregate identifier found for aggregate root '%s'.",
                     $aggregateRootClass,
                 ),
             );
@@ -450,7 +451,7 @@ final class EventEngineFactory
         if (! isset($commandContextProviderMapping[$commandClass])) {
             throw new RuntimeException(
                 sprintf(
-                    'No context providers found for command \'%s\'.',
+                    "No context providers found for command '%s'.",
                     $commandClass,
                 ),
             );
@@ -475,7 +476,7 @@ final class EventEngineFactory
         if (! isset($commandServiceMapping[$commandClass])) {
             throw new RuntimeException(
                 sprintf(
-                    'No services found for command \'%s\'.',
+                    "No services found for command '%s'.",
                     $commandClass,
                 ),
             );
@@ -539,7 +540,7 @@ final class EventEngineFactory
 
         throw new RuntimeException(
             sprintf(
-                'Aggregate method \'%s\' for aggregate root \'%s\' is not callable.',
+                "Aggregate method '%s' for aggregate root '%s' is not callable.",
                 $aggregateMethod,
                 $aggregateRootClass,
             ),

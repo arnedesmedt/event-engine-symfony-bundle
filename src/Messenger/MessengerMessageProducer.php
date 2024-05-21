@@ -24,9 +24,11 @@ use function reset;
 final class MessengerMessageProducer implements MessageProducer, MessageDispatcher
 {
     public const ASYNC_METADATA = ['async' => true];
+
     public const NO_ASYNC_METADATA = ['async' => false];
 
     public const LOCK = ['lock' => true];
+
     public const NO_LOCK = ['lock' => false];
 
     public function __construct(
@@ -100,13 +102,15 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
                 EventEngineMessage::TYPE_EVENT => $this->eventBus->dispatch($messageToPutOnTheQueue),
                 default => $this->queryBus->dispatch($messageToPutOnTheQueue),
             };
-        } catch (HandlerFailedException $exception) {
-            while ($exception instanceof HandlerFailedException) {
-                /** @var Throwable $exception */
-                $exception = $exception->getPrevious();
+        } catch (HandlerFailedException $handlerFailedException) {
+            while (
+                $handlerFailedException instanceof HandlerFailedException
+                && $handlerFailedException->getPrevious() !== null
+            ) {
+                $handlerFailedException = $handlerFailedException->getPrevious();
             }
 
-            throw $exception;
+            throw $handlerFailedException;
         }
 
         $handledStamps = $envelop->all(HandledStamp::class);

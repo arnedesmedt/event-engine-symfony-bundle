@@ -221,7 +221,7 @@ abstract class DefaultStateRepository implements StateRepository
         if ($document === null) {
             $exception ??= new NotFoundHttpException(
                 sprintf(
-                    'Resource with id \'%s\' not found in document store \'%s\'',
+                    "Resource with id '%s' not found in document store '%s'",
                     (string) $identifier,
                     $this->documentStoreName,
                 ),
@@ -243,7 +243,7 @@ abstract class DefaultStateRepository implements StateRepository
         if ($state === null) {
             $exception ??= new NotFoundHttpException(
                 sprintf(
-                    'Resource with id \'%s\' not found in document store \'%s\'',
+                    "Resource with id '%s' not found in document store '%s'",
                     (string) $identifier,
                     $this->documentStoreName,
                 ),
@@ -268,7 +268,7 @@ abstract class DefaultStateRepository implements StateRepository
 
         $exception ??= new ConflictHttpException(
             sprintf(
-                'Resource with id \'%s\' already exists in document store \'%s\'',
+                "Resource with id '%s' already exists in document store '%s'",
                 (string) $identifier,
                 $this->documentStoreName,
             ),
@@ -295,7 +295,7 @@ abstract class DefaultStateRepository implements StateRepository
         if (count($documents) !== count($identifiers)) {
             throw $exception ?? new NotFoundHttpException(
                 sprintf(
-                    'One of the identifiers is not found: \'%s\'.',
+                    "One of the identifiers is not found: '%s'.",
                     json_encode($this->identifiersToScalars($identifiers), JSON_THROW_ON_ERROR),
                 ),
             );
@@ -322,7 +322,7 @@ abstract class DefaultStateRepository implements StateRepository
         if (count($documentStates) !== count($identifiers)) {
             throw $exception ?? new NotFoundHttpException(
                 sprintf(
-                    'One of the identifiers is not found: \'%s\'.',
+                    "One of the identifiers is not found: '%s'.",
                     json_encode($this->identifiersToScalars($identifiers), JSON_THROW_ON_ERROR),
                 ),
             );
@@ -388,7 +388,7 @@ abstract class DefaultStateRepository implements StateRepository
 
         if ($identifiersClass === null) {
             throw new RuntimeException(
-                sprintf('Could not found identifiers class for repository \'%s\'.', static::class),
+                sprintf("Could not found identifiers class for repository '%s'.", static::class),
             );
         }
 

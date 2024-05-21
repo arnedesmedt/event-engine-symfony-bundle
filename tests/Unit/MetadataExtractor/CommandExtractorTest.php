@@ -58,7 +58,7 @@ class CommandExtractorTest extends TestCase
         $reflectionClass = new ReflectionClass(TestPreProcessorWithoutCommands::class);
 
         $this->expectExceptionMessage(sprintf(
-            '__invoke method of PreProcessor \'%s\' has no parameters.',
+            "__invoke method of PreProcessor '%s' has no parameters.",
             TestPreProcessorWithoutCommands::class,
         ));
 
@@ -70,7 +70,7 @@ class CommandExtractorTest extends TestCase
         $reflectionClass = new ReflectionClass(TestPreProcessorWithoutType::class);
 
         $this->expectExceptionMessage(sprintf(
-            'PreProcessor \'%s\' has no linked commands.',
+            "PreProcessor '%s' has no linked commands.",
             TestPreProcessorWithoutType::class,
         ));
 

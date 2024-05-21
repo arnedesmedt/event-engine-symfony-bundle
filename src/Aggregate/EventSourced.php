@@ -73,7 +73,7 @@ trait EventSourced
         if (! method_exists($this, $whenMethod)) {
             throw new RuntimeException(
                 sprintf(
-                    'Unable to apply event \'%s\'. Missing method \'%s\' in class \'%s\'.',
+                    "Unable to apply event '%s'. Missing method '%s' in class '%s'.",
                     $event::class,
                     $whenMethod,
                     static::class,
@@ -98,7 +98,7 @@ trait EventSourced
         if ($eventReflectionAttributes === []) {
             throw new RuntimeException(
                 sprintf(
-                    'Unable to apply event \'%s\'. Missing attribute \'%s\' in class \'%s\'.',
+                    "Unable to apply event '%s'. Missing attribute '%s' in class '%s'.",
                     $event::class,
                     \ADS\Bundle\EventEngineBundle\Attribute\Event::class,
                     static::class,
@@ -156,7 +156,7 @@ trait EventSourced
 
         throw new RuntimeException(
             sprintf(
-                'You have to override the aggregateId method for aggregate root \'%s\'.',
+                "You have to override the aggregateId method for aggregate root '%s'.",
                 static::class,
             ),
         );

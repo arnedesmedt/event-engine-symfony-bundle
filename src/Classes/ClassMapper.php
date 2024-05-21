@@ -34,14 +34,19 @@ class ClassMapper
 {
     /** @var array<class-string<JsonSchemaAwareRecord>, class-string<AggregateRoot<JsonSchemaAwareRecord>>> */
     private array $commandAggregateMapping = [];
+
     /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string<JsonSchemaAwareRecord>>> */
     private array $commandEventMapping = [];
+
     /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string|string>> */
     private array $commandServiceMapping = [];
+
     /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string>> */
     private array $commandContextProviderMapping = [];
+
     /** @var array<class-string<JsonSchemaAwareRecord>, array<class-string>> */
     private array $commandPreProcessorMapping = [];
+
     /** @var array<class-string<AggregateRoot<JsonSchemaAwareRecord>>, string> */
     private array $aggregateIdentifierMapping = [];
 
@@ -244,7 +249,7 @@ class ClassMapper
             if ($commandClasses === []) {
                 throw new RuntimeException(
                     sprintf(
-                        'PreProcessor \'%s\' has no commands.',
+                        "PreProcessor '%s' has no commands.",
                         $preProcessorReflectionClass->getName(),
                     ),
                 );
@@ -254,7 +259,7 @@ class ClassMapper
                 if (! in_array($commandClass, $this->commands)) {
                     throw new RuntimeException(
                         sprintf(
-                            'PreProcessor \'%s\' has command \'%s\' which is not a command.',
+                            "PreProcessor '%s' has command '%s' which is not a command.",
                             $preProcessorReflectionClass->getName(),
                             $commandClass,
                         ),

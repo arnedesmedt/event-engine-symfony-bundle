@@ -112,7 +112,7 @@ final class PropertyTypeExtractor implements PropertyTypeExtractorInterface
             $reflectionClass->implementsInterface(ImmutableRecord::class) => Type::BUILTIN_TYPE_OBJECT,
             default => throw new RuntimeException(
                 sprintf(
-                    'No symfony type mapping found for class \'%s\'.',
+                    "No symfony type mapping found for class '%s'.",
                     $reflectionClass->getName(),
                 ),
             )

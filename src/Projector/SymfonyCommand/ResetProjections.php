@@ -31,6 +31,7 @@ final class ResetProjections extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Reset projectors');
+
         $projectionNames = $this->projectionManager->fetchProjectionNames(null);
 
         $io->note(sprintf('I found %d projectors (streams) to reset', count($projectionNames)));

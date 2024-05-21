@@ -165,7 +165,7 @@ final class EventEnginePass implements CompilerPassInterface
             if (! $container->hasDefinition($serviceToMakePublic)) {
                 throw new RuntimeException(
                     sprintf(
-                        'Service \'%s\' can\'t be made public because it\'s not found.',
+                        "Service '%s' can't be made public because it's not found.",
                         $serviceToMakePublic,
                     ),
                 );

@@ -15,7 +15,7 @@ final class MessageException extends Exception
     {
         return new self(
             sprintf(
-                'Could not find a %s for message \'%s\'.',
+                "Could not find a %s for message '%s'.",
                 $type,
                 $message,
             ),
@@ -26,7 +26,7 @@ final class MessageException extends Exception
     {
         return new self(
             sprintf(
-                'The message \'%s\' has a nested folder structure for the directory \'%s\'.',
+                "The message '%s' has a nested folder structure for the directory '%s'.",
                 $class,
                 $folder,
             ),

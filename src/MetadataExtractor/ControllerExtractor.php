@@ -29,7 +29,7 @@ class ControllerExtractor
             [
                 ControllerCommandAttribute::class => static fn (
                     ControllerCommandAttribute $attribute,
-                ) => $attribute->controller(),
+                ): string => $attribute->controller(),
                 /** @param class-string<ControllerCommand> $class */
                 ControllerCommand::class => static fn (string $class) => $class::__controller(),
             ],

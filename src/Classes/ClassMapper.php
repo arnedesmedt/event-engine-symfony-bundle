@@ -142,7 +142,7 @@ class ClassMapper
 
                 $commandTypes = array_filter(
                     $commandTypes,
-                    fn ($type) => $type instanceof ReflectionNamedType
+                    fn ($type): bool => $type instanceof ReflectionNamedType
                         && in_array($type->getName(), $this->aggregateCommands)
                 );
 
@@ -203,7 +203,7 @@ class ClassMapper
         return array_unique(
             array_map(
                 /** @param class-string<JsonSchemaAwareRecord> $eventClass */
-                fn (string $eventClass) => $this->aggregateRootClassFromEventClass($eventClass),
+                fn (string $eventClass): string => $this->aggregateRootClassFromEventClass($eventClass),
                 $eventClasses,
             ),
         );
@@ -280,12 +280,12 @@ class ClassMapper
         foreach ($mapping as &$preProcessors) {
             usort(
                 $preProcessors,
-                static fn (array $a, array $b) => $a['priority'] <=> $b['priority'],
+                static fn (array $a, array $b): int => $a['priority'] <=> $b['priority'],
             );
         }
 
         $this->commandPreProcessorMapping = array_map(
-            static fn (array $preProcessors) => array_map(
+            static fn (array $preProcessors): array => array_map(
                 static fn (array $preProcessor) => $preProcessor['preProcessor'],
                 $preProcessors,
             ),

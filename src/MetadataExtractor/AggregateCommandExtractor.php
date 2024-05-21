@@ -27,7 +27,7 @@ class AggregateCommandExtractor
             [
                 AggregateCommandAttribute::class => static fn (
                     AggregateCommandAttribute $attribute,
-                ) => $attribute->newAggregate(),
+                ): bool => $attribute->newAggregate(),
                 /** @param class-string<AggregateCommand> $class */
                 AggregateCommand::class => static fn (string $class) => $class::__newAggregate(),
             ],
@@ -45,7 +45,7 @@ class AggregateCommandExtractor
             [
                 AggregateCommandAttribute::class => static fn (
                     AggregateCommandAttribute $attribute,
-                ) => $attribute->aggregateMethod(),
+                ): string => $attribute->aggregateMethod(),
                 /** @param class-string<AggregateCommand> $class */
                 AggregateCommand::class => static fn (string $class) => $class::__aggregateMethod(),
             ],
@@ -67,7 +67,7 @@ class AggregateCommandExtractor
             [
                 AggregateCommandAttribute::class => static fn (
                     AggregateCommandAttribute $attribute,
-                ) => $attribute->contextProviders(),
+                ): array => $attribute->contextProviders(),
                 /** @param class-string<AggregateCommand> $class */
                 AggregateCommand::class => static fn (string $class) => $class::__contextProviders(),
             ],
@@ -88,7 +88,7 @@ class AggregateCommandExtractor
                 ) => $aggregateCommand->toArray()[$attribute->aggregateIdProperty()],
                 AggregateCommand::class => static fn (
                     AggregateCommand $aggregateCommand,
-                ) => $aggregateCommand->__aggregateId(),
+                ): string => $aggregateCommand->__aggregateId(),
             ],
         );
 

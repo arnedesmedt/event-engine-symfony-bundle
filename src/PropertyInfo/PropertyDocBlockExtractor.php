@@ -52,7 +52,7 @@ class PropertyDocBlockExtractor
 
         return array_filter(
             array_map(
-                function (ReflectionClass $typeReflectionClass) {
+                function (ReflectionClass $typeReflectionClass): DocBlock|null {
                     try {
                         return $this->docBlockFactory->create($typeReflectionClass);
                     } catch (InvalidArgumentException) {

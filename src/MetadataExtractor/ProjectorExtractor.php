@@ -25,7 +25,7 @@ class ProjectorExtractor
             [
                 /** @param class-string<Projector> $class */
                 Projector::class => static fn (string $class) => $class::projectionName(),
-                ProjectorAttribute::class => static fn (ProjectorAttribute $projector) => $projector->name(),
+                ProjectorAttribute::class => static fn (ProjectorAttribute $projector): string => $projector->name(),
             ],
         );
 
@@ -41,7 +41,7 @@ class ProjectorExtractor
             [
                 /** @param class-string<Projector> $class */
                 Projector::class => static fn (string $class) => $class::version(),
-                ProjectorAttribute::class => static fn (ProjectorAttribute $projector) => $projector->version(),
+                ProjectorAttribute::class => static fn (ProjectorAttribute $projector): string => $projector->version(),
             ],
         );
 

@@ -47,7 +47,7 @@ final class PropertyTypeExtractor implements PropertyTypeExtractorInterface
         }
 
         return array_map(
-            static fn (ReflectionClass $propertyValueObjectReflectionClass) => self::symfonyType(
+            static fn (ReflectionClass $propertyValueObjectReflectionClass): Type => self::symfonyType(
                 $propertyValueObjectReflectionClass,
                 PropertyReflection::propertyReflectionTypeFromClassAndProperty($class, $property),
             ),

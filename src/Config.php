@@ -38,7 +38,7 @@ final class Config implements CacheClearerInterface
         /** @var array<string, array<mixed>> $result */
         $result = $this->cache->get(
             self::CONFIG,
-            fn () => $this->getConfig()
+            fn (): array => $this->getConfig()
         );
 
         return $result;
@@ -52,12 +52,12 @@ final class Config implements CacheClearerInterface
         /** @var array<string, string> $aggregateIdentifiers */
         $aggregateIdentifiers = $this->cache->get(
             self::AGGREGATE_IDENTIFIERS,
-            function () {
+            function (): array {
                 /** @var array<string, array<string, array<string, mixed>>> $config */
                 $config = $this->config();
 
                 return array_map(
-                    static fn (array $aggregateDescription) => $aggregateDescription['aggregateIdentifier'],
+                    static fn (array $aggregateDescription): mixed => $aggregateDescription['aggregateIdentifier'],
                     $config['aggregateDescriptions'],
                 );
             },

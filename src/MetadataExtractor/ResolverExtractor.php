@@ -29,7 +29,7 @@ class ResolverExtractor
             [
                 /** @param class-string<Query> $class */
                 Query::class => static fn (string $class) => $class::__resolver(),
-                QueryAttribute::class => static fn (QueryAttribute $attribute) => $attribute->resolver(),
+                QueryAttribute::class => static fn (QueryAttribute $attribute): string => $attribute->resolver(),
             ],
         );
 

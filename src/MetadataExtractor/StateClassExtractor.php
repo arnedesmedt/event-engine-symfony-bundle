@@ -50,7 +50,8 @@ class StateClassExtractor
             [
                 /** @param class-string<Projector> $class */
                 Projector::class => static fn (string $class) => $class::stateClass(),
-                ProjectorAttribute::class => static fn (ProjectorAttribute $attribute) => $attribute->stateClass(),
+                ProjectorAttribute::class => static fn (ProjectorAttribute $attribute): string => $attribute
+                    ->stateClass(),
             ],
         );
 

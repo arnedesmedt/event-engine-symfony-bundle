@@ -71,7 +71,7 @@ class SpecificationValidator extends ConstraintValidator
     protected function convertClassesToServices(ValidationMessage $value, array $neededServiceClasses): array
     {
         return array_map(
-            fn (string $class) => $this->convertClassToService($value, $class),
+            fn (string $class): mixed => $this->convertClassToService($value, $class),
             $neededServiceClasses,
         );
     }

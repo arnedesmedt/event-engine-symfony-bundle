@@ -32,7 +32,8 @@ class EventClassExtractor
         $events = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
             [
-                ListenerAttribute::class => static fn (ListenerAttribute $attribute) => $attribute->eventsToHandle(),
+                ListenerAttribute::class => static fn (ListenerAttribute $attribute): array => $attribute
+                    ->eventsToHandle(),
                 /** @param class-string<Listener> $class */
                 Listener::class => static fn (string $class) => $class::__handleEvents(),
             ],
@@ -52,7 +53,8 @@ class EventClassExtractor
         $events = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
             [
-                ProjectorAttribute::class => static fn (ProjectorAttribute $attribute) => $attribute->eventsToHandle(),
+                ProjectorAttribute::class => static fn (ProjectorAttribute $attribute): array => $attribute
+                    ->eventsToHandle(),
                 /** @param class-string<Projector> $class */
                 Projector::class => static fn (string $class) => $class::events(),
             ],
@@ -74,7 +76,7 @@ class EventClassExtractor
             [
                 AggregateCommandAttribute::class => static fn (
                     AggregateCommandAttribute $attribute,
-                ) => $attribute->eventsToRecord(),
+                ): array => $attribute->eventsToRecord(),
                 /** @param class-string<AggregateCommand> $class */
                 AggregateCommand::class => static fn (string $class) => $class::__eventsToRecord(),
             ],

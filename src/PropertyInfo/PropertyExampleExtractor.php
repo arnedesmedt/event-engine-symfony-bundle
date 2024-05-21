@@ -47,7 +47,7 @@ class PropertyExampleExtractor
 
         $examples = array_reduce(
             $docBlocksPerType,
-            function (array $carry, DocBlock $docBlock) {
+            function (array $carry, DocBlock $docBlock): array {
                 $carry[] = $this->fromDocBlock($docBlock);
 
                 return $carry;

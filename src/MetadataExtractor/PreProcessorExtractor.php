@@ -23,9 +23,10 @@ class PreProcessorExtractor
         $priority = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,
             [
-                PreProcessorAttribute::class => static fn (PreProcessorAttribute $attribute) => $attribute->priority(),
+                PreProcessorAttribute::class => static fn (PreProcessorAttribute $attribute): int => $attribute
+                    ->priority(),
                 /** @param class-string<PreProcessor> $class */
-                PreProcessor::class => static fn (string $class) => 0,
+                PreProcessor::class => static fn (string $class): int => 0,
             ],
         );
 

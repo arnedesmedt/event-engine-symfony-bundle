@@ -81,7 +81,7 @@ class EventEngineFactoryTest extends TestCase
         $this->container = $this->createMock(ContainerInterface::class);
         $this->container->expects($this->any())
             ->method('get')
-            ->willReturnCallback(static fn ($class) => new $class());
+            ->willReturnCallback(static fn ($class): object => new $class());
 
         $this->eventEngineFactory = new EventEngineFactory(
             new OpisJsonSchema(),

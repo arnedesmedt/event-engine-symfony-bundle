@@ -473,7 +473,7 @@ abstract class DefaultStateRepository implements StateRepository
         }
 
         $filters = array_map(
-            static fn ($scalarIdentifier) => new DocIdFilter($scalarIdentifier),
+            static fn ($scalarIdentifier): DocIdFilter => new DocIdFilter($scalarIdentifier),
             $scalarIdentifiers,
         );
 
@@ -492,7 +492,7 @@ abstract class DefaultStateRepository implements StateRepository
         }
 
         return array_map(
-            static fn ($identifier) => $identifier instanceof ValueObject
+            static fn ($identifier): mixed => $identifier instanceof ValueObject
                 ? $identifier->toValue()
                 : $identifier,
             $identifiers,

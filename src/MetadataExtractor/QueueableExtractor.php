@@ -25,7 +25,7 @@ class QueueableExtractor
             [
                 /** @param class-string<Queueable> $class */
                 Queueable::class => static fn (string $class) => $class::__queue(),
-                QueueableAttribute::class => static fn (QueueableAttribute $attribute) => $attribute->queue(),
+                QueueableAttribute::class => static fn (QueueableAttribute $attribute): bool => $attribute->queue(),
             ],
         );
 
@@ -41,7 +41,7 @@ class QueueableExtractor
             [
                 /** @param class-string<Queueable> $class */
                 Queueable::class => static fn (string $class) => $class::__maxRetries(),
-                QueueableAttribute::class => static fn (QueueableAttribute $attribute) => $attribute->maxRetries(),
+                QueueableAttribute::class => static fn (QueueableAttribute $attribute): int => $attribute->maxRetries(),
             ],
         );
 
@@ -59,7 +59,7 @@ class QueueableExtractor
                 Queueable::class => static fn (string $class) => $class::__delayInMilliseconds(),
                 QueueableAttribute::class => static fn (
                     QueueableAttribute $attribute,
-                ) => $attribute->delayInMilliseconds(),
+                ): int => $attribute->delayInMilliseconds(),
             ],
         );
 
@@ -75,7 +75,7 @@ class QueueableExtractor
             [
                 /** @param class-string<Queueable> $class */
                 Queueable::class => static fn (string $class) => $class::__multiplier(),
-                QueueableAttribute::class => static fn (QueueableAttribute $attribute) => $attribute->multiplier(),
+                QueueableAttribute::class => static fn (QueueableAttribute $attribute): int => $attribute->multiplier(),
             ],
         );
 
@@ -93,7 +93,7 @@ class QueueableExtractor
                 Queueable::class => static fn (string $class) => $class::__maxDelayInMilliseconds(),
                 QueueableAttribute::class => static fn (
                     QueueableAttribute $attribute,
-                ) => $attribute->maxDelayInMilliseconds(),
+                ): int => $attribute->maxDelayInMilliseconds(),
             ],
         );
 
@@ -111,7 +111,7 @@ class QueueableExtractor
                 Queueable::class => static fn (string $class) => $class::__sendToLinkedFailureTransport(),
                 QueueableAttribute::class => static fn (
                     QueueableAttribute $attribute,
-                ) => $attribute->sendToLinkedFailureTransport(),
+                ): bool => $attribute->sendToLinkedFailureTransport(),
             ],
         );
 

@@ -232,13 +232,13 @@ final class EventEngineFactory
         $types = array_unique(
             [
                 ...array_map(
-                    fn (string $aggregateClass) => $this->stateClassExtractor
+                    fn (string $aggregateClass): string => $this->stateClassExtractor
                         ->fromAggregateRootReflectionClass(new ReflectionClass($aggregateClass)),
                     $this->aggregates,
                 ),
                 ...array_map(
                     /** @param ReflectionClass<object> $projectorRelfectionClass */
-                    fn (string $projectorClass) => $this->stateClassExtractor
+                    fn (string $projectorClass): string => $this->stateClassExtractor
                         ->fromProjectorReflectionClass(new ReflectionClass($projectorClass)),
                     $this->projectors,
                 ),
@@ -299,7 +299,7 @@ final class EventEngineFactory
         array $aggregateRootClasses,
     ): array {
         return array_map(
-            static fn ($aggregateRootClass) => Stream::ofLocalProjection(
+            static fn ($aggregateRootClass): Stream => Stream::ofLocalProjection(
                 EventEngineUtil::fromAggregateClassToStreamName($aggregateRootClass),
             ),
             $aggregateRootClasses,

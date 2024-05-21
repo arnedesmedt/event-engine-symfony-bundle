@@ -48,7 +48,7 @@ final class EventEnginePass implements CompilerPassInterface
 
         $aggregateRepositoryDefinitions = array_reduce(
             $aggregates,
-            static function (array $result, $aggregateClass) use ($entityNamespace) {
+            static function (array $result, $aggregateClass) use ($entityNamespace): array {
                 $aggregateShortName = (new ReflectionClass($aggregateClass))->getShortName();
                 $identifier = sprintf('event_engine.repository.%s', StringUtil::decamelize($aggregateShortName));
 
@@ -83,7 +83,7 @@ final class EventEnginePass implements CompilerPassInterface
 
         $aggregateRepositoryDefinitions = array_reduce(
             $aggregates,
-            static function (array $result, $aggregate) use ($entityNamespace, $repository) {
+            static function (array $result, $aggregate) use ($entityNamespace, $repository): array {
                 $aggregateShortName = (new ReflectionClass($aggregate))->getShortName();
                 $identifier = sprintf('event_engine.repository.%s', StringUtil::decamelize($aggregateShortName));
 
@@ -150,12 +150,12 @@ final class EventEnginePass implements CompilerPassInterface
             ...$preProcessors,
             ...$projectors,
             ...array_map(
-                static fn (string $controllerCommandClass) => $controllerExtractor
+                static fn (string $controllerCommandClass): string => $controllerExtractor
                     ->fromReflectionClass(new ReflectionClass($controllerCommandClass)),
                 $controllerCommands,
             ),
             ...array_map(
-                static fn (string $queryClass) => $resolverExtractor
+                static fn (string $queryClass): string => $resolverExtractor
                     ->fromReflectionClass(new ReflectionClass($queryClass)),
                 $queries,
             ),

@@ -105,7 +105,7 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
         } catch (HandlerFailedException $handlerFailedException) {
             while (
                 $handlerFailedException instanceof HandlerFailedException
-                && $handlerFailedException->getPrevious() !== null
+                && $handlerFailedException->getPrevious() instanceof Throwable
             ) {
                 $handlerFailedException = $handlerFailedException->getPrevious();
             }

@@ -39,7 +39,7 @@ class ResponseExtractor
             [
                 /** @param class-string<HasResponses> $class */
                 HasResponses::class => static fn (string $class) => $class::__defaultStatusCode(),
-                Response::class => static fn (Response $response) => $response->defaultStatusCode(),
+                Response::class => static fn (Response $response): int => $response->defaultStatusCode(),
             ],
         );
 
@@ -59,7 +59,7 @@ class ResponseExtractor
             [
                 /** @param class-string<HasResponses> $class */
                 HasResponses::class => static fn (string $class) => $class::__defaultResponseClass(),
-                Response::class => static fn (Response $response) => $response->defaultResponseClass(),
+                Response::class => static fn (Response $response): string => $response->defaultResponseClass(),
             ],
         );
 

@@ -72,7 +72,7 @@ class PropertyDescriptionExtractor implements PropertyDescriptionExtractorInterf
         );
 
         $descriptions = array_map(
-            fn (DocBlock $docBlock) => $this->fullDescriptionFromDocBlock($docBlock),
+            fn (DocBlock $docBlock): string|null => $this->fullDescriptionFromDocBlock($docBlock),
             $docBlocks,
         );
 
@@ -88,7 +88,7 @@ class PropertyDescriptionExtractor implements PropertyDescriptionExtractorInterf
         );
 
         $descriptions = array_map(
-            fn (DocBlock $docBlock) => $this->descriptionFromDocBlock($docBlock),
+            fn (DocBlock $docBlock): string|null => $this->descriptionFromDocBlock($docBlock),
             $docBlocks,
         );
 
@@ -104,7 +104,7 @@ class PropertyDescriptionExtractor implements PropertyDescriptionExtractorInterf
         );
 
         $descriptions = array_map(
-            fn (DocBlock $docBlock) => $this->summaryFromDocBlock($docBlock),
+            fn (DocBlock $docBlock): string|null => $this->summaryFromDocBlock($docBlock),
             $docBlocks,
         );
 

@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Response\Implementation\Created;
 use ADS\Bundle\EventEngineBundle\Response\Implementation\Deleted;
 use ADS\Bundle\EventEngineBundle\Response\Implementation\Ok;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
+use LogicException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -39,7 +40,10 @@ trait DefaultResponses
             return match ($httpMethod) {
                 Request::METHOD_POST => Created::class,
                 Request::METHOD_DELETE => Deleted::class,
-                default => Ok::class,
+                Request::METHOD_PATCH, Request::METHOD_PUT => Ok::class,
+                default => throw new LogicException(
+                    'You need to override the default response class for queries.',
+                ),
             };
         }
 

@@ -21,7 +21,7 @@ use function array_filter;
 use function array_map;
 use function sprintf;
 
-final class PropertyTypeExtractor implements PropertyTypeExtractorInterface
+final class PropertyTypeExtractorForValueObjects implements PropertyTypeExtractorInterface
 {
     /**
      * @param class-string $class

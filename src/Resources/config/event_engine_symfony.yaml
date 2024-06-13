@@ -18,7 +18,7 @@ services:
     ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyExampleExtractor:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor'
-    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyTypeExtractor:
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyTypeExtractorForValueObjects:
         tags:
             - 'property_info.type_extractor'
 

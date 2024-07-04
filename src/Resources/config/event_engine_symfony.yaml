@@ -11,6 +11,7 @@ services:
 
     # PROPERTY INFO
     ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDefaultExtractor: ~
+    ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyRequiredExtractor: ~
     ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDeprecationExtractor:
         arguments:
             - '@ADS\Bundle\EventEngineBundle\PropertyInfo\PropertyDocBlockExtractor'

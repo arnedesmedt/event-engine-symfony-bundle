@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\PropertyInfo;
 
 use ADS\JsonImmutableObjects\HasPropertyExamples;
+use ADS\Util\ScalarUtil;
+use ADS\ValueObjects\HasExamples;
 use ADS\ValueObjects\ValueObject;
 use phpDocumentor\Reflection\DocBlock;
 use ReflectionClass;
@@ -26,7 +28,34 @@ class PropertyExampleExtractor
     {
         return $this->fromInterface($class, $property)
             ?? $this->fromPropertyDocBlock($class, $property)
+            ?? $this->fromPropertyTypeClassInterface($class, $property)
             ?? $this->fromPropertyTypeClassDocBlocks($class, $property);
+    }
+
+    /** @param class-string $class */
+    private function fromInterface(string $class, string $property): mixed
+    {
+        $reflectionClass = new ReflectionClass($class);
+        if (! $reflectionClass->implementsInterface(HasPropertyExamples::class)) {
+            return null;
+        }
+
+        $propertyExamples = $class::examples();
+        $propertyExample = $propertyExamples[$property] ?? null;
+
+        if ($propertyExample === null) {
+            return null;
+        }
+
+        $examples = is_array($propertyExample) ? $propertyExample : [$propertyExample];
+
+        if ($examples === []) {
+            return null;
+        }
+
+        $example = reset($examples);
+
+        return $example instanceof ValueObject ? $example->toValue() : $example;
     }
 
     /** @param class-string $class */
@@ -35,6 +64,23 @@ class PropertyExampleExtractor
         $docBlock = $this->propertyDocBlockExtractor->propertyDocBlockFromClassAndProperty($class, $property);
 
         return $this->fromDocBlock($docBlock);
+    }
+
+    /** @param class-string $class */
+    private function fromPropertyTypeClassInterface(string $class, string $property): mixed
+    {
+        $reflectionClasses = PropertyReflection::propertyTypeReflectionClassesFromClassAndProperty($class, $property);
+
+        foreach ($reflectionClasses as $reflectionClass) {
+            if ($reflectionClass->implementsInterface(HasExamples::class)) {
+                /** @var class-string<HasExamples> $typeClass */
+                $typeClass = $reflectionClass->getName();
+
+                return ScalarUtil::toScalar($typeClass::example());
+            }
+        }
+
+        return null;
     }
 
     /** @param class-string $class */
@@ -71,31 +117,5 @@ class PropertyExampleExtractor
         $exampleTag = reset($exampleTags);
 
         return (string) $exampleTag;
-    }
-
-    /** @param class-string $class */
-    private function fromInterface(string $class, string $property): mixed
-    {
-        $reflectionClass = new ReflectionClass($class);
-        if (! $reflectionClass->implementsInterface(HasPropertyExamples::class)) {
-            return null;
-        }
-
-        $propertyExamples = $class::examples();
-        $propertyExample = $propertyExamples[$property] ?? null;
-
-        if ($propertyExample === null) {
-            return null;
-        }
-
-        $examples = is_array($propertyExample) ? $propertyExample : [$propertyExample];
-
-        if ($examples === []) {
-            return null;
-        }
-
-        $example = reset($examples);
-
-        return $example instanceof ValueObject ? $example->toValue() : $example;
     }
 }

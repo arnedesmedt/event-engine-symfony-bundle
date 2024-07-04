@@ -17,6 +17,13 @@ class PropertyDefaultExtractor
             return null;
         }
 
+        $propertyReflectionType = PropertyReflection::propertyReflectionFromClassAndProperty($class, $property);
+        $defaultValue = $propertyReflectionType?->getDefaultValue();
+
+        if ($defaultValue) {
+            return $defaultValue;
+        }
+
         $metadataDefaultProperties = $class::__defaultProperties();
 
         if (isset($metadataDefaultProperties[$property])) {

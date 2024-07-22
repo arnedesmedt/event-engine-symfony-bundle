@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Messenger;
 
 use ADS\Bundle\EventEngineBundle\Message\Message;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor;
 use EventEngine\EventEngine;
 use EventEngine\Messaging\Message as EventEngineMessage;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Messaging\MessageDispatcher;
 use EventEngine\Messaging\MessageProducer;
 use EventEngine\Runtime\Flavour;
+use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -33,9 +35,11 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
 
     public function __construct(
         private readonly MessageBusInterface $commandBus,
+        private readonly MessageBusInterface $commandLowPriorityBus,
         private readonly MessageBusInterface $eventBus,
         private readonly MessageBusInterface $queryBus,
         private readonly Flavour $flavour,
+        private readonly QueueableExtractor $queueableExtractor,
         private readonly EventEngine|null $eventEngine = null,
     ) {
     }
@@ -96,12 +100,7 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
         }
 
         try {
-            /** @var Envelope $envelop */
-            $envelop = match ($messageToPutOnTheQueue->messageType()) {
-                EventEngineMessage::TYPE_COMMAND => $this->commandBus->dispatch($messageToPutOnTheQueue),
-                EventEngineMessage::TYPE_EVENT => $this->eventBus->dispatch($messageToPutOnTheQueue),
-                default => $this->queryBus->dispatch($messageToPutOnTheQueue),
-            };
+            $envelop = $this->dispatchMessage($messageToPutOnTheQueue);
         } catch (HandlerFailedException $handlerFailedException) {
             while (
                 $handlerFailedException instanceof HandlerFailedException
@@ -144,5 +143,25 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
         $messageClass = $messageToPutOnTheQueue->messageName();
 
         return is_a($messageClass, Queueable::class, true) && $messageClass::__queue();
+    }
+
+    private function dispatchMessage(EventEngineMessage $messageToPutOnTheQueue): Envelope
+    {
+        $messageReflectionClass = new ReflectionClass($messageToPutOnTheQueue);
+        $onLowPriority = $this->queueableExtractor->lowPriorityFromReflectionClass($messageReflectionClass) ?? false;
+
+        $bus = $this->queryBus;
+
+        if ($messageToPutOnTheQueue->messageType() === EventEngineMessage::TYPE_COMMAND) {
+            if ($onLowPriority) {
+                $bus = $this->commandLowPriorityBus;
+            } else {
+                $bus = $this->commandBus;
+            }
+        } elseif ($messageToPutOnTheQueue->messageType() === EventEngineMessage::TYPE_EVENT) {
+            $bus = $this->eventBus;
+        }
+
+        return $bus->dispatch($messageToPutOnTheQueue);
     }
 }

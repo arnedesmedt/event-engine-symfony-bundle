@@ -85,6 +85,15 @@ final class ADSEventEngineBundle extends AbstractBundle
                             $eventEngineConfig['messenger']['command']['middleware'] ?? [],
                         ),
                     ],
+                    'command.low-priority' => [
+                        'middleware' => array_merge(
+                            [
+                                PickTransportMiddleware::class,
+                                DontSendToFailureTransportMiddleware::class,
+                            ],
+                            $eventEngineConfig['messenger']['command']['middleware'] ?? [],
+                        ),
+                    ],
                     'event' => [
                         'middleware' => array_merge(
                             [
@@ -118,10 +127,11 @@ final class ADSEventEngineBundle extends AbstractBundle
                         ],
                     ],
                     'command.low-priority' => [
-                        'dsn' => $eventEngineConfig['messenger']['command']['transport']
+                        'dsn' => $eventEngineConfig['messenger']['command.low-priority']['transport']
                             ?? 'doctrine://default?table_name=messenger_commands&queue_name=low-priority',
                         'retry_strategy' => [
-                            'service' => $eventEngineConfig['messenger']['command']['retry'] ?? CommandRetry::class,
+                            'service' => $eventEngineConfig['messenger']['command.low-priority']['retry']
+                                ?? CommandRetry::class,
                         ],
                         'failure_transport' => 'command.failed',
                         'options' => [

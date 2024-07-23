@@ -27,7 +27,10 @@ class PickTransportMiddleware implements MiddlewareInterface
         $sendAsync = $eventEngineMessage->getMetaOrDefault('async', null)
             ?? ($message instanceof Queueable && $message::__queue());
 
-        if ($sendAsync) {
+        $lowPriority = $envelope->getMessage()->getMeta('lowPriority');
+        if ($lowPriority) {
+            $envelope = $envelope->with(new TransportNamesStamp(['command_low_priority']));
+        } elseif ($sendAsync) {
             $envelope = $envelope->with(new TransportNamesStamp([$eventEngineMessage->messageType()]));
         }
 

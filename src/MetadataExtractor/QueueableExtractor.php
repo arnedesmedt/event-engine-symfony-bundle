@@ -35,6 +35,18 @@ class QueueableExtractor
     /** @param ReflectionClass<object> $reflectionClass */
     public function lowPriorityFromReflectionClass(ReflectionClass $reflectionClass): bool|null
     {
+        if (
+            ! $this->metadataExtractor->hasAttributeOrClassFromReflectionClass(
+                $reflectionClass,
+                [
+                    Queueable::class,
+                    QueueableAttribute::class,
+                ],
+            )
+        ) {
+            return null;
+        }
+
         /** @var bool|null $lowPriority */
         $lowPriority = $this->metadataExtractor->needMetadataFromReflectionClass(
             $reflectionClass,

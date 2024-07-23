@@ -56,6 +56,11 @@ final class ADSEventEngineBundle extends AbstractBundle
         $command->scalarNode('retry')->defaultValue(CommandRetry::class);
         $command->arrayNode('middleware')->prototype('scalar');
 
+        $command = $messenger->arrayNode('command.low-priority')->addDefaultsIfNotSet()->children();
+        $command->scalarNode('transport')->defaultValue('doctrine://default?table_name=messenger_commands');
+        $command->scalarNode('retry')->defaultValue(CommandRetry::class);
+        $command->arrayNode('middleware')->prototype('scalar');
+
         $event = $messenger->arrayNode('event')->addDefaultsIfNotSet()->children();
         $event->scalarNode('transport')->defaultValue('doctrine://default?table_name=messenger_events');
         $event->scalarNode('retry')->defaultValue(EventRetry::class);
@@ -91,7 +96,7 @@ final class ADSEventEngineBundle extends AbstractBundle
                                 PickTransportMiddleware::class,
                                 DontSendToFailureTransportMiddleware::class,
                             ],
-                            $eventEngineConfig['messenger']['command']['middleware'] ?? [],
+                            $eventEngineConfig['messenger']['command.low-priority']['middleware'] ?? [],
                         ),
                     ],
                     'event' => [

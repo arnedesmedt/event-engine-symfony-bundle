@@ -147,7 +147,7 @@ final class MessengerMessageProducer implements MessageProducer, MessageDispatch
 
     private function dispatchMessage(EventEngineMessage $messageToPutOnTheQueue): Envelope
     {
-        $messageReflectionClass = new ReflectionClass($messageToPutOnTheQueue);
+        $messageReflectionClass = new ReflectionClass($messageToPutOnTheQueue->messageName());
         $onLowPriority = $this->queueableExtractor->lowPriorityFromReflectionClass($messageReflectionClass) ?? false;
 
         $bus = $this->queryBus;

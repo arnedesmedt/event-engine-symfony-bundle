@@ -102,7 +102,7 @@ services:
         public: true
         arguments:
             - '@command'
-            - '@command.low-priority'
+            - '@command_low_priority'
             - '@event'
             - '@query'
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'

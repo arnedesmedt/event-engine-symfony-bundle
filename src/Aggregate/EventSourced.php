@@ -47,7 +47,7 @@ trait EventSourced
         $stateClass = static::stateClass();
 
         $self = new static();
-        $self->state = $stateClass::fromArray($state);
+        $self->state = $stateClass::fromEncryptedSensitiveData($state);
 
         return $self;
     }
@@ -116,7 +116,7 @@ trait EventSourced
     /** @inheritDoc */
     public function toArray(): array
     {
-        return $this->state->toArray();
+        return $this->state->toSensitiveEncryptedArray();
     }
 
     /**

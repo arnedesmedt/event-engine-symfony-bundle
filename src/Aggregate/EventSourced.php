@@ -47,7 +47,9 @@ trait EventSourced
         $stateClass = static::stateClass();
 
         $self = new static();
-        $self->state = $stateClass::fromEncryptedSensitiveData($state);
+        $self->state = method_exists($stateClass, 'fromEncryptedSensitiveData')
+            ? $stateClass::fromEncryptedSensitiveData($state)
+            : $stateClass::fromArray($state);
 
         return $self;
     }

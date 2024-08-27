@@ -26,6 +26,7 @@ use function array_map;
 use function count;
 use function iterator_to_array;
 use function json_encode;
+use function method_exists;
 use function reset;
 use function sprintf;
 
@@ -437,7 +438,7 @@ abstract class DefaultStateRepository implements StateRepository
      */
     protected function statesFromDocuments(array $documentStates)
     {
-        return $this->statesClass::fromArray($documentStates);
+        return $this->statesClass::fromEncryptedSensitiveData($documentStates);
     }
 
     /**
@@ -447,7 +448,9 @@ abstract class DefaultStateRepository implements StateRepository
      */
     protected function stateFromDocument(array $documentState)
     {
-        return $this->stateClass::fromArray($documentState);
+        return method_exists($this->stateClass, 'fromEncryptedSensitiveData')
+            ? $this->stateClass::fromEncryptedSensitiveData($documentState)
+            : $this->stateClass::fromArray($documentState);
     }
 
     /** @return class-string<TState> */

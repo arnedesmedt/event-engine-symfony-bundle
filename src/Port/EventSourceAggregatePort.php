@@ -8,6 +8,7 @@ use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
 use ADS\Bundle\EventEngineBundle\Command\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
+use EventEngine\Data\ImmutableRecord;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Runtime\Oop\Port;
 use ReflectionClass;
@@ -89,7 +90,24 @@ final class EventSourceAggregatePort implements Port
             );
         }
 
-        return $aggregate->popRecordedEvents();
+        $events = $aggregate->popRecordedEvents();
+
+        foreach ($events as &$event) {
+            if (! $event instanceof ImmutableRecord) {
+                continue;
+            }
+
+            $eventData = method_exists($event, 'toSensitiveEncryptedArray')
+                ? $event->toSensitiveEncryptedArray()
+                : $event->toArray();
+
+            /** @var class-string<ImmutableRecord&Event> $eventClass */
+            $eventClass = $event::class;
+
+            $event = $eventClass::fromArray($eventData);
+        }
+
+        return $events;
     }
 
     /**

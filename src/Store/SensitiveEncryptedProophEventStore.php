@@ -6,10 +6,12 @@ namespace ADS\Bundle\EventEngineBundle\Store;
 
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\EventStore\EventStore;
+use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use EventEngine\Messaging\GenericEvent;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Prooph\V7\EventStore\ProophEventStore;
 use EventEngine\Runtime\FunctionalFlavour;
+use EventEngine\Util\MapIterator;
 use Iterator;
 
 use function array_map;
@@ -70,8 +72,16 @@ class SensitiveEncryptedProophEventStore implements EventStore
         int $minVersion = 1,
         int|null $maxVersion = null,
     ): Iterator {
-        return $this->proophEventStore
-            ->loadAggregateEvents($streamName, $aggregateType, $aggregateId, $minVersion, $maxVersion);
+        return $this->decryptEncryptedEvents(
+            $this->proophEventStore
+                ->loadAggregateEvents(
+                    $streamName,
+                    $aggregateType,
+                    $aggregateId,
+                    $minVersion,
+                    $maxVersion,
+                ),
+        );
     }
 
     /** @return Iterator<GenericEvent> */
@@ -79,7 +89,12 @@ class SensitiveEncryptedProophEventStore implements EventStore
         string $streamName,
         string $correlationId,
     ): Iterator {
-        return $this->proophEventStore->loadEventsByCorrelationId($streamName, $correlationId);
+        return $this->decryptEncryptedEvents(
+            $this->proophEventStore->loadEventsByCorrelationId(
+                $streamName,
+                $correlationId,
+            ),
+        );
     }
 
     /** @return Iterator<GenericEvent> */
@@ -87,6 +102,36 @@ class SensitiveEncryptedProophEventStore implements EventStore
         string $streamName,
         string $causationId,
     ): Iterator {
-        return $this->proophEventStore->loadEventsByCausationId($streamName, $causationId);
+        return $this->decryptEncryptedEvents(
+            $this->proophEventStore->loadEventsByCausationId(
+                $streamName,
+                $causationId,
+            ),
+        );
+    }
+
+    /**
+     * @param Iterator<GenericEvent> $events
+     *
+     * @return Iterator<GenericEvent>
+     */
+    private function decryptEncryptedEvents(Iterator $events): Iterator
+    {
+        return new MapIterator($events, static function (GenericEvent $event): GenericEvent {
+            $eventName = $event->messageName();
+            $eventData = $event->payload();
+            /** @var JsonSchemaAwareRecord $decryptedEvent */
+            $decryptedEvent = method_exists($eventName, 'fromEncryptedSensitiveData')
+                ? $eventName::fromEncryptedSensitiveData($eventData)
+                : $eventName::fromArray($eventData);
+
+            $eventData = $event->toArray();
+            $eventData['payload'] = $decryptedEvent->toArray();
+
+            /** @var GenericEvent $decryptedGenericEvent */
+            $decryptedGenericEvent = GenericEvent::fromArray($eventData);
+
+            return $decryptedGenericEvent;
+        });
     }
 }

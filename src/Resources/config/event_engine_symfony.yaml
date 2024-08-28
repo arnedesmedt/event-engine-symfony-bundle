@@ -107,6 +107,10 @@ services:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
             - '@EventEngine\EventEngine'
 
+    # STORES
+    ADS\Bundle\EventEngineBundle\Store\SensitiveEncryptedProophEventStore:
+        autowire: true
+
     # FLAVOURS
     EventEngine\Runtime\PrototypingFlavour:
         arguments:

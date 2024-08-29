@@ -13,10 +13,12 @@ use EventEngine\Prooph\V7\EventStore\ProophEventStore;
 use EventEngine\Runtime\FunctionalFlavour;
 use EventEngine\Util\MapIterator;
 use Iterator;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 
 use function array_map;
 use function method_exists;
 
+#[AsDecorator(ProophEventStore::class)]
 class SensitiveEncryptedProophEventStore implements EventStore
 {
     public function __construct(

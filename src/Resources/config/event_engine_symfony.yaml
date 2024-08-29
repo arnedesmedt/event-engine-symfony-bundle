@@ -198,7 +198,7 @@ services:
     Prooph\EventStore\TransactionalEventStore: '@Prooph\EventStore\Pdo\PostgresEventStore'
 
     EventEngine\DocumentStore\DocumentStore: '@EventEngine\DocumentStore\Postgres\PostgresDocumentStore'
-    EventEngine\EventStore\EventStore: '@ADS\Bundle\EventEngineBundle\Store\SensitiveEncryptedProophEventStore'
+    EventEngine\EventStore\EventStore: '@EventEngine\Prooph\V7\EventStore\ProophEventStore'
     EventEngine\Logger\LogEngine: '@EventEngine\Logger\SimpleMessageEngine'
     EventEngine\Persistence\MultiModelStore: '@EventEngine\Persistence\ComposedMultiModelStore'
     EventEngine\Persistence\TransactionalConnection: '@ADS\Bundle\EventEngineBundle\Persistency\TransactionalConnection'

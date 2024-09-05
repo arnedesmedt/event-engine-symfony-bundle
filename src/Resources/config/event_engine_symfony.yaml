@@ -102,9 +102,11 @@ services:
         public: true
         arguments:
             - '@command'
+            - '@command_low_priority'
             - '@event'
             - '@query'
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor'
             - '@EventEngine\EventEngine'
 
     # STORES

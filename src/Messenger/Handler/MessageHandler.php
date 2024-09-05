@@ -24,6 +24,12 @@ class MessageHandler
         return $this->handlesMessageBag($message);
     }
 
+    #[AsMessageHandler(bus: 'command_low_priority')]
+    public function handlesCommandLowPriorityEventEngineMessage(EventEngineMessage $message): mixed
+    {
+        return $this->handlesMessageBag($message);
+    }
+
     #[AsMessageHandler(bus: 'event')]
     public function handlesEventEventEngineMessage(EventEngineMessage $message): mixed
     {

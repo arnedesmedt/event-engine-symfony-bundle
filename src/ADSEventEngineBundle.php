@@ -56,6 +56,11 @@ final class ADSEventEngineBundle extends AbstractBundle
         $command->scalarNode('retry')->defaultValue(CommandRetry::class);
         $command->arrayNode('middleware')->prototype('scalar');
 
+        $command = $messenger->arrayNode('command_low_priority')->addDefaultsIfNotSet()->children();
+        $command->scalarNode('transport')->defaultValue('doctrine://default?table_name=messenger_commands');
+        $command->scalarNode('retry')->defaultValue(CommandRetry::class);
+        $command->arrayNode('middleware')->prototype('scalar');
+
         $event = $messenger->arrayNode('event')->addDefaultsIfNotSet()->children();
         $event->scalarNode('transport')->defaultValue('doctrine://default?table_name=messenger_events');
         $event->scalarNode('retry')->defaultValue(EventRetry::class);
@@ -85,6 +90,15 @@ final class ADSEventEngineBundle extends AbstractBundle
                             $eventEngineConfig['messenger']['command']['middleware'] ?? [],
                         ),
                     ],
+                    'command_low_priority' => [
+                        'middleware' => array_merge(
+                            [
+                                PickTransportMiddleware::class,
+                                DontSendToFailureTransportMiddleware::class,
+                            ],
+                            $eventEngineConfig['messenger']['command_low_priority']['middleware'] ?? [],
+                        ),
+                    ],
                     'event' => [
                         'middleware' => array_merge(
                             [
@@ -110,6 +124,19 @@ final class ADSEventEngineBundle extends AbstractBundle
                             ?? 'doctrine://default?table_name=messenger_commands',
                         'retry_strategy' => [
                             'service' => $eventEngineConfig['messenger']['command']['retry'] ?? CommandRetry::class,
+                        ],
+                        'failure_transport' => 'command.failed',
+                        'options' => [
+                            'use_notify' => true,
+                            'check_delayed_interval' => 0,
+                        ],
+                    ],
+                    'command_low_priority' => [
+                        'dsn' => $eventEngineConfig['messenger']['command_low_priority']['transport']
+                            ?? 'doctrine://default?table_name=messenger_commands&queue_name=low-priority',
+                        'retry_strategy' => [
+                            'service' => $eventEngineConfig['messenger']['command_low_priority']['retry']
+                                ?? CommandRetry::class,
                         ],
                         'failure_transport' => 'command.failed',
                         'options' => [

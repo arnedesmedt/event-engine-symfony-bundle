@@ -16,6 +16,7 @@
         "ext-pdo": "*",
         "arnedesmedt/json-immutable-objects": "^0.4.17",
         "arnedesmedt/value-objects": "^0.4.26",
+        "chrisguitarguy/request-id-bundle": "~6.0",
         "event-engine/php-engine": "~0.1",
         "event-engine/php-postgres-document-store": "~0.1",
         "event-engine/prooph-v7-event-store": "~0.1",

@@ -370,3 +370,9 @@ services:
     ADS\Bundle\EventEngineBundle\Validator\ListenerWithValidatedMessage:
         abstract: true
 
+    ADS\Bundle\EventEngineBundle\MessageDispatcher\FixedMessageUuidDispatcher:
+        arguments:
+            $messageDispatcher: '@EventEngine\Messaging\MessageDispatcher'
+            $requestIdStorage: '@Chrisguitarguy\RequestId\RequestIdStorage'
+
+

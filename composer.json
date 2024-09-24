@@ -26,7 +26,8 @@
         "symfony/lock": "~6.0 || ~7.0",
         "symfony/messenger": "~6.0 || ~7.0",
         "symfony/validator": "~6.0 || ~7.0",
-        "symfony/property-info": "~6.0 || ~7.0"
+        "symfony/property-info": "~6.0 || ~7.0",
+        "team-blue/php-test-request": "^0.0.35"
     },
     "require-dev": {
         "doctrine/coding-standard": "~11.0",
@@ -37,6 +38,12 @@
         "phpunit/phpunit": "^10.3",
         "rector/rector": "~1.0",
         "squizlabs/php_codesniffer": "~3.0"
+    },
+    "repositories": {
+        "packeton.teamblue-ops.net": {
+            "type": "composer",
+            "url": "https://packeton.teamblue-ops.net"
+        }
     },
     "autoload": {
         "psr-4": {

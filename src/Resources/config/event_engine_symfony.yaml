@@ -358,6 +358,7 @@ services:
             - '@lock.aggregate.factory'
             - '@logger'
             - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor'
+            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor'
 
     ADS\Bundle\EventEngineBundle\Lock\NoLockAggregate:
         arguments:

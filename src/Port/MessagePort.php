@@ -6,6 +6,7 @@ namespace ADS\Bundle\EventEngineBundle\Port;
 
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
 use ADS\Bundle\EventEngineBundle\Query\Query;
+use Chrisguitarguy\RequestId\RequestIdStorage;
 use Closure;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
@@ -14,10 +15,12 @@ use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
 use EventEngine\Runtime\Functional\Port;
 use Opis\JsonSchema\Validator;
+use Ramsey\Uuid\Uuid;
 use ReflectionClass;
 use RuntimeException;
 use stdClass;
 
+use function array_map;
 use function get_debug_type;
 use function is_array;
 use function json_decode;
@@ -31,6 +34,7 @@ final class MessagePort implements Port
     public function __construct(
         private readonly Validator $validator,
         private readonly AggregateCommandExtractor $aggregateCommandExtractor,
+        private readonly RequestIdStorage $requestIdStorage,
     ) {
     }
 
@@ -95,10 +99,18 @@ final class MessagePort implements Port
             return $customCommand;
         }
 
+        $messageUuid = $this->requestIdStorage->getRequestId();
+
+        if ($messageUuid !== null) {
+            $messageUuid = Uuid::fromString($messageUuid);
+        }
+
         return new MessageBag(
             $customCommand::class,
             MessageBag::TYPE_COMMAND,
             $customCommand,
+            [],
+            $messageUuid,
         );
     }
 
@@ -161,7 +173,19 @@ final class MessagePort implements Port
      */
     public function callCommandController($customCommand, $controller): array|CommandDispatchResult|null
     {
-        return $controller($customCommand);
+        /** @var array<array<mixed>|MessageBag|ImmutableRecord>|CommandDispatchResult $result */
+        $result = $controller($customCommand);
+
+        if (is_array($result)) {
+            return array_map(
+                fn (array|MessageBag|ImmutableRecord $messageOrArray): MessageBag|array => is_array($messageOrArray)
+                    ? $messageOrArray
+                    : $this->decorateCommand($messageOrArray),
+                $result,
+            );
+        }
+
+        return $result;
     }
 
     /**

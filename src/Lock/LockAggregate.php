@@ -7,10 +7,8 @@ namespace ADS\Bundle\EventEngineBundle\Lock;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
 use EventEngine\EventEngine;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
-use EventEngine\Messaging\GenericEvent;
 use EventEngine\Messaging\Message;
 use EventEngine\Messaging\MessageBag;
-use LogicException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\SharedLockInterface;
@@ -34,21 +32,11 @@ final class LockAggregate implements LockAggregateStrategy
         $lock = null;
         $lockId = '';
 
-        /** @var string $aggregateId */
-        $aggregateId = match ($message->messageType()) {
-            Message::TYPE_COMMAND => $this->aggregateCommandExtractor
-                ->aggregateIdFromAggregateCommand($customMessage),
-            Message::TYPE_EVENT => $message->getMeta(GenericEvent::META_AGGREGATE_ID),
-            default => throw new LogicException('No lock needed for query messages.'),
-        };
+        $aggregateId = $this->aggregateCommandExtractor->aggregateIdFromAggregateCommand($customMessage);
 
         if ($aggregateId) {
-            $aggregateType = match ($message->messageType()) {
-                Message::TYPE_COMMAND => $this->eventEngine
-                    ->compileCacheableConfig()['compiledCommandRouting'][$customMessage::class]['aggregateType'],
-                Message::TYPE_EVENT => $message->getMeta(GenericEvent::META_AGGREGATE_TYPE),
-                default => throw new LogicException('No lock needed for query messages.'),
-            };
+            $commandRouting = $this->eventEngine->compileCacheableConfig()['compiledCommandRouting'];
+            $aggregateType = $commandRouting[$customMessage::class]['aggregateType'];
 
             $lockId = sprintf('aggregate:%s-id:%s', $aggregateType, $aggregateId);
             $lock = $this->aggregateLockFactory->createLock($lockId);

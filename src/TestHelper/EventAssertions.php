@@ -23,9 +23,14 @@ class EventAssertions
         StringValue $aggregateId,
         array $listOfNewEventClasses,
     ): Closure {
-        return function (TestRequest $testRequest) use ($aggregateId, $listOfNewEventClasses, $streamName): void {
-            /** @var ContainerInterface $container */
-            $container = static::getContainer();
+        return function (
+            TestRequest $testRequest,
+            ContainerInterface $container,
+        ) use (
+            $aggregateId,
+            $listOfNewEventClasses,
+            $streamName,
+        ): void {
             /** @var PDO $connection */
             $connection = $container->get('event_engine.connection');
             /** @var PDOStatement $statement */

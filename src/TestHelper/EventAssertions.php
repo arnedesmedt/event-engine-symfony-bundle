@@ -18,7 +18,7 @@ use function sprintf;
 class EventAssertions
 {
     /** @param array<class-string<Event>> $listOfNewEventClasses */
-    private static function assertNewEventsForStream(
+    public static function assertNewEventsForStream(
         string $streamName,
         StringValue $aggregateId,
         array $listOfNewEventClasses,

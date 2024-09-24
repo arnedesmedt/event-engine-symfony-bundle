@@ -282,7 +282,7 @@ services:
     ADS\Bundle\EventEngineBundle\Util\EventEngineUtil: ~
     ADS\Bundle\EventEngineBundle\Exception\Handler:
         tags:
-            - 'kernel.event_subscriber'
+            - 'kernel.event_subscriber'q
 
     Prooph\EventStore\Projection\ProjectionManager:
         class: Prooph\EventStore\Pdo\Projection\PostgresProjectionManager
@@ -350,6 +350,7 @@ services:
         public: true
         arguments:
             - '@ADS\Bundle\EventEngineBundle\Flavour\OopMetaDataFlavour'
+            - '@ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor'
 
     ADS\Bundle\EventEngineBundle\Lock\LockAggregate:
         arguments:

@@ -17,6 +17,18 @@ class QueueableExtractor
     }
 
     /** @param ReflectionClass<object> $reflectionClass */
+    public function isQueueableFromReflectionClass(ReflectionClass $reflectionClass): bool
+    {
+        return $this->metadataExtractor->hasAttributeOrClassFromReflectionClass(
+            $reflectionClass,
+            [
+                QueueableAttribute::class,
+                Queueable::class,
+            ],
+        );
+    }
+
+    /** @param ReflectionClass<object> $reflectionClass */
     public function queueFromReflectionClass(ReflectionClass $reflectionClass): bool|null
     {
         /** @var bool|null $queue */

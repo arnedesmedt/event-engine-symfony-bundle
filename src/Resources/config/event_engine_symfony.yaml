@@ -282,7 +282,7 @@ services:
     ADS\Bundle\EventEngineBundle\Util\EventEngineUtil: ~
     ADS\Bundle\EventEngineBundle\Exception\Handler:
         tags:
-            - 'kernel.event_subscriber'q
+            - 'kernel.event_subscriber'
 
     Prooph\EventStore\Projection\ProjectionManager:
         class: Prooph\EventStore\Pdo\Projection\PostgresProjectionManager

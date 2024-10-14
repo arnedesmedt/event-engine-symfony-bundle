@@ -7,9 +7,9 @@ namespace ADS\Bundle\EventEngineBundle\Tests\Object\Query;
 use ADS\Bundle\EventEngineBundle\Attribute\Query;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Resolver\TestResolver;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Response\Ok;
-use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use Symfony\Component\HttpFoundation\Response;
+use TeamBlue\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
 #[Query(
     resolver: TestResolver::class,

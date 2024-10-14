@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Tests\Object\Response;
 
-use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
+use TeamBlue\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
 class NotFound implements JsonSchemaAwareRecord
 {

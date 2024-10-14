@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Event;
 
-use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 use ReflectionClass;
+use TeamBlue\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
 use function sprintf;
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Command;
 
 use ADS\Bundle\EventEngineBundle\Exception\MessageException;
-use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
+use TeamBlue\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
 use function class_exists;
 use function str_replace;

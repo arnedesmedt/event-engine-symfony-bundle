@@ -6,9 +6,9 @@ namespace ADS\Bundle\EventEngineBundle\Query;
 
 use ADS\Bundle\EventEngineBundle\Exception\MessageException;
 use ADS\Bundle\EventEngineBundle\Response\DefaultResponses;
-use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 use ADS\Util\StringUtil;
 use EventEngine\Schema\TypeSchema;
+use TeamBlue\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
 use function class_exists;
 use function sprintf;

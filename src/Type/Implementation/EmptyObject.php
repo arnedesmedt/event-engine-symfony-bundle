@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Type\Implementation;
 
 use ADS\Bundle\EventEngineBundle\Type\Type;
-use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
+use TeamBlue\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
 class EmptyObject implements Type
 {

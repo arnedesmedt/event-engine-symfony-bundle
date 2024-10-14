@@ -8,8 +8,8 @@ use ADS\Bundle\EventEngineBundle\Attribute\AggregateCommand;
 use ADS\Bundle\EventEngineBundle\Attribute\Queueable;
 use ADS\Bundle\EventEngineBundle\Tests\Object\ContextProvider\TestContextProvider;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Event\TestAttributeEvent;
-use ADS\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
+use TeamBlue\JsonImmutableObjects\JsonSchemaAwareRecordLogic;
 
 #[AggregateCommand(
     aggregateIdProperty: 'test',

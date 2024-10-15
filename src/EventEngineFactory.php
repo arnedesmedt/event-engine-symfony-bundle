@@ -14,7 +14,6 @@ use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResolverExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\StateClassExtractor;
 use ADS\Bundle\EventEngineBundle\Util\EventEngineUtil;
-use ADS\JsonImmutableObjects\MetadataExtractor\JsonSchemaExtractor;
 use EventEngine\Commanding\CommandProcessorDescription;
 use EventEngine\EventEngine;
 use EventEngine\EventEngineDescription;
@@ -35,6 +34,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use RuntimeException;
+use TeamBlue\JsonImmutableObjects\MetadataExtractor\JsonSchemaExtractor;
 
 use function array_diff_key;
 use function array_flip;

@@ -96,7 +96,7 @@ services:
         namespace: ADS\Bundle\EventEngineBundle\MetadataExtractor\
         resource: '../../MetadataExtractor/*Extractor.php'
         arguments:
-            $metadataExtractor: '@ADS\Util\MetadataExtractor\MetadataExtractor'
+            $metadataExtractor: '@TeamBlue\Util\MetadataExtractor\MetadataExtractor'
 
     ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer:
         public: true

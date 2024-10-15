@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\PropertyInfo;
 
-use ADS\Util\ScalarUtil;
+use TeamBlue\Util\ScalarUtil;
 
 use function method_exists;
 

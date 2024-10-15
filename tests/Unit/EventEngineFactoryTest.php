@@ -23,9 +23,6 @@ use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestInterfaceControllerCom
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestAttributeQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestInterfaceQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Service\TestFlavour;
-use ADS\Util\MetadataExtractor\AttributeExtractor;
-use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\Data\ImmutableRecord;
 use EventEngine\EventEngine;
 use EventEngine\JsonSchema\OpisJsonSchema;
@@ -40,6 +37,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
+use TeamBlue\Util\MetadataExtractor\AttributeExtractor;
+use TeamBlue\Util\MetadataExtractor\ClassExtractor;
+use TeamBlue\Util\MetadataExtractor\MetadataExtractor;
 
 /** @SuppressWarnings(PHPMD.CouplingBetweenObjects) */
 class EventEngineFactoryTest extends TestCase

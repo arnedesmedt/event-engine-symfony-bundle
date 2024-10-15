@@ -6,8 +6,8 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
 use ADS\Bundle\EventEngineBundle\Attribute\PreProcessor as PreProcessorAttribute;
 use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
 use ReflectionClass;
+use TeamBlue\Util\MetadataExtractor\MetadataExtractor;
 
 class PreProcessorExtractor
 {

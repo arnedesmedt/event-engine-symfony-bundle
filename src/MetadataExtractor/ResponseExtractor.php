@@ -6,10 +6,10 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
 use ADS\Bundle\EventEngineBundle\Attribute\Response;
 use ADS\Bundle\EventEngineBundle\Response\HasResponses;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareCollection;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
+use TeamBlue\Util\MetadataExtractor\MetadataExtractor;
 
 class ResponseExtractor
 {

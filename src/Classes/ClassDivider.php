@@ -15,14 +15,14 @@ use ADS\Bundle\EventEngineBundle\Attribute\Projector;
 use ADS\Bundle\EventEngineBundle\Attribute\Query;
 use ADS\Bundle\EventEngineBundle\Attribute\Type;
 use ADS\Bundle\EventEngineBundle\Repository\StateRepository;
-use ADS\ValueObjects\Implementation\ListValue\IterableListValue;
-use ADS\ValueObjects\ValueObject;
 use EventEngine\EventEngineDescription;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use Iterator;
 use ReflectionAttribute;
 use ReflectionClass;
 use RuntimeException;
+use TeamBlue\ValueObjects\Implementation\ListValue\IterableListValue;
+use TeamBlue\ValueObjects\ValueObject;
 
 use function array_keys;
 use function sprintf;

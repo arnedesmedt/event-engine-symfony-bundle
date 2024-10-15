@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Repository;
 
-use ADS\ValueObjects\Implementation\ListValue\IterableListValue;
-use ADS\ValueObjects\ListValue;
-use ADS\ValueObjects\ValueObject;
 use EventEngine\DocumentStore\Filter\Filter;
 use EventEngine\DocumentStore\PartialSelect;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
+use TeamBlue\ValueObjects\Implementation\ListValue\IterableListValue;
+use TeamBlue\ValueObjects\ListValue;
+use TeamBlue\ValueObjects\ValueObject;
 use Throwable;
 
 /**

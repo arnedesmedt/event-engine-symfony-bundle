@@ -14,9 +14,6 @@ use ADS\Bundle\EventEngineBundle\Messenger\Retry\QueryRetry;
 use ADS\Bundle\EventEngineBundle\Messenger\Service\MessageFromEnvelope;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor;
 use ADS\Bundle\EventEngineBundle\Query\Query;
-use ADS\Util\MetadataExtractor\AttributeExtractor;
-use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\Messaging\Message as EventEngineMessage;
 use ReflectionClass;
 use Symfony\Component\Messenger\Envelope;
@@ -26,6 +23,9 @@ use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
+use TeamBlue\Util\MetadataExtractor\AttributeExtractor;
+use TeamBlue\Util\MetadataExtractor\ClassExtractor;
+use TeamBlue\Util\MetadataExtractor\MetadataExtractor;
 use Throwable;
 
 class DontSendToFailureTransportMiddleware implements MiddlewareInterface

@@ -7,6 +7,6 @@ parameters:
         - tests/Service/TestFlavour.php
 services:
     -
-        class: ADS\JsonImmutableObjects\PhpStan\PropertiesExtension
+        class: TeamBlue\JsonImmutableObjects\PhpStan\PropertiesExtension
         tags:
             - phpstan.properties.readWriteExtension

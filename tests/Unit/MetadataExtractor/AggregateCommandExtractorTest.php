@@ -8,11 +8,11 @@ use ADS\Bundle\EventEngineBundle\MetadataExtractor\AggregateCommandExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestAttributeAggregateCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestInterfaceAggregateCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestAttributeQuery;
-use ADS\Util\MetadataExtractor\AttributeExtractor;
-use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use TeamBlue\Util\MetadataExtractor\AttributeExtractor;
+use TeamBlue\Util\MetadataExtractor\ClassExtractor;
+use TeamBlue\Util\MetadataExtractor\MetadataExtractor;
 
 class AggregateCommandExtractorTest extends TestCase
 {

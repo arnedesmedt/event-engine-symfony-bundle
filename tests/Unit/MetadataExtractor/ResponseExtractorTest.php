@@ -8,13 +8,13 @@ use ADS\Bundle\EventEngineBundle\MetadataExtractor\ResponseExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestAttributeQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Query\TestInterfaceQuery;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Response\Ok;
-use ADS\JsonImmutableObjects\MetadataExtractor\JsonSchemaExtractor;
-use ADS\Util\MetadataExtractor\AttributeExtractor;
-use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;
+use TeamBlue\JsonImmutableObjects\MetadataExtractor\JsonSchemaExtractor;
+use TeamBlue\Util\MetadataExtractor\AttributeExtractor;
+use TeamBlue\Util\MetadataExtractor\ClassExtractor;
+use TeamBlue\Util\MetadataExtractor\MetadataExtractor;
 
 class ResponseExtractorTest extends TestCase
 {

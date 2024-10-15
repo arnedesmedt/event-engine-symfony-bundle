@@ -6,11 +6,11 @@ namespace ADS\Bundle\EventEngineBundle\TestHelper;
 
 use ADS\Bundle\EventEngineBundle\Event\Event;
 use ADS\Bundle\EventEngineBundle\Persistency\PDO;
-use ADS\ValueObjects\StringValue;
 use Closure;
 use PDOStatement;
 use Psr\Container\ContainerInterface;
 use TeamBlue\TestRequest\TestRequest\TestRequest;
+use TeamBlue\ValueObjects\StringValue;
 
 use function array_map;
 use function sprintf;

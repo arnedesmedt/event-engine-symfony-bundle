@@ -8,12 +8,12 @@ use ADS\Bundle\EventEngineBundle\Attribute\Command as CommandAttribute;
 use ADS\Bundle\EventEngineBundle\Attribute\PreProcessor as PreProcessorAttribute;
 use ADS\Bundle\EventEngineBundle\Command\Command;
 use ADS\Bundle\EventEngineBundle\PreProcessor\PreProcessor;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionUnionType;
 use RuntimeException;
+use TeamBlue\Util\MetadataExtractor\MetadataExtractor;
 
 use function array_filter;
 use function array_map;

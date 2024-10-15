@@ -6,8 +6,8 @@ namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
 use ADS\Bundle\EventEngineBundle\Attribute\Queueable as QueueableAttribute;
 use ADS\Bundle\EventEngineBundle\Messenger\Queueable;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
 use ReflectionClass;
+use TeamBlue\Util\MetadataExtractor\MetadataExtractor;
 
 class QueueableExtractor
 {

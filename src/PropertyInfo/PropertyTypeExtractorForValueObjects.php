@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\PropertyInfo;
 
 use ADS\Bundle\EventEngineBundle\Type\ComplexTypeExtractor;
-use ADS\ValueObjects\BoolValue;
-use ADS\ValueObjects\FloatValue;
-use ADS\ValueObjects\IntValue;
-use ADS\ValueObjects\ListValue;
-use ADS\ValueObjects\StringValue;
-use ADS\ValueObjects\ValueObject;
 use EventEngine\Data\ImmutableRecord;
 use ReflectionClass;
 use ReflectionType;
 use RuntimeException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type as PropertyInfoType;
+use TeamBlue\ValueObjects\BoolValue;
+use TeamBlue\ValueObjects\FloatValue;
+use TeamBlue\ValueObjects\IntValue;
+use TeamBlue\ValueObjects\ListValue;
+use TeamBlue\ValueObjects\StringValue;
+use TeamBlue\ValueObjects\ValueObject;
 
 use function array_filter;
 use function sprintf;

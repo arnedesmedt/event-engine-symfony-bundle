@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Repository;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
-use ADS\ValueObjects\Implementation\ListValue\IterableListValue;
-use ADS\ValueObjects\ValueObject;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
+use TeamBlue\ValueObjects\Implementation\ListValue\IterableListValue;
+use TeamBlue\ValueObjects\ValueObject;
 use Throwable;
 
 /**

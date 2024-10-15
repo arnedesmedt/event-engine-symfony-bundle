@@ -8,7 +8,7 @@ use ADS\Bundle\EventEngineBundle\Repository\Repository;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Aggregate\TestAggregate;
 use ADS\Bundle\EventEngineBundle\Tests\Object\State\TestState;
 use ADS\Bundle\EventEngineBundle\Tests\Object\State\TestStates;
-use ADS\ValueObjects\Implementation\String\StringValue;
+use TeamBlue\ValueObjects\Implementation\String\StringValue;
 
 /** @extends Repository<TestAggregate, TestStates, TestState, StringValue> */
 class TestAggregateRepository extends Repository

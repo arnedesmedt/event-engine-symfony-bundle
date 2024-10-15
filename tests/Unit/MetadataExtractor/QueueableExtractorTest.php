@@ -7,11 +7,11 @@ namespace ADS\Bundle\EventEngineBundle\Tests\Unit\MetadataExtractor;
 use ADS\Bundle\EventEngineBundle\MetadataExtractor\QueueableExtractor;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestAttributeAggregateCommand;
 use ADS\Bundle\EventEngineBundle\Tests\Object\Command\TestInterfaceAggregateCommand;
-use ADS\Util\MetadataExtractor\AttributeExtractor;
-use ADS\Util\MetadataExtractor\ClassExtractor;
-use ADS\Util\MetadataExtractor\MetadataExtractor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use TeamBlue\Util\MetadataExtractor\AttributeExtractor;
+use TeamBlue\Util\MetadataExtractor\ClassExtractor;
+use TeamBlue\Util\MetadataExtractor\MetadataExtractor;
 
 class QueueableExtractorTest extends TestCase
 {

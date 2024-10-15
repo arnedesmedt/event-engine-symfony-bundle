@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Tests\Object\State;
 
-use ADS\ValueObjects\Implementation\ListValue\IterableListValue;
-use ADS\ValueObjects\Implementation\ListValue\JsonSchemaAwareCollectionLogic;
+use TeamBlue\ValueObjects\Implementation\ListValue\IterableListValue;
+use TeamBlue\ValueObjects\Implementation\ListValue\JsonSchemaAwareCollectionLogic;
 
 /** @extends IterableListValue<TestState> */
 class TestStates extends IterableListValue

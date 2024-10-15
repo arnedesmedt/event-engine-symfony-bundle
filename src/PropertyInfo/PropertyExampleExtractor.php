@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\PropertyInfo;
 
-use ADS\JsonImmutableObjects\HasPropertyExamples;
-use ADS\Util\ScalarUtil;
-use ADS\ValueObjects\HasExamples;
-use ADS\ValueObjects\ValueObject;
 use phpDocumentor\Reflection\DocBlock;
 use ReflectionClass;
+use TeamBlue\JsonImmutableObjects\HasPropertyExamples;
+use TeamBlue\Util\ScalarUtil;
+use TeamBlue\ValueObjects\HasExamples;
+use TeamBlue\ValueObjects\ValueObject;
 
 use function array_filter;
 use function array_reduce;

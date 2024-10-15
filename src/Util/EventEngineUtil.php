@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace ADS\Bundle\EventEngineBundle\Util;
 
 use ADS\Bundle\EventEngineBundle\Aggregate\AggregateRoot;
-use ADS\Util\StringUtil;
 use EventEngine\JsonSchema\JsonSchemaAwareRecord;
 use ReflectionClass;
 use RuntimeException;
+use TeamBlue\Util\StringUtil;
 
 use function preg_quote;
 use function preg_replace;

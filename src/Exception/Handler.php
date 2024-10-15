@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\Exception;
 
-use ADS\Util\StringUtil;
 use EventEngine\Aggregate\Exception\AggregateNotFound;
 use EventEngine\JsonSchema\Exception\JsonValidationError;
 use Prooph\EventStore\Exception\ConcurrencyException;
@@ -14,6 +13,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use TeamBlue\Util\StringUtil;
 use Throwable;
 
 use function json_decode;

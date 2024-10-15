@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\PropertyInfo;
 
-use ADS\ValueObjects\ValueObject;
 use EventEngine\Data\ImmutableRecord;
 use ReflectionClass;
 use ReflectionException;
@@ -13,6 +12,7 @@ use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionType;
 use ReflectionUnionType;
+use TeamBlue\ValueObjects\ValueObject;
 
 class PropertyReflection
 {

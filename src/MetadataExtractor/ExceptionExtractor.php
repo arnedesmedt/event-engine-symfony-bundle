@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
 
-use ADS\Specifications\Specification;
 use LogicException;
 use ReflectionClass;
 use TeamBlue\Exception\HttpException\HttpException;
+use TeamBlue\Specifications\Specification;
 
 use function array_filter;
 use function array_unique;

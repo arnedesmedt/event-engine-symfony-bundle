@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ADS\Bundle\EventEngineBundle\MetadataExtractor;
+namespace ADS\Bundle\EventEngineBundle\Exception;
 
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor;
+use ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor;
 use LogicException;
 use ReflectionClass;
 use TeamBlue\Exception\HttpException\HttpException;

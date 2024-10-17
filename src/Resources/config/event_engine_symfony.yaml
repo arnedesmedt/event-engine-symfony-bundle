@@ -98,6 +98,11 @@ services:
         arguments:
             $metadataExtractor: '@TeamBlue\Util\MetadataExtractor\MetadataExtractor'
 
+    ADS\Bundle\EventEngineBundle\Exception\ExceptionExtractor:
+        arguments:
+            $commandExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\CommandExtractor'
+            $controllerExtractor: '@ADS\Bundle\EventEngineBundle\MetadataExtractor\ControllerExtractor'
+
     ADS\Bundle\EventEngineBundle\Messenger\MessengerMessageProducer:
         public: true
         arguments:

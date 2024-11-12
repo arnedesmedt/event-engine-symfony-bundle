@@ -72,7 +72,8 @@ class EventAssertions
         string $eventClass,
         Closure $assertion,
     ): Closure {
-        return static function (
+        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic
+        return function (
             TestRequest $testRequest,
             ContainerInterface $container,
         ) use (

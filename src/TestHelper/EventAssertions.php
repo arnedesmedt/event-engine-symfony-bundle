@@ -9,11 +9,15 @@ use ADS\Bundle\EventEngineBundle\Persistency\PDO;
 use Closure;
 use PDOStatement;
 use Psr\Container\ContainerInterface;
+use RuntimeException;
 use TeamBlue\TestRequest\TestRequest\TestRequest;
 use TeamBlue\ValueObjects\StringValue;
 
 use function array_map;
+use function json_decode;
 use function sprintf;
+
+use const JSON_THROW_ON_ERROR;
 
 class EventAssertions
 {
@@ -99,9 +103,23 @@ class EventAssertions
                     'eventClass' => $eventClass,
                 ],
             );
+
+            /** @var array{payload: string}|false $newEventInDatabase */
             $newEventInDatabase = $statement->fetch(PDO::FETCH_ASSOC);
 
-            $assertion($newEventInDatabase);
+            if ($newEventInDatabase === false) {
+                throw new RuntimeException(
+                    sprintf(
+                        'New event of class %s not found in database for aggregate %s',
+                        $eventClass,
+                        $aggregateId->toString(),
+                    ),
+                );
+            }
+
+            /** @var array<string, mixed> $payload */
+            $payload = json_decode($newEventInDatabase['payload'], true, 512, JSON_THROW_ON_ERROR);
+            $assertion($eventClass::fromArray($payload));
         };
     }
 }

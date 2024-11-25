@@ -29,12 +29,10 @@ class PickTransportMiddleware implements MiddlewareInterface
         /** @var object $message */
         $message = $this->flavour->convertMessageReceivedFromNetwork($eventEngineMessage)->get(MessageBag::MESSAGE);
         $reflectionMessage = new ReflectionClass($message);
+        $queueable = $this->queueableExtractor->isQueueableFromReflectionClass($reflectionMessage);
         $sendAsync = $eventEngineMessage->getMetaOrDefault('async', null)
-            ?? (
-                $this->queueableExtractor->isQueueableFromReflectionClass($reflectionMessage)
-                && $this->queueableExtractor->queueFromReflectionClass($reflectionMessage)
-            );
-        $lowPriority = $this->queueableExtractor->lowPriorityFromReflectionClass($reflectionMessage);
+            ?? ($queueable && $this->queueableExtractor->queueFromReflectionClass($reflectionMessage));
+        $lowPriority = $queueable && $this->queueableExtractor->lowPriorityFromReflectionClass($reflectionMessage);
         $transportName = $eventEngineMessage->messageType() . ($lowPriority ? '.low_priority' : '');
 
         if ($sendAsync) {

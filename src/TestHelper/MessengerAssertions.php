@@ -16,8 +16,8 @@ use function is_string;
 use function sprintf;
 
 /**
- * @method assertCount(int $count, iterable $haystack, string $message)
- * @method assertEquals($expected, $actual, string $message)
+ * @method assertCount(int $count, iterable $haystack, string $message = '')
+ * @method assertEquals($expected, $actual, string $message = '')
  */
 trait MessengerAssertions
 {

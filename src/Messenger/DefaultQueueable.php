@@ -35,4 +35,9 @@ trait DefaultQueueable
     {
         return true;
     }
+
+    public static function __lowPriority(): bool
+    {
+        return false;
+    }
 }

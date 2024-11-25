@@ -129,4 +129,22 @@ class QueueableExtractor
 
         return $sendToLinkedFailureTransport;
     }
+
+    /** @param ReflectionClass<object> $reflectionClass */
+    public function lowPriorityFromReflectionClass(ReflectionClass $reflectionClass): bool
+    {
+        /** @var bool $sendToLinkedFailureTransport */
+        $sendToLinkedFailureTransport = $this->metadataExtractor->needMetadataFromReflectionClass(
+            $reflectionClass,
+            [
+                /** @param class-string<Queueable> $class */
+                Queueable::class => static fn (string $class) => $class::__lowPriority(),
+                QueueableAttribute::class => static fn (
+                    QueueableAttribute $attribute,
+                ): bool => $attribute->lowPriority(),
+            ],
+        );
+
+        return $sendToLinkedFailureTransport;
+    }
 }
